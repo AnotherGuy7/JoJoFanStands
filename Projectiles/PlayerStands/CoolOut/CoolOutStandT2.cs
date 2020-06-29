@@ -1,13 +1,11 @@
 using Microsoft.Xna.Framework;
-using JoJoFanStands;
 using Terraria;
 using Terraria.ID;
 using JoJoStands;
-using Terraria.ModLoader;
  
 namespace JoJoFanStands.Projectiles.Minions
 {  
-    public class CoolOutStandT2 : ModProjectile
+    public class CoolOutStandT2 : JoJoStands.Projectiles.PlayerStands.StandClass
     {
         public override string Texture
         {
@@ -17,11 +15,6 @@ namespace JoJoFanStands.Projectiles.Minions
         public override void SetStaticDefaults()
         {
             Main.projFrames[projectile.type] = 18;
-            Main.projPet[projectile.type] = true;
-            ProjectileID.Sets.MinionSacrificable[projectile.type] = true;
-            ProjectileID.Sets.Homing[projectile.type] = true;
-            ProjectileID.Sets.LightPet[projectile.type] = true;
-            Main.projPet[projectile.type] = true;
         }
 
         public override void SetDefaults()

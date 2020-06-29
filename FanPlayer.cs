@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using Terraria;
+using Terraria.GameInput;
 using Terraria.ModLoader;
+using JoJoStands;
+using Terraria.ID;
 
 namespace JoJoFanStands
 {
@@ -8,29 +11,19 @@ namespace JoJoFanStands
     {
         public static bool spawnPao = false;
 
-        public float numberOfSpikesCreated = 0;
+        private int activationTimer = 0;
 
         public bool BrianEnoAct1 = false;
         public bool BrianEnoAct2 = false;
         public bool BrianEnoAct3 = false;
-        public bool CoolOutActive = false;
-        public bool FollowMeActive = false;
-        public bool TheFatesActive = false;
         public bool InTheShadowsPet = false;
         public bool SpinBoost = false;
         public bool RoseColoredSunActive = false;
-        public bool StandOut = false;
-        public bool additionMode = false;
-        public bool avalanche = false;
         public bool wearingStandAccessory = false;
 
         public override void ResetEffects()
         {
-            StandOut = false;
             SpinBoost = false;
-            CoolOutActive = false;
-            FollowMeActive = false;
-            TheFatesActive = false;
             InTheShadowsPet = false;
             BrianEnoAct1 = false;
             BrianEnoAct2 = false;
@@ -41,13 +34,34 @@ namespace JoJoFanStands
 
         public override void PreUpdate()
         {
-            if (numberOfSpikesCreated >= 1f)
+            if (activationTimer > 0)
             {
-                additionMode = false;
+                activationTimer--;
             }
-            if (numberOfSpikesCreated <= 0f)
+        }
+
+        public override void ProcessTriggers(TriggersSet triggersSet)
+        {
+            Player player = Main.player[Main.myPlayer];
+            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
+
+            if (JoJoStands.JoJoStands.StandOut.JustPressed && !mPlayer.StandOut && activationTimer <= 0)
             {
-                additionMode = true;
+                SpawnStand();       //this is
+                activationTimer += 30;
+            }
+        }
+
+        public void SpawnStand()
+        {
+            Player player = Main.player[Main.myPlayer];
+            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
+            int inputItemtype = mPlayer.StandSlot.Item.type;
+
+            if (inputItemtype == mod.ItemType("CoolOutT1"))
+            {
+                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("CoolOutStandT1"), 0, 0f, Main.myPlayer);
+                MyPlayer.spawningOtherStands = true;
             }
         }
 
@@ -67,7 +81,6 @@ namespace JoJoFanStands
                 damage = 0;
                 crit = false;
             }
-            base.OnHitByNPC(npc, damage, crit);
         }
 
         public override void ModifyDrawLayers(List<PlayerLayer> layers)
@@ -93,7 +106,7 @@ namespace JoJoFanStands
             }
             /*@AnotherGuy int index = layers.FindIndex(l => l.Name.Equals("MountBack"));
             if (index > -1) //do stuff
-                then use layer[index].visible = false; for examlpe*/
+                then use layer[index].visible = false; for example*/
         }
     }
 }

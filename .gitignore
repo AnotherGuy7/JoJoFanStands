@@ -1,2 +1,5 @@
 .vs
 *.sln
+obj
+Properties
+bin

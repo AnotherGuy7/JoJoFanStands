@@ -18,7 +18,9 @@ namespace JoJoFanStands.Buffs
         public override void Update(Player player, ref int buffIndex)
         {
             if (player.HasBuff(mod.BuffType(Name)))
-            {}
+            {
+                //forseeing stuff here
+            }
             else
             {
                 player.AddBuff(mod.BuffType("SoreEye"), 1800);

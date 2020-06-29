@@ -1,13 +1,13 @@
 using Microsoft.Xna.Framework;
-using JoJoFanStands;
 using Terraria;
 using Terraria.ID;
 using JoJoStands;
+using JoJoStands.Projectiles.PlayerStands;
 using Terraria.ModLoader;
  
 namespace JoJoFanStands.Projectiles.PlayerStands
 {  
-    public class CoolOutStand : ModProjectile
+    public class CoolOutStandT1 : StandClass
     {
         public override void SetStaticDefaults()
         {
@@ -34,56 +34,30 @@ namespace JoJoFanStands.Projectiles.PlayerStands
             MyPlayer.stopImmune.Add(mod.ProjectileType(Name));
         }
 
-        protected float shootCool = 12f;
-        protected float shootSpeed = 12f;
+        public override int projectileDamage => 17;
+        public override int shootTime => 12;
+        public override int altDamage => 20;
 
-        public bool normalFrames = false;
-        public bool attackFrames = false;
-        public bool slamFrames = false;
-
-        public int shootDamage = 17;
-        public int altDamage = 20;
-        public int specialDamage = 25;
-        public bool altAttacking = false;
-        public int proj = 0;
-        public int projectilesChosen = 0;
-        public int chance = 0;
+        private int specialDamage = 25;
+        private bool altAttacking = false;
+        private int spearWhoAmI = -1;
 
         public override void AI()
         {
             Player player = Main.player[projectile.owner];
-            FanPlayer Fplayer = player.GetModPlayer<FanPlayer>();
             SelectFrame();
-            shootCool--;
-            if (shootCool <= 0f)
-            {
-                shootCool = 0f;
-            }
-            Fplayer.StandOut = true;
-            if (player.HeldItem.type == mod.ItemType("CoolOutT1") && Fplayer.StandOut)
-            {
-                projectile.timeLeft = 2;
-            }
-            if (player.HeldItem.type != mod.ItemType("CoolOutT1") || !Fplayer.StandOut || player.dead)
-            {
-                projectile.active = false;
-            }
-            Vector2 vector131 = player.Center;
-            vector131.X -= (float)((12 + player.width / 2) * player.direction);
-            vector131.Y -= 25f;
-            projectile.Center = Vector2.Lerp(projectile.Center, vector131, 0.2f);
-            projectile.velocity *= 0.8f;
-            projectile.direction = (projectile.spriteDirection = player.direction);
+            UpdateStandInfo();
+            StayBehind();
             Lighting.AddLight(projectile.position, 1.78f, 2.21f, 2.54f);
             if (Main.mouseLeft)
             {
                 normalFrames = false;
                 attackFrames = true;
-                slamFrames = false;
-                if (shootCool <= 0f)
+                secondaryAbilityFrames = false;
+                if (shootCount <= 0f)
                 {
                     Main.PlaySound(SoundID.Item28, projectile.position);
-                    shootCool += 30;
+                    shootCount += 30;
                     Vector2 shootVel = Main.MouseWorld - projectile.Center;
                     if (shootVel == Vector2.Zero)
                     {
@@ -91,7 +65,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands
                     }
                     shootVel.Normalize();
                     shootVel *= shootSpeed;
-                    int proj = Projectile.NewProjectile(projectile.Center.X, projectile.Center.Y, shootVel.X, shootVel.Y, mod.ProjectileType("IceBolt"), shootDamage, 8f, Main.myPlayer);
+                    int proj = Projectile.NewProjectile(projectile.Center, shootVel, mod.ProjectileType("IceBolt"), projectileDamage, 8f, Main.myPlayer);
                     Main.projectile[proj].netUpdate = true;
                     projectile.netUpdate = true;
                 }
@@ -100,30 +74,52 @@ namespace JoJoFanStands.Projectiles.PlayerStands
             {
                 normalFrames = true;
                 attackFrames = false;
-                slamFrames = false;
+                secondaryAbilityFrames = false;
             }
-            if (Main.mouseRight && shootCool <= 0f && player.ownedProjectileCounts[mod.ProjectileType("IceSpear")] == 0)
+            if (Main.mouseRight && shootCount <= 0f && player.ownedProjectileCounts[mod.ProjectileType("IceSpear")] == 0 && projectile.owner == Main.myPlayer)
             {
+                spearWhoAmI = Projectile.NewProjectile(projectile.Center.X, projectile.Center.Y, 0f, 0f, mod.ProjectileType("IceSpear"), altDamage, 10f, Main.myPlayer, projectile.whoAmI);
+                Main.projectile[spearWhoAmI].netUpdate = true;
+                projectile.netUpdate = true;
+            }
+            if (Main.mouseRight && spearWhoAmI != -1)
+            {
+                Projectile spear = Main.projectile[spearWhoAmI];
                 projectile.ai[0] += 0.005f;
                 if (projectile.ai[0] >= 2f)
                 {
                     player.AddBuff(BuffID.Chilled, 2);
                 }
-                if (projectile.ai[0] == 0.005f)
+                Vector2 direction = Main.MouseWorld - projectile.Center;
+                spear.scale += projectile.ai[0];
+                spear.rotation = direction.ToRotation();
+                spear.velocity = Vector2.Zero;
+                spear.position = projectile.position;
+            }
+            if (!Main.mouseRight && spearWhoAmI != -1)
+            {
+                Projectile spear = Main.projectile[spearWhoAmI];
+                spear.damage *= (int)projectile.ai[0] + 1;
+                Vector2 direction = Main.MouseWorld - projectile.Center;
+                direction.Normalize();
+                //spear.velocity = (direction * 5f) * projectile.ai[0];
+            }
+            if (spearWhoAmI != -1)
+            {
+                Projectile spear = Main.projectile[spearWhoAmI];
+                if (!spear.active)
                 {
-                    int proj = Projectile.NewProjectile(projectile.Center.X, projectile.Center.Y, 0f, 0f, mod.ProjectileType("IceSpear"), altDamage, 10f, Main.myPlayer, projectile.whoAmI);
-                    Main.projectile[proj].netUpdate = true;
-                    projectile.netUpdate = true;
+                    projectile.ai[0] = 0f;
+                    spearWhoAmI = -1;
                 }
             }
-
-            if (JoJoStands.JoJoStands.SpecialHotKey.JustPressed && shootCool <= 0f)
+            if (SpecialKeyPressed() && shootCount <= 0f)
             {
                 normalFrames = false;
                 attackFrames = false;
-                slamFrames = true;
+                secondaryAbilityFrames = true;
                 Main.PlaySound(SoundID.Item28, projectile.position);
-                shootCool += 600;        //make it 600, 10 seconds
+                shootCount += 600;        //make it 600, 10 seconds
                 int proj = Projectile.NewProjectile(projectile.Center.X + 7f, projectile.Center.Y + 3f, 0f, 0f, mod.ProjectileType("IceSpike"), specialDamage, 2f, Main.myPlayer);
                 Main.projectile[proj].netUpdate = true;
                 projectile.netUpdate = true;
@@ -161,7 +157,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands
                     projectile.frame = 8;
                 }
             }
-            if (slamFrames)
+            if (secondaryAbilityFrames)
             {
                 if (projectile.frameCounter >= 10)
                 {
