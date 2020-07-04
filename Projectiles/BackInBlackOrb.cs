@@ -8,7 +8,7 @@ namespace JoJoFanStands.Projectiles
 {
     public class BackInBlackOrb : ModProjectile
     {
-        public float vacuumStrength = 1.5f;
+        private float vacuumStrength = 1.5f;
         public float npcDistance = 0f;
 
         public override void SetDefaults()
@@ -32,7 +32,7 @@ namespace JoJoFanStands.Projectiles
                 npcDistance = Vector2.Distance(projectile.Center, Main.npc[k].Center);
                 if (npc.active && !npc.dontTakeDamage && !npc.immortal && npcDistance < 31f)
                 {
-                    if (npc.position.X < projectile.position.X)
+                    /*if (npc.position.X < projectile.position.X)
                     {
                         npc.velocity.X += vacuumStrength;
                     }
@@ -47,7 +47,11 @@ namespace JoJoFanStands.Projectiles
                     if (npc.position.Y > projectile.position.Y)
                     {
                         npc.velocity.Y -= vacuumStrength;
-                    }
+                    }*/
+                    Vector2 positionDifference = projectile.Center - Main.npc[k].Center;
+                    positionDifference.Normalize();
+                    npc.velocity = positionDifference * vacuumStrength;
+
                 }
             }
         }

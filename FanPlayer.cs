@@ -3,7 +3,8 @@ using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;
 using JoJoStands;
-using Terraria.ID;
+using static Terraria.ModLoader.ModContent;
+using JoJoFanStands.Items.Stands;
 
 namespace JoJoFanStands
 {
@@ -58,10 +59,74 @@ namespace JoJoFanStands
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             int inputItemtype = mPlayer.StandSlot.Item.type;
 
-            if (inputItemtype == mod.ItemType("CoolOutT1"))
+            if (inputItemtype == ItemType<BackInBlack>())
+            {
+                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("BackInBlackStand"), 0, 0f, Main.myPlayer);
+                MyPlayer.spawningOtherStands = true;
+            }
+            if (inputItemtype == ItemType<CoolOutT1>())
             {
                 Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("CoolOutStandT1"), 0, 0f, Main.myPlayer);
                 MyPlayer.spawningOtherStands = true;
+            }
+            else if (inputItemtype == ItemType<CoolOutT2>())
+            {
+                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("CoolOutStandT2"), 0, 0f, Main.myPlayer);
+                MyPlayer.spawningOtherStands = true;
+            }
+            else if (inputItemtype == ItemType<FollowMeT1>())
+            {
+                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("FollowMeStandT1"), 0, 0f, Main.myPlayer);
+                MyPlayer.spawningOtherStands = true;
+            }
+            else if (inputItemtype == ItemType<FollowMeT2>())
+            {
+                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("FollowMeStandT2"), 0, 0f, Main.myPlayer);
+                MyPlayer.spawningOtherStands = true;
+            }
+            else if (inputItemtype == ItemType<Megalovania>())
+            {
+                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("MegalovaniaStand"), 0, 0f, Main.myPlayer);
+                MyPlayer.spawningOtherStands = true;
+            }
+            else if (inputItemtype == ItemType<MortalReminderT1>())
+            {
+                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("MortalReminderStandT2"), 0, 0f, Main.myPlayer);
+                MyPlayer.spawningOtherStands = true;
+            }
+            /*else if (inputItemtype == ItemType<RoseColoredBoy>())
+            {
+                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("FollowMeStandT2"), 0, 0f, Main.myPlayer);
+                MyPlayer.spawningOtherStands = true;
+            }*/
+            else if (inputItemtype == ItemType<SlavesOfFearT1>())
+            {
+                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("SlavesOfFearStandT1"), 0, 0f, Main.myPlayer);
+                MyPlayer.spawningOtherStands = true;
+            }
+            else if (inputItemtype == ItemType<SlavesOfFearT2>())
+            {
+                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("SlavesOfFearStandT2"), 0, 0f, Main.myPlayer);
+                MyPlayer.spawningOtherStands = true;
+            }
+            else if (inputItemtype == ItemType<SlavesOfFearT3>())
+            {
+                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("SlavesOfFearStandT3"), 0, 0f, Main.myPlayer);
+                MyPlayer.spawningOtherStands = true;
+            }
+            else if (inputItemtype == ItemType<SlavesOfFearFinal>())
+            {
+                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("SlavesOfFearStandFinal"), 0, 0f, Main.myPlayer);
+                MyPlayer.spawningOtherStands = true;
+            }
+            else if (inputItemtype == ItemType<TheFatesT1>())
+            {
+                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("TheFatesStand"), 0, 0f, Main.myPlayer);
+                MyPlayer.spawningOtherStands = true;
+            }
+            else
+            {
+                MyPlayer.spawningOtherStands = false;
             }
         }
 

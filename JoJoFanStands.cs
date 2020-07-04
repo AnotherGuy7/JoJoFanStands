@@ -5,6 +5,7 @@ using JoJoFanStands.UI;
 using Terraria;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using JoJoFanStands.Items.Stands;
 
 namespace JoJoFanStands
 {
@@ -29,6 +30,7 @@ namespace JoJoFanStands
 		{
             AccessorySpecialKey = RegisterHotKey("JoJoFanStands: Accessory Special", "L");
             JoJoStandsMod = ModLoader.GetMod("JoJoStands");
+
             if (!Main.dedServ)
             {
                 AbilityUI = new AbilityChooserUI();
@@ -36,6 +38,11 @@ namespace JoJoFanStands
                 _abilityui = new UserInterface();
                 _abilityui.SetState(AbilityUI);
             }
+            MyPlayer.standTier1List.Add(ModContent.ItemType<CoolOutT1>());
+            MyPlayer.standTier1List.Add(ModContent.ItemType<FollowMeT1>());
+            MyPlayer.standTier1List.Add(ModContent.ItemType<MortalReminderT1>());
+            MyPlayer.standTier1List.Add(ModContent.ItemType<SlavesOfFearT1>());
+            MyPlayer.standTier1List.Add(ModContent.ItemType<TheFatesT1>());
         }
 
         public override void UpdateUI(GameTime gameTime)

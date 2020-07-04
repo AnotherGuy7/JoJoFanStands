@@ -6,64 +6,42 @@ using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
 using JoJoStands;
+using JoJoStands.Projectiles.PlayerStands;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
 {
-    public class MegalovaniaStand : ModProjectile      //has 2 poses
+    public class MegalovaniaStand : StandClass
     {
-        public override void SetStaticDefaults()
-        {
-            //Main.projPet[projectile.type] = true;
-        }
+        public override int projectileDamage => 18;
+        public override int altDamage => 96;
+        public override int halfStandHeight => 28;
 
-        public override void SetDefaults()
-        {
-            projectile.netImportant = true;
-            projectile.width = 38;
-            projectile.height = 1;
-            projectile.friendly = true;
-            projectile.minion = true;
-            projectile.netImportant = true;
-            //projectile.minionSlots = 1;
-            projectile.penetrate = 1;
-            projectile.tileCollide = true;
-            projectile.ignoreWater = true;
-            projectile.timeLeft = 300;
-            MyPlayer.stopImmune.Add(mod.ProjectileType(Name));
-        }
-
-        public Vector2 velocityAddition = Vector2.Zero;
-        public float mouseDistance = 0f;
-        protected float shootSpeed = 16f;
-        public float maxDistance = 0f;
-        public int punchDamage = 18;
-        public int altDamage = 96;
-        int shootCount = 0;
-        public int halfStandHeight = 28;
-        public Mod JoJoStands2 = null;
         public static int abilityNumber = 0;
-        public string animationName;
 
-        public Texture2D standTexture;
+        private string abilityName;
+        private string direction;
+        private float mouseDistance = 0f;
+        private int maxFrames = 0;
 
         public override void AI()
         {
+            SelectAnimation();
+            UpdateStandInfo();
             Player player = Main.player[projectile.owner];
-            MyPlayer modPlayer = player.GetModPlayer<MyPlayer>();
-            if (player.HeldItem.type == mod.ItemType("Megalovania"))
+            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
+            if (shootCount > 0)
+            {
+                shootCount--;
+            }
+            if (mPlayer.StandOut)
             {
                 projectile.timeLeft = 2;
             }
-            if (player.HeldItem.type != mod.ItemType("Megalovania") || player.dead)
-            {
-                projectile.active = false;
-            }
-            if (JoJoStands2 == null)
-            {
-                JoJoStands2 = ModLoader.GetMod("JoJoStands");
-            }
             drawOriginOffsetY = -halfStandHeight;
-            if (Main.mouseLeft && abilityNumber == 0)
+            StayBehind();
+
+
+            if (Main.mouseLeft && abilityNumber == 0 && player.whoAmI == Main.myPlayer)
             {
                 if (shootCount <= 0)
                 {
@@ -72,7 +50,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                         float NPCdist = Vector2.Distance(Main.MouseWorld, Main.npc[i].position);
                         if (NPCdist < 25f)
                         {
-                            shootCount += 60;
+                            shootCount += newShootTime;
                             Main.npc[i].StrikeNPC(97, 0f, projectile.direction * -1);
                         }
                     }
@@ -82,65 +60,47 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             {
                 UI.AbilityChooserUI.Visible = true;
             }
-            if (Main.mouseX >= projectile.position.X)
+            if (player.whoAmI == Main.myPlayer)
             {
-                projectile.direction = 1;
-            }
-            if (Main.mouseX < projectile.position.X)
-            {
-                projectile.direction = -1;
-            }
-            if (abilityNumber == 0)
-            {
-                if (Main.mouseY <= Main.screenHeight / 5)
+                if (Main.mouseX >= projectile.position.X)
                 {
-                    animationName = "Up";
-                    AnimationStates(2, 1.5f, true, false);
+                    projectile.direction = 1;
                 }
-                if (Main.mouseY > Main.screenHeight / 5 && Main.mouseY < (Main.screenHeight / 5) * 2)
+                if (Main.mouseX < projectile.position.X)
                 {
-                    animationName = "SlightUp";
-                    AnimationStates(2, 1.5f, true, false);
+                    projectile.direction = -1;
                 }
-                if (Main.mouseY > (Main.screenHeight / 5) * 2 && Main.mouseY < (Main.screenHeight / 5) * 4)
+                if (abilityNumber == 0)
                 {
-                    animationName = "Straight";
-                    AnimationStates(2, 1.5f, true, false);
-                }
-                if (Main.mouseY > (Main.screenHeight / 5) * 4)
-                {
-                    animationName = "Down";
-                    AnimationStates(2, 1.5f, true, false);
+                    if (Main.mouseY <= Main.screenHeight / 5)
+                    {
+                        direction = "Up";
+                        //AnimationStates(2, 1.5f, true, false);
+                    }
+                    if (Main.mouseY > Main.screenHeight / 5 && Main.mouseY < (Main.screenHeight / 5) * 2)
+                    {
+                        direction = "SlightUp";
+                        //AnimationStates(2, 1.5f, true, false);
+                    }
+                    if (Main.mouseY > (Main.screenHeight / 5) * 2 && Main.mouseY < (Main.screenHeight / 5) * 4)
+                    {
+                        direction = "Straight";
+                        //AnimationStates(2, 1.5f, true, false);
+                    }
+                    if (Main.mouseY > (Main.screenHeight / 5) * 4)
+                    {
+                        direction = "Down";
+                        //AnimationStates(2, 1.5f, true, false);
+                    }
                 }
             }
             //Main.NewText(Main.mouseY);
-            Vector2 vector131 = player.Center;
-            vector131.X -= (float)((39 + player.width / 2) * player.direction);
-            vector131.Y -= -35f + halfStandHeight;
-            if (!Main.mouseLeft)
-            {
-                projectile.direction = player.direction;
-            }
-            projectile.Center = Vector2.Lerp(projectile.Center, vector131, 0.2f);
-            projectile.velocity *= 0.8f;
-            projectile.rotation = 0;
-            if (projectile.direction == -1)
-            {
-                drawOffsetX = -30;
-            }
-            else
-            {
-                drawOffsetX = 0;
-            }
-            if (shootCount > 0)
-            {
-                shootCount--;
-            }
+
 
             if (abilityNumber == 1)     //push everything away
             {
-                animationName = "PushBack";
-                AnimationStates(1, 0.5f, false, true);
+                abilityName = "PushBack";
+                //AnimationStates(1, 0.5f, false, true);
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
                     NPC npc = Main.npc[i];
@@ -162,10 +122,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                     }
                 }
             }
+
             if (abilityNumber == 2)     //forcefield
             {
-                animationName = "ForceField";
-                AnimationStates(1, 0.05f, false, true);
+                abilityName = "ForceField";
+                //AnimationStates(1, 0.05f, false, true);
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
                     NPC npc = Main.npc[i];
@@ -193,10 +154,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                     }
                 }
             }
+
             if (abilityNumber == 3)     //crystal shower
             {
-                animationName = "Crystal";
-                AnimationStates(1, 0.16f, false, true);
+                abilityName = "Crystal";
+                //AnimationStates(1, 0.16f, false, true);
                 if (shootCount <= 0)
                 {
                     shootCount += 85;
@@ -206,10 +168,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                     Projectile.NewProjectile(projectile.position.X - 5f, projectile.position.Y, 0f, 0f, mod.ProjectileType("Crystal"), 82, 2f, Main.myPlayer);
                 }
             }
+
             if (abilityNumber == 4)     //make NPCs reverse gravity
             {
-                animationName = "Gravity";
-                AnimationStates(1, 0.5f, false, true);
+                abilityName = "Gravity";
+                //AnimationStates(1, 0.5f, false, true);
                 if (shootCount <= 0)
                 {
                     shootCount += 120;
@@ -229,10 +192,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                     }
                 }
             }
+
             if (abilityNumber == 5)     //non-existant: Whatever this projectile touches will no longer ever spawn in the game for the time you are in the world
             {
-                animationName = "Genocide";
-                AnimationStates(1, 0.16f, false, true);
+                abilityName = "Genocide";
+                //AnimationStates(1, 0.16f, false, true);
                 if (shootCount <= 0)
                 {
                     for (int i = 0; i < Main.maxNPCs; i++)
@@ -258,34 +222,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             }
         }
 
-        public SpriteEffects effects = SpriteEffects.None;
-
-        public override void PostDraw(SpriteBatch spriteBatch, Color lightColor)
-        {
-            Player player = Main.player[projectile.owner];
-            if (projectile.direction == -1)
-            {
-                effects = SpriteEffects.FlipHorizontally;
-            }
-            if (projectile.direction == 1)
-            {
-                effects = SpriteEffects.None;
-            }
-            int frameHeight = standTexture.Height / Main.projFrames[projectile.whoAmI];
-            spriteBatch.Draw(standTexture, projectile.Center - Main.screenPosition + new Vector2(19f, 1f), new Rectangle(0, frameHeight * projectile.frame, standTexture.Width, frameHeight), Color.White, 0f, new Vector2(standTexture.Width / 2f, frameHeight / 2f), 1f, effects, 0);
-
-            if (Main.mouseLeft && abilityNumber == 0)
-            {
-                Texture2D texture = mod.GetTexture("Projectiles/PlayerStands/Megalovania/M" + animationName + "A");     //the attack stare stuff
-                spriteBatch.Draw(texture, projectile.Center - Main.screenPosition + new Vector2(19f, 1f), new Rectangle(0, frameHeight * projectile.frame, texture.Width, frameHeight), Color.White, 0f, new Vector2(texture.Width / 2f, frameHeight / 2f), 1f, effects, 0);
-            }
-        }
-
-        public virtual void AnimationStates(int frameAmount, float fps, bool loop, bool ability)        //remember that 'fps' refers to how many frames is supposed to play every second, not how fast it plays
+        /*public virtual void AnimationStates(int frameAmount, float fps, bool loop, bool ability)        //remember that 'fps' refers to how many frames is supposed to play every second, not how fast it plays
         {
             Main.projFrames[projectile.whoAmI] = frameAmount;
             projectile.frameCounter++;
-            standTexture = mod.GetTexture("Projectiles/PlayerStands/Megalovania/M" + animationName);
+            standTexture = mod.GetTexture("Projectiles/PlayerStands/Megalovania/M" + direction);
             float framesPerSecond = 60f / fps;
             if (projectile.frameCounter >= framesPerSecond)
             {
@@ -298,12 +239,93 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             }
             if (projectile.frame >= frameAmount && !loop)
             {
-                animationName = "Idle";
+                direction = "Idle";
             }
             if (projectile.frame >= frameAmount && ability)
             {
-                animationName = "Idle";
+                direction = "Idle";
                 abilityNumber = 0;
+            }
+        }*/
+
+        public override void SelectAnimation()
+        {
+            if (abilityNumber == 0)
+            {
+                PlayAnimation(direction);
+                maxFrames = 2;
+            }
+            else
+            {
+                PlayAnimation(abilityName);
+                maxFrames = 1;
+                if (projectile.frame >= maxFrames)
+                {
+                    abilityNumber = 0;
+                }
+            }
+            /*if (attackFrames)
+            {
+                normalFrames = false;
+                PlayAnimation("Attack");
+            }
+            if (normalFrames)
+            {
+                attackFrames = false;
+                PlayAnimation("Idle");
+            }
+            if (secondaryAbilityFrames)
+            {
+                normalFrames = false;
+                attackFrames = false;
+                PlayAnimation("Pose");
+            }
+            if (Main.player[projectile.owner].GetModPlayer<MyPlayer>().poseMode)
+            {
+                normalFrames = false;
+                attackFrames = false;
+                PlayAnimation("Pose");
+            }*/
+        }
+
+        public override void PlayAnimation(string animationName)
+        {
+            standTexture = mod.GetTexture("Projectiles/PlayerStands/Megalovania/M" + animationName);
+            if (animationName == "Up")
+            {
+                AnimationStates(animationName, 2, 30, true);
+            }
+            if (animationName == "SlightUp")
+            {
+                AnimationStates(animationName, 2, 30, true);
+            }
+            if (animationName == "Straight")
+            {
+                AnimationStates(animationName, 2, 30, true);
+            }
+            if (animationName == "Down")
+            {
+                AnimationStates(animationName, 2, 30, false);
+            }
+            if (animationName == "PushBack")
+            {
+                AnimationStates(animationName, 1, 120, false);
+            }
+            if (animationName == "ForceField")
+            {
+                AnimationStates(animationName, 1, 1200, false);
+            }
+            if (animationName == "Crystal")
+            {
+                AnimationStates(animationName, 1, 375, false);
+            }
+            if (animationName == "Gravity")
+            {
+                AnimationStates(animationName, 1, 120, false);
+            }
+            if (animationName == "Genocide")
+            {
+                AnimationStates(animationName, 1, 375, false);
             }
         }
     }

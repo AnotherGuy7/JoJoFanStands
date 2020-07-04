@@ -10,8 +10,8 @@ namespace JoJoFanStands.NPCs
 {
     public class Pao : ModNPC
     {
-        public int frame = 0;
-        public bool timeToDie = false;
+        private int frame = 0;
+        private bool timeToDie = false;
 
         public override void SetStaticDefaults()
         {
@@ -40,7 +40,7 @@ namespace JoJoFanStands.NPCs
                 int npc3 = NPC.NewNPC((int)npc.position.X, (int)npc.position.Y, npc.type);
                 Main.npc[npc2].GivenName = "Pao Alt #" + npc.whoAmI;
                 Main.npc[npc3].GivenName = "Pao Alt #" + npc.whoAmI;
-                Main.NewText("I can't be rid of that easily.", Color.DarkRed);
+                Main.NewText("You can't get rid of me that easily.", Color.DarkRed);
                 return false;
             }
             else
@@ -71,7 +71,7 @@ namespace JoJoFanStands.NPCs
             {
                 npc.ai[0] = 0;
                 npc.ai[1] = Main.rand.NextFloat(120f, 450f);
-                int randText = Main.rand.Next(1, 10);
+                int randText = Main.rand.Next(1, 12);
                 if (randText == 1)
                 {
                     Main.NewText("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGGGGGGGGGHHHHHHHHHHHHHHHHH");
@@ -108,6 +108,14 @@ namespace JoJoFanStands.NPCs
                 {
                     Main.NewText("ghlaghaoigh eioh ngia ophgoa hg haoiegh auoguh augn hgioagh oiahn goea");
                 }
+                if (randText == 10)
+                {
+                    Main.NewText("Dead.");
+                }
+                if (randText == 11)
+                {
+                    Main.NewText("How die???");
+                }
             }
         }
 
@@ -115,7 +123,7 @@ namespace JoJoFanStands.NPCs
         {
             if (FanPlayer.spawnPao)
             {
-                return 0.05f;
+                return 0.02f;
             }
             else
             {

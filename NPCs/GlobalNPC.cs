@@ -25,10 +25,10 @@ namespace JoJoFanStands.NPCs
         public override bool PreAI(NPC npc)
         {
             FanPlayer FPlayer = Main.LocalPlayer.GetModPlayer<FanPlayer>();
-            if (FPlayer.avalanche)
+            /*if (FPlayer.avalanche)
             {
                 affectedByAvalance = true;
-            }
+            }*/
             if (welded)
             {
                 npc.velocity = Vector2.Zero;
@@ -41,7 +41,7 @@ namespace JoJoFanStands.NPCs
                 }
                 return false;
             }
-            if (affectedByAvalance)
+            /*if (affectedByAvalance)
             {
                 icicleTimer++;
                 npc.velocity = Vector2.Zero;
@@ -64,7 +64,7 @@ namespace JoJoFanStands.NPCs
                     affectedByAvalance = false;
                 }
                 return false;
-            }
+            }*/
             return true;
         }
 

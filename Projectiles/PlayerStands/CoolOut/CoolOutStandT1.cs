@@ -4,39 +4,18 @@ using Terraria.ID;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
 using Terraria.ModLoader;
- 
+using System.Security.Policy;
+
 namespace JoJoFanStands.Projectiles.PlayerStands
 {  
     public class CoolOutStandT1 : StandClass
     {
-        public override void SetStaticDefaults()
-        {
-            Main.projFrames[projectile.type] = 18;
-            Main.projPet[projectile.type] = true;
-            ProjectileID.Sets.MinionSacrificable[projectile.type] = true;
-            ProjectileID.Sets.Homing[projectile.type] = true;
-            ProjectileID.Sets.LightPet[projectile.type] = true;
-            Main.projPet[projectile.type] = true;
-        }
-
-        public override void SetDefaults()
-        {
-            projectile.netImportant = true;
-            projectile.width = 46;
-            projectile.height = 64;
-            projectile.friendly = true;
-            projectile.minion = true;
-            projectile.netImportant = true;
-            projectile.penetrate = 1;
-            projectile.timeLeft = 1;
-            projectile.tileCollide = false;
-            projectile.ignoreWater = true;
-            MyPlayer.stopImmune.Add(mod.ProjectileType(Name));
-        }
-
         public override int projectileDamage => 17;
         public override int shootTime => 12;
         public override int altDamage => 20;
+        public override int standType => 2;
+        public override int standOffset => 20;
+        public override int halfStandHeight => 32;
 
         private int specialDamage = 25;
         private bool altAttacking = false;
@@ -45,15 +24,19 @@ namespace JoJoFanStands.Projectiles.PlayerStands
         public override void AI()
         {
             Player player = Main.player[projectile.owner];
-            SelectFrame();
+            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
+            SelectAnimation();
             UpdateStandInfo();
             StayBehind();
             Lighting.AddLight(projectile.position, 1.78f, 2.21f, 2.54f);
+            if (mPlayer.StandOut)
+            {
+                projectile.timeLeft = 2;
+            }
+
             if (Main.mouseLeft)
             {
-                normalFrames = false;
                 attackFrames = true;
-                secondaryAbilityFrames = false;
                 if (shootCount <= 0f)
                 {
                     Main.PlaySound(SoundID.Item28, projectile.position);
@@ -126,52 +109,50 @@ namespace JoJoFanStands.Projectiles.PlayerStands
             }
         }
 
-        public virtual void SelectFrame()
+        public override void SelectAnimation()
         {
-            projectile.frameCounter++;
-            if (normalFrames)
-            {
-                if (projectile.frameCounter >= 12)
-                {
-                    projectile.frame += 1;
-                    projectile.frameCounter = 0;
-                }
-                if (projectile.frame >= 8)
-                {
-                    projectile.frame = 0;
-                }
-            }
             if (attackFrames)
             {
-                if (projectile.frameCounter >= 7)
-                {
-                    projectile.frame += 1;
-                    projectile.frameCounter = 0;
-                }
-                if (projectile.frame >= 7)
-                {
-                    projectile.frame = 8;
-                }
-                if (projectile.frame <= 12)
-                {
-                    projectile.frame = 8;
-                }
+                normalFrames = false;
+                PlayAnimation("Attack");
+            }
+            if (normalFrames)
+            {
+                attackFrames = false;
+                PlayAnimation("Idle");
             }
             if (secondaryAbilityFrames)
             {
-                if (projectile.frameCounter >= 10)
-                {
-                    projectile.frame += 1;
-                    projectile.frameCounter = 0;
-                }
-                if (projectile.frame >= 14)
-                {
-                    projectile.frame = 15;
-                }
-                if (projectile.frame <= 18)
-                {
-                    projectile.frame = 15;
-                }
+                normalFrames = false;
+                attackFrames = false;
+                PlayAnimation("Pose");
+            }
+            if (Main.player[projectile.owner].GetModPlayer<MyPlayer>().poseMode)
+            {
+                normalFrames = false;
+                attackFrames = false;
+                PlayAnimation("Pose");
+            }
+        }
+
+        public override void PlayAnimation(string animationName)
+        {
+            standTexture = mod.GetTexture("Projectiles/PlayerStands/CoolOut/CoolOut_" + animationName);
+            if (animationName == "Idle")
+            {
+                AnimationStates(animationName, 8, 15, true);
+            }
+            if (animationName == "Attack")
+            {
+                AnimationStates(animationName, 4, 14, true);
+            }
+            if (animationName == "Slam")
+            {
+                AnimationStates(animationName, 1, 300, true);
+            }
+            if (animationName == "Pose")
+            {
+                AnimationStates(animationName, 2, 15, true);
             }
         }
     }

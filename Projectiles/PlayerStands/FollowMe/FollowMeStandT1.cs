@@ -6,66 +6,39 @@ using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
 using JoJoStands;
+using JoJoStands.Projectiles.PlayerStands;
+using System.Data.SqlTypes;
+using System.IO;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
 {
-    public class FollowMeStandT1 : ModProjectile      //has 2 poses
+    public class FollowMeStandT1 : StandClass
     {
-        public override void SetDefaults()
-        {
-            projectile.netImportant = true;
-            projectile.width = 38;
-            projectile.height = 1;
-            projectile.friendly = true;
-            projectile.minion = true;
-            projectile.netImportant = true;
-            //projectile.minionSlots = 1;
-            projectile.penetrate = 1;
-            projectile.tileCollide = true;
-            projectile.ignoreWater = true;
-            projectile.timeLeft = 2;
-            projectile.ai[0] = -1f;
-            MyPlayer.stopImmune.Add(mod.ProjectileType(Name));
-        }
+        public override int punchDamage => 21;
+        public override int altDamage => 48;
+        public override int halfStandHeight => 39;
+        public override int standType => 1;
 
-        public Vector2 velocityAddition = Vector2.Zero;
-        public float mouseDistance = 0f;
-        protected float shootSpeed = 16f;
-        public float maxDistance = 0f;
-        public int punchDamage = 21;
-        public int altDamage = 48;
-        int shootCount = 0;
-        public int halfStandHeight = 39;
-        public Mod JoJoStands2 = null;
-        public bool grabbing = false;
-        public bool intangible = false;
-        public float windUpForce = 0f;
-
-        public Texture2D standTexture;
-
-        //projectile.ai[0] = the enemy being grabbed's whoAmI
+        private Vector2 velocityAddition;
+        private float mouseDistance;
+        private bool grabbing = false;
+        private bool intangible = false;
+        private float windUpForce = 0f;
 
         public override void AI()
         {
+            SelectAnimation();
+            UpdateStandInfo();
             if (shootCount > 0)
             {
                 shootCount--;
             }
+
             Player player = Main.player[projectile.owner];
-            MyPlayer modPlayer = player.GetModPlayer<MyPlayer>();
-            FanPlayer Fplayer = player.GetModPlayer<FanPlayer>();
-            projectile.frameCounter++;
-            if (player.HeldItem.type == mod.ItemType("FollowMeT1") && Fplayer.StandOut)
+            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
+            if (mPlayer.StandOut)
             {
                 projectile.timeLeft = 2;
-            }
-            if (player.HeldItem.type != mod.ItemType("FollowMeT1") || !Fplayer.StandOut || player.dead)
-            {
-                projectile.active = false;
-            }
-            if (JoJoStands2 == null)
-            {
-                JoJoStands2 = ModLoader.GetMod("JoJoStands");
             }
             drawOriginOffsetY = -halfStandHeight;
 
@@ -128,8 +101,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
             }
             if (Main.mouseLeft && projectile.owner == Main.myPlayer)
             {
+                attackFrames = true;
                 windUpForce += 0.02f;
-                SwitchStatesTo("WindUp");
                 Main.mouseRight = false;
             }
             else
@@ -145,11 +118,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
                     projectile.rotation = 0;
                     if (!intangible)
                     {
-                        SwitchStatesTo("Idle");
-                    }
-                    else
-                    {
-                        SwitchStatesTo("NoClip");
+                        normalFrames = true;
                     }
                 }
             }
@@ -163,7 +132,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
                 }
                 shootVel.Normalize();
                 shootVel *= shootSpeed;
-                int proj = Projectile.NewProjectile(projectile.Center.X, projectile.Center.Y, shootVel.X, shootVel.Y, JoJoStands2.ProjectileType("Fists"), (int)((punchDamage * modPlayer.standDamageBoosts) * windUpForce), 2f, Main.myPlayer, -1f, -1f);
+                int proj = Projectile.NewProjectile(projectile.Center.X, projectile.Center.Y, shootVel.X, shootVel.Y, JoJoFanStands.JoJoStandsMod.ProjectileType("Fists"), (int)(newPunchDamage * windUpForce), 2f, Main.myPlayer, -1f, -1f);
                 Main.projectile[proj].timeLeft = 6;
                 Main.projectile[proj].netUpdate = true;
                 projectile.netUpdate = true;
@@ -178,7 +147,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
                     {
                         if (projectile.Distance(npc.Center) <= 30f && !npc.boss && !npc.immortal && !npc.hide)
                         {
-
                             projectile.ai[0] = npc.whoAmI;
                             grabbing = true;
                         }
@@ -199,7 +167,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
                     projectile.ai[0] = -1f;
                     grabbing = false;
                 }
-                SwitchStatesTo("Grab");
             }
             if (JoJoStands.JoJoStands.SpecialHotKey.JustPressed && !player.HasBuff(mod.BuffType("Intangible")) && !player.HasBuff(mod.BuffType("IntangibleCooldown")))
             {
@@ -210,7 +177,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
             {
                 Vector2 direction = player.Center - projectile.Center;
                 float distanceTo = direction.Length();
-                maxDistance = 98f + modPlayer.standRangeBoosts;
                 if (distanceTo > maxDistance)
                 {
                     if (projectile.position.X <= player.position.X - 15f)
@@ -234,90 +200,82 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
                         projectile.velocity = Vector2.Zero;
                     }
                 }
-                if (distanceTo >= maxDistance + 22f)
+                if (distanceTo >= newMaxDistance + 22f)
                 {
                     Main.mouseLeft = false;
                     Main.mouseRight = false;
                     projectile.Center = player.Center;
                 }
             }
-        }
-
-        public SpriteEffects effects = SpriteEffects.None;
-
-        public override void PostDraw(SpriteBatch spriteBatch, Color lightColor)
-        {
-            Player player = Main.player[projectile.owner];
-            if (projectile.spriteDirection == -1)
-            {
-                effects = SpriteEffects.FlipHorizontally;
-            }
-            if (projectile.spriteDirection == 1)
-            {
-                effects = SpriteEffects.None;
-            }
-            /*if (MyPlayer.RangeIndicators)
-            {
-                Texture2D texture = JoJoStands.GetTexture("Extras/RangeIndicator");        //the initial tile amount the indicator covers is 20 tiles, 320 pixels, border is included in the measurements
-                spriteBatch.Draw(texture, player.Center - Main.screenPosition, new Rectangle(0, 0, texture.Width, texture.Height), Color.White, 0f, new Vector2(texture.Width / 2f, texture.Height / 2f), maxDistance / 122.5f, SpriteEffects.None, 0);
-            }*/
             if (intangible)
             {
-                lightColor.A = 40;
+                projectile.alpha = 40;
             }
-            int frameHeight = standTexture.Height / Main.projFrames[projectile.whoAmI];
-            spriteBatch.Draw(standTexture, projectile.Center - Main.screenPosition + new Vector2(19f, 1f), new Rectangle(0, frameHeight * projectile.frame, standTexture.Width, frameHeight), lightColor, 0f, new Vector2(standTexture.Width / 2f, frameHeight / 2f), 1f, effects, 0);
         }
 
-        public virtual void SwitchStatesTo(string animationName)
+        public override void SendExtraStates(BinaryWriter writer)
         {
+            writer.Write(grabbing);
+            writer.Write(intangible);
+        }
+
+        public override void ReceiveExtraStates(BinaryReader reader)
+        {
+            grabbing = reader.ReadBoolean();
+            intangible = reader.ReadBoolean();
+        }
+
+        public override void SelectAnimation()
+        {
+            if (attackFrames)
+            {
+                normalFrames = false;
+                PlayAnimation("WindUp");
+            }
+            if (normalFrames)
+            {
+                attackFrames = false;
+                PlayAnimation("Idle");
+            }
+            if (intangible)
+            {
+                normalFrames = false;
+                PlayAnimation("NoClip");
+            }
+            if (grabbing)
+            {
+                normalFrames = false;
+                attackFrames = false;
+                secondaryAbilityFrames = false;
+                PlayAnimation("Grab");
+            }
+            if (Main.mouseRight && projectile.owner == Main.myPlayer && shootCount <= 0 && !grabbing)       //loops grabbing
+            {
+                if (projectile.frame <= 0)
+                {
+                    projectile.frame = 1;
+                }
+                if (projectile.frame >= 3)
+                {
+                    projectile.frame = 1;
+                }
+            }
+        }
+
+        public override void PlayAnimation(string animationName)
+        {
+            standTexture = mod.GetTexture("Projectiles/PlayerStands/FollowMe/FollowMe_" + animationName);
             if (animationName == "Idle")
             {
-                AnimationStates(animationName, 4, 4, true);
-            }
-            if (animationName == "Grab")
-            {
-                AnimationStates(animationName, 9, 3, false);
-            }
-            if (animationName == "Attack")
-            {
-                AnimationStates(animationName, 8, 4, true);
-            }
-            if (animationName == "NoClip")
-            {
-                AnimationStates(animationName, 5, 4, true);
+                AnimationStates(animationName, 8, 15, true);
             }
             if (animationName == "WindUp")
             {
-                AnimationStates(animationName, 9, 3, false, true, 5, 7);
+                AnimationStates(animationName, 4, 14, true);
             }
-        }
-
-        public virtual void AnimationStates(string stateName, int frameAmount, int fps, bool loop, bool loopCertainFrames = false, int loopFrameStart = 0, int loopFrameEnd = 0)
-        {
-            Main.projFrames[projectile.whoAmI] = frameAmount;
-            projectile.frameCounter++;
-            standTexture = mod.GetTexture("Projectiles/PlayerStands/FollowMe/FollowMe_" + stateName);
-            int framesPerSecond = 60 / fps;
-            if (projectile.frameCounter >= framesPerSecond)
+            if (animationName == "Grab")
             {
-                projectile.frameCounter = 0;
-                projectile.frame += 1;
-            }
-            if (loopCertainFrames)
-            {
-                if (projectile.frame >= loopFrameEnd)
-                {
-                    projectile.frame = loopFrameStart;
-                }
-            }
-            if (projectile.frame >= frameAmount && loop)
-            {
-                projectile.frame = 0;
-            }
-            if (projectile.frame >= frameAmount && !loop)
-            {
-                SwitchStatesTo("Idle");
+                AnimationStates(animationName, 9, 12, false);
             }
         }
     }

@@ -32,7 +32,7 @@ namespace JoJoFanStands.Projectiles
                 spawnedAnother = true;
                 Yaddition += 1;
             }
-            if (!spawnedAnother && projectile.timeLeft <= 5)
+            /*if (!spawnedAnother && projectile.timeLeft <= 5)
             {
                 if (FPlayer.additionMode)
                 {
@@ -47,7 +47,7 @@ namespace JoJoFanStands.Projectiles
                 Main.projectile[proj].scale = 1 + (FPlayer.numberOfSpikesCreated / 5);
                 Main.projectile[proj].netUpdate = true;
                 projectile.netUpdate = true;
-            }
+            }*/
         }
 
         public override bool OnTileCollide(Vector2 oldVelocity)

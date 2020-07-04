@@ -1,5 +1,4 @@
-using Terraria;
-using Terraria.ID;
+using Microsoft.Xna.Framework;
 using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles
@@ -17,16 +16,8 @@ namespace JoJoFanStands.Projectiles
 
         public override void AI()
         {
-            projectile.rotation += (float)projectile.direction * 0.8f;
-            if (Items.BackInBlack.teleporting)
-            {
-                projectile.scale += 1.13f;
-            }
-            else
-            {
-                projectile.Kill();
-            }
-            projectile.position = Main.player[projectile.owner].position;
+            projectile.rotation += MathHelper.ToRadians(3f);       //90 degrees every 2s
+            projectile.timeLeft++;
         }
     }
 }

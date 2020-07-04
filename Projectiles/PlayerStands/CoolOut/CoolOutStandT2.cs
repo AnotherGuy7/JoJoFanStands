@@ -7,11 +7,6 @@ namespace JoJoFanStands.Projectiles.Minions
 {  
     public class CoolOutStandT2 : JoJoStands.Projectiles.PlayerStands.StandClass
     {
-        public override string Texture
-        {
-            get { return mod.Name + "/Projectiles/PlayerStands/CoolOutStand"; }
-        }
-
         public override void SetStaticDefaults()
         {
             Main.projFrames[projectile.type] = 18;
@@ -70,14 +65,6 @@ namespace JoJoFanStands.Projectiles.Minions
             if (shootCool <= 0f)
             {
                 shootCool = 0f;
-            }
-            if (Fplayer.CoolOutActive)
-            {
-                projectile.timeLeft++;
-            }
-            else
-            {
-                projectile.Kill();
             }
             Vector2 vector131 = player.Center;
             vector131.X -= (float)((12 + player.width / 2) * player.direction);
@@ -205,7 +192,7 @@ namespace JoJoFanStands.Projectiles.Minions
             }
             if (Main.mouseRight && abilityNumber == 3 && abilityCooldown <= 0)
             {
-                Fplayer.avalanche = true;
+                //Fplayer.avalanche = true;
                 abilityCooldown += 600;
             }
             if (JoJoStands.JoJoStands.SpecialHotKey.JustPressed && abilitySwitchTimer <= 0)

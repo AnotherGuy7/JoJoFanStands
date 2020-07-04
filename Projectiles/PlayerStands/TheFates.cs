@@ -43,16 +43,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands
             SelectFrame();
             shootCount--;
             Player player = Main.player[projectile.owner];
-            MyPlayer MPlayer = player.GetModPlayer<MyPlayer>();
+            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             FanPlayer FPlayer = player.GetModPlayer<FanPlayer>();
             projectile.frameCounter++;
-            if (player.HeldItem.type == mod.ItemType("TheFates") && FPlayer.StandOut)
+            if (mPlayer.StandOut)
             {
                 projectile.timeLeft = 2;
-            }
-            if (player.HeldItem.type != mod.ItemType("TheFates") || !FPlayer.StandOut || player.dead)
-            {
-                projectile.active = false;
             }
             if (projectile.spriteDirection == 1)
             {
