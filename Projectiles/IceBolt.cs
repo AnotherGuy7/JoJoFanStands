@@ -9,10 +9,9 @@ namespace JoJoFanStands.Projectiles
     {
         public override void SetDefaults()
         {
-            projectile.width = 10;
-            projectile.height = 20;
+            projectile.width = 8;
+            projectile.height = 8;
             projectile.aiStyle = 0;
-            projectile.ranged = true;
             projectile.timeLeft = 180;
             projectile.friendly = true;
             projectile.tileCollide = true;

@@ -74,6 +74,16 @@ namespace JoJoFanStands
                 Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("CoolOutStandT2"), 0, 0f, Main.myPlayer);
                 MyPlayer.spawningOtherStands = true;
             }
+            else if (inputItemtype == ItemType<CoolOutT3>())
+            {
+                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("CoolOutStandT3"), 0, 0f, Main.myPlayer);
+                MyPlayer.spawningOtherStands = true;
+            }
+            else if (inputItemtype == ItemType<CoolOutFinal>())
+            {
+                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("CoolOutStandFinal"), 0, 0f, Main.myPlayer);
+                MyPlayer.spawningOtherStands = true;
+            }
             else if (inputItemtype == ItemType<FollowMeT1>())
             {
                 Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("FollowMeStandT1"), 0, 0f, Main.myPlayer);

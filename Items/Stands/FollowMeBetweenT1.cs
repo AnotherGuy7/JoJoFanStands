@@ -2,21 +2,25 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using JoJoStands;
+using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Stands
 {
-	public class CoolOutT1 : ModItem
+	public class FollowMeBetweenT1 : ModItem
 	{
+        public override string Texture => mod.Name + "/Items/Stands/FollowMeT1";
+
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Cool Out (Tier 1)");
-            Tooltip.SetDefault("Left-click to shoot an Ice Bolt and right-click to charge and throw an Ice Spear!\nSpecial: Summon an infinite Ice Wave!\nUser Name: NekroSektor \nReference: Cool Out and Natural by Imagine Dragons");
+            DisplayName.SetDefault("Follow Me: Between (Tier 1)");
+            Tooltip.SetDefault("Left-click to wind-up a punch and Right-click to grab enemies!\nSpecial: Intangible\nUser Name: Agatha/Betty/Thabita/Mrs Destiny/Hot Pants \nReference: ???");
         }
 
         public override void SetDefaults()
         {
-            item.damage = 15;
+            item.damage = 16;
             item.width = 32;
             item.height = 32;
             item.useTime = 12;
@@ -31,7 +35,7 @@ namespace JoJoFanStands.Items.Stands
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             MyPlayer mPlayer = Main.player[Main.myPlayer].GetModPlayer<MyPlayer>();
-            TooltipLine tooltipAddition = new TooltipLine(mod, "Speed", "Shoot Speed: " + (40 - mPlayer.standSpeedBoosts));
+            TooltipLine tooltipAddition = new TooltipLine(mod, "Speed", "Punch Speed: " + (12 - mPlayer.standSpeedBoosts));
             tooltips.Add(tooltipAddition);
         }
 
@@ -42,12 +46,13 @@ namespace JoJoFanStands.Items.Stands
 
         public override void AddRecipes()
         {
-            Mod JoJoStands = JoJoFanStands.JoJoStandsMod;
+            Mod JoJoStands = ModLoader.GetMod("JoJoStands");
             ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(JoJoStands.ItemType("StandArrow"));
-            recipe.AddIngredient(ItemID.IceBlock, 15);
-            recipe.AddIngredient(ItemID.Shiverthorn, 3);
-            recipe.AddIngredient(JoJoStands.ItemType("WillToProtect"));
+            recipe.AddIngredient(ItemType<FollowMeT2>());
+            recipe.AddIngredient(ItemID.SoulofFright, 16);
+            recipe.AddIngredient(JoJoStands.ItemType("StoneMask"));
+            recipe.AddIngredient(ItemID.BrokenBatWing);
+            recipe.AddIngredient(JoJoStands.ItemType("WillToChange"));
             recipe.SetResult(this);
             recipe.AddRecipe();
         }

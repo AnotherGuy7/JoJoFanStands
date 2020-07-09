@@ -4,25 +4,23 @@ using Terraria.ModLoader;
 using JoJoStands;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Stands
 {
 	public class FollowMeT2 : ModItem
 	{
-        public override string Texture
-        {
-            get { return mod.Name + "/Items/Stands/FollowMeT1"; }
-        }
+        public override string Texture => mod.Name + "/Items/Stands/FollowMeT1";
 
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Follow Me (Tier 2)");
-            Tooltip.SetDefault("Left-click + Left-click to barrage enemies, Left-click + Right-click to wind-up a punch, and Right-click to grab enemies!\nSpecial: Intangible\nUser Name: Agatha/Betty/Thabita/Hot Pants \nReference: ???");
+            Tooltip.SetDefault("Left-click to wind-up a punch and Right-click to grab enemies!\nSpecial: Intangible\nUser Name: Agatha/Betty/Thabita/Mrs Destiny/Hot Pants \nReference: ???");
         }
 
         public override void SetDefaults()
         {
-            item.damage = 62;
+            item.damage = 16;
             item.width = 32;
             item.height = 32;
             item.useTime = 12;
@@ -50,7 +48,10 @@ namespace JoJoFanStands.Items.Stands
         {
             Mod JoJoStands = ModLoader.GetMod("JoJoStands");
             ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(JoJoStands.ItemType("StandArrow"));
+            recipe.AddIngredient(ItemType<FollowMeT1>());
+            recipe.AddIngredient(ItemID.Amethyst, 4);
+            recipe.AddIngredient(ItemID.SharkToothNecklace);
+            recipe.AddIngredient(JoJoStands.ItemType("WillToChange"));
             recipe.SetResult(this);
             recipe.AddRecipe();
         }

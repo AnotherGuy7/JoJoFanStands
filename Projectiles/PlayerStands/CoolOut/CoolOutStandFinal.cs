@@ -7,17 +7,17 @@ using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands
 {  
-    public class CoolOutStandT3 : StandClass
+    public class CoolOutStandFinal : StandClass
     {
-        public override int projectileDamage => 39;
-        public override int shootTime => 30;
-        public override int altDamage => 44;
+        public override int projectileDamage => 51;
+        public override int shootTime => 20;
+        public override int altDamage => 63;
         public override int standType => 2;
         public override int standOffset => 20;
         public override int halfStandHeight => 32;
 
         private int abilityNumber = 0;
-        private int specialDamage = 51;
+        private int specialDamage = 71;
         private int spearWhoAmI = -1;
         private bool letGoOfSpear = false;
         private int slamCounter = 0;
@@ -94,7 +94,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands
                         int proj = Projectile.NewProjectile(projectile.Center.X + 7f, projectile.Center.Y + 3f, 0f, 0f, mod.ProjectileType("IceSpike"), specialDamage, 2f, Main.myPlayer, projectile.whoAmI, projectile.direction);
                         Main.projectile[proj].netUpdate = true;
                         projectile.netUpdate = true;
-                        player.AddBuff(JoJoFanStands.JoJoStandsMod.BuffType("AbilityCooldown"), mPlayer.AbilityCooldownTime(15));
+                        player.AddBuff(JoJoFanStands.JoJoStandsMod.BuffType("AbilityCooldown"), mPlayer.AbilityCooldownTime(10));
                     }
                 }
                 if (abilityNumber == 1)     //Ice spear
@@ -132,14 +132,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands
                         Vector2 direction = Main.MouseWorld - projectile.Center;
                         direction.Normalize();
                         spear.velocity = (direction * 12f) * projectile.ai[0];
-                        player.AddBuff(JoJoFanStands.JoJoStandsMod.BuffType("AbilityCooldown"), mPlayer.AbilityCooldownTime(10));
+                        player.AddBuff(JoJoFanStands.JoJoStandsMod.BuffType("AbilityCooldown"), mPlayer.AbilityCooldownTime(5));
                         letGoOfSpear = true;
                     }
                 }
                 if (Main.mouseRight && abilityNumber == 2 && player.ownedProjectileCounts[mod.ProjectileType("SnowGlobe")] == 0)     //Snow Globe
                 {
-                    int globe = Projectile.NewProjectile(player.Center, Vector2.Zero, mod.ProjectileType("SnowGlobe"), 0, 0, Main.myPlayer, projectile.whoAmI, 200);
-                    player.AddBuff(JoJoFanStands.JoJoStandsMod.BuffType("AbilityCooldown"), mPlayer.AbilityCooldownTime(60));
+                    int globe = Projectile.NewProjectile(player.Center, Vector2.Zero, mod.ProjectileType("SnowGlobe"), 0, 0, Main.myPlayer, projectile.whoAmI, 500);
+                    player.AddBuff(JoJoFanStands.JoJoStandsMod.BuffType("AbilityCooldown"), mPlayer.AbilityCooldownTime(30));
                     Main.projectile[globe].netUpdate = true;
                 }
                 if (Main.mouseRight && abilityNumber == 3)     //Hail Storm

@@ -12,7 +12,7 @@ namespace JoJoFanStands.Items.Stands
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Follow Me (Tier 1)");
-            Tooltip.SetDefault("Left-click to wind-up a punch and Right-click to grab enemies!\nSpecial: Intangible\nUser Name: Agatha/Betty/Thabita/Hot Pants \nReference: ???");
+            Tooltip.SetDefault("Left-click to wind-up a punch and Right-click to grab enemies!\nSpecial: Intangible\nUser Name: Agatha/Betty/Thabita/Mrs Destiny/Hot Pants \nReference: ???");
         }
 
         public override void SetDefaults()
@@ -46,6 +46,7 @@ namespace JoJoFanStands.Items.Stands
             Mod JoJoStands = ModLoader.GetMod("JoJoStands");
             ModRecipe recipe = new ModRecipe(mod);
             recipe.AddIngredient(JoJoStands.ItemType("StandArrow"));
+            recipe.AddIngredient(JoJoStands.ItemType("WillToChange"));
             recipe.SetResult(this);
             recipe.AddRecipe();
         }

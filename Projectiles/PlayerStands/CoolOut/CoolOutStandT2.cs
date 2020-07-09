@@ -2,86 +2,69 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using JoJoStands;
- 
-namespace JoJoFanStands.Projectiles.Minions
+using JoJoStands.Projectiles.PlayerStands;
+using Terraria.ModLoader;
+
+namespace JoJoFanStands.Projectiles.PlayerStands
 {  
-    public class CoolOutStandT2 : JoJoStands.Projectiles.PlayerStands.StandClass
+    public class CoolOutStandT2 : StandClass
     {
-        public override void SetStaticDefaults()
-        {
-            Main.projFrames[projectile.type] = 18;
-        }
+        public override int projectileDamage => 24;
+        public override int shootTime => 35;
+        public override int altDamage => 32;
+        public override int standType => 2;
+        public override int standOffset => 20;
+        public override int halfStandHeight => 32;
 
-        public override void SetDefaults()
-        {
-            projectile.netImportant = true;
-            projectile.width = 46;
-            projectile.height = 64;
-            projectile.friendly = true;
-            projectile.minion = true;
-            projectile.netImportant = true;
-            projectile.penetrate = 1;
-            projectile.timeLeft = 1;
-            projectile.tileCollide = false;
-            projectile.ignoreWater = true;
-            MyPlayer.stopImmune.Add(mod.ProjectileType(Name));
-        }
-
-        protected float shootCool = 12f;
-        protected float shootSpeed = 12f;
-        public int abilityCooldown = 0;
-        public bool normalFrames = false;
-        public bool attackFrames = false;
-        public bool altAttacking = false;
-        public bool slamFrames = false;
-        public int proj = 0;
-        public int projectilesChosen = 0;
-        public int chance = 0;
-        public int abilityNumber = 0;
-        public bool saidAbility = true;
-        public int abilitySwitchTimer = 0;      //switches a bunch when you press it, causing a mess and not picking the right ability in the end
+        private int specialDamage = 41;
+        private int spearWhoAmI = -1;
+        private bool letGoOfSpear = false;
+        private int slamCounter = 0;
 
         public override void AI()
         {
             Player player = Main.player[projectile.owner];
-            FanPlayer Fplayer = player.GetModPlayer<FanPlayer>();
-            SelectFrame();
-            shootCool--;
-            abilityCooldown--;
-
-            abilitySwitchTimer--;
-            if (abilitySwitchTimer <= 0)
-            {
-                abilitySwitchTimer = 0;
-            }
-            if (abilityCooldown <= 0)
-            {
-                abilityCooldown = 0;
-            }
-            if (abilityNumber >= 4)
-            {
-                abilityNumber = 0;
-            }
-            if (shootCool <= 0f)
-            {
-                shootCool = 0f;
-            }
-            Vector2 vector131 = player.Center;
-            vector131.X -= (float)((12 + player.width / 2) * player.direction);
-            vector131.Y -= 25f;
-            projectile.Center = Vector2.Lerp(projectile.Center, vector131, 0.2f);
-            projectile.velocity *= 0.8f;
-            projectile.direction = (projectile.spriteDirection = player.direction);
+            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
+            SelectAnimation();
+            UpdateStandInfo();
             Lighting.AddLight(projectile.position, 1.78f, 2.21f, 2.54f);
+            if (shootCount > 0)
+            {
+                shootCount--;
+            }
+            if (mPlayer.StandOut)
+            {
+                projectile.timeLeft = 2;
+            }
+            if (spearWhoAmI != -1)
+            {
+                Projectile spear = Main.projectile[spearWhoAmI];
+                if (!spear.active)
+                {
+                    projectile.ai[0] = 0f;
+                    spearWhoAmI = -1;
+                    letGoOfSpear = false;
+                }
+            }
+            if (slamCounter > 0)
+            {
+                slamCounter--;
+                secondaryAbilityFrames = true;
+                GoInFront();
+            }
+            else
+            {
+                secondaryAbilityFrames = false;
+                StayBehind();
+            }
+
             if (Main.mouseLeft)
             {
-                normalFrames = false;
                 attackFrames = true;
-                slamFrames = false;
-                if (shootCool <= 0f)
+                if (shootCount <= 0f)
                 {
                     Main.PlaySound(SoundID.Item28, projectile.position);
-                    shootCool += 30;
+                    shootCount += newShootTime;
                     Vector2 shootVel = Main.MouseWorld - projectile.Center;
                     if (shootVel == Vector2.Zero)
                     {
@@ -89,7 +72,7 @@ namespace JoJoFanStands.Projectiles.Minions
                     }
                     shootVel.Normalize();
                     shootVel *= shootSpeed;
-                    int proj = Projectile.NewProjectile(projectile.Center.X, projectile.Center.Y, shootVel.X, shootVel.Y, mod.ProjectileType("IceBolt"), 35, 10f, Main.myPlayer);
+                    int proj = Projectile.NewProjectile(projectile.Center, shootVel, mod.ProjectileType("IceBolt"), newProjectileDamage, 8f, Main.myPlayer);
                     Main.projectile[proj].netUpdate = true;
                     projectile.netUpdate = true;
                 }
@@ -97,181 +80,99 @@ namespace JoJoFanStands.Projectiles.Minions
             else
             {
                 normalFrames = true;
-                attackFrames = false;
-                slamFrames = false;
             }
-            if (Main.mouseRight && abilityCooldown <= 0f && abilityNumber == 0)
+            if (Main.mouseRight && shootCount <= 0f && player.ownedProjectileCounts[mod.ProjectileType("IceSpear")] == 0 && projectile.owner == Main.myPlayer && spearWhoAmI == -1)
             {
-                altAttacking = true;
-            }
-            if (altAttacking)
-            {
-                normalFrames = false;
-                attackFrames = true;
-                slamFrames = false;
-                Main.PlaySound(SoundID.Item28, projectile.position);
-                Vector2 shootVel = Main.MouseWorld - projectile.Center;
-                if (shootVel == Vector2.Zero)
-                {
-                    shootVel = new Vector2(0f, 1f);
-                }
-                shootVel.Normalize();
-                shootVel *= shootSpeed;
-                if (projectilesChosen <= 2)
-                {
-                    chance = Main.rand.Next(1, 7);
-                    projectilesChosen += 1;
-                }
-                if (projectilesChosen >= 3)
-                {
-                    chance = 0;
-                    altAttacking = false;
-                    abilityCooldown += 60;
-                }
-                if (chance == 1)
-                {
-                    proj = Projectile.NewProjectile(projectile.Center.X, projectile.Center.Y, shootVel.X, shootVel.Y, ProjectileID.NightBeam, 30, projectile.knockBack, Main.myPlayer);
-                }
-                if (chance == 2)
-                {
-                    proj = Projectile.NewProjectile(projectile.Center.X, projectile.Center.Y, shootVel.X, shootVel.Y, mod.ProjectileType("IceKnife"), 15, projectile.knockBack, Main.myPlayer);
-                }
-                if (chance == 3)
-                {
-                    proj = Projectile.NewProjectile(projectile.Center.X, projectile.Center.Y, shootVel.X, shootVel.Y, mod.ProjectileType("IceJavelin"), 25, projectile.knockBack, Main.myPlayer);
-                }
-                if (chance == 4)
-                {
-                    proj = Projectile.NewProjectile(projectile.Center.X, projectile.Center.Y, shootVel.X, shootVel.Y, mod.ProjectileType("IceGlaive"), 30, projectile.knockBack, Main.myPlayer);
-                }
-                if (chance == 5)
-                {
-                    proj = Projectile.NewProjectile(projectile.Center.X, projectile.Center.Y, shootVel.X, shootVel.Y, mod.ProjectileType("IceArrow"), 20, projectile.knockBack, Main.myPlayer);
-                }
-                if (chance == 6)
-                {
-                    proj = Projectile.NewProjectile(projectile.Center.X, projectile.Center.Y, shootVel.X, shootVel.Y, ProjectileID.IceSickle, 40, projectile.knockBack, Main.myPlayer);
-                }
-                Main.projectile[proj].netUpdate = true;
+                projectile.ai[0] = 0.5f;
+                spearWhoAmI = Projectile.NewProjectile(projectile.Center.X, projectile.Center.Y - 10f, 0f, 0f, mod.ProjectileType("IceSpear"), (int)(altDamage * mPlayer.standDamageBoosts), 10f, Main.myPlayer, projectile.whoAmI);
+                Main.projectile[spearWhoAmI].netUpdate = true;
                 projectile.netUpdate = true;
             }
-            if (Main.mouseRight && abilityNumber == 1 && abilityCooldown <= 0)
+            if (Main.mouseRight && spearWhoAmI != -1 && !letGoOfSpear)
             {
-                normalFrames = false;
-                attackFrames = false;
-                slamFrames = true;
+                Projectile spear = Main.projectile[spearWhoAmI];
+                projectile.ai[0] += 0.005f;     //used to change multiple things, that's why we're using this
+                if (projectile.ai[0] >= 2f)
+                {
+                    player.AddBuff(BuffID.Chilled, 2);
+                }
+                Vector2 direction = Main.MouseWorld - projectile.Center;
+                if (projectile.ai[0] <= 1.3f)
+                {
+                    spear.scale = projectile.ai[0];
+                }
+                direction.Normalize();
+                spear.rotation = direction.ToRotation() + 1f;
+                spear.velocity = Vector2.Zero;
+                spear.position = projectile.Center + new Vector2(0f, -10f);
+            }
+            if (!Main.mouseRight && spearWhoAmI != -1 && !letGoOfSpear)
+            {
+                Projectile spear = Main.projectile[spearWhoAmI];
+                spear.ai[0] = 1f;
+                spear.damage = (int)(altDamage * (projectile.ai[0] + 1));
+                Vector2 direction = Main.MouseWorld - projectile.Center;
+                direction.Normalize();
+                spear.velocity = (direction * 12f) * projectile.ai[0];
+                letGoOfSpear = true;
+            }
+            if (SpecialKeyPressed() && shootCount <= 0f && !player.HasBuff(JoJoFanStands.JoJoStandsMod.BuffType("AbilityCooldown")))
+            {
+                secondaryAbilityFrames = true;
                 Main.PlaySound(SoundID.Item28, projectile.position);
-                abilityCooldown += 10;        //make it 600, 10 seconds
-                int proj = Projectile.NewProjectile(projectile.Center.X + 7f, projectile.Center.Y + 3f, 0f, 0f, mod.ProjectileType("IceSpike"), 25, 2f, Main.myPlayer);
+                slamCounter += 80;
+                int proj = Projectile.NewProjectile(projectile.Center.X + 7f, projectile.Center.Y + 3f, 0f, 0f, mod.ProjectileType("IceSpike"), specialDamage, 2f, Main.myPlayer, projectile.whoAmI, projectile.direction);
                 Main.projectile[proj].netUpdate = true;
                 projectile.netUpdate = true;
-            }
-            if (Main.mouseRight && abilityNumber == 2 && abilityCooldown <= 0)
-            {
-                abilityCooldown += 300;
-                Projectile.NewProjectile(player.Center, Vector2.Zero, mod.ProjectileType("IceGlobe"), 1, 10f, Main.myPlayer);
-                for (int k = 0; k < Main.maxNPCs; k++)
-                {
-                    if (Main.npc[k].position.X > player.position.X)
-                    {
-                        Main.npc[k].velocity.X = 10f;
-                    }
-                    if (Main.npc[k].position.X <= player.position.X)
-                    {
-                        Main.npc[k].velocity.X = -10f;
-                    }
-                    if (Main.npc[k].position.Y > player.position.Y)
-                    {
-                        Main.npc[k].velocity.Y = 10f;
-                    }
-                    if (Main.npc[k].position.Y <= player.position.Y)
-                    {
-                        Main.npc[k].velocity.Y = -10f;
-                    }
-                }
-            }
-            if (Main.mouseRight && abilityNumber == 3 && abilityCooldown <= 0)
-            {
-                //Fplayer.avalanche = true;
-                abilityCooldown += 600;
-            }
-            if (JoJoStands.JoJoStands.SpecialHotKey.JustPressed && abilitySwitchTimer <= 0)
-            {
-                abilityNumber++;
-                abilitySwitchTimer = 10;
-                saidAbility = false;
-            }
-            if (!saidAbility)
-            {
-                if (abilityNumber == 0)
-                {
-                    Main.NewText("Ability: Ice Weapons");
-                    saidAbility = true;
-                }
-                if (abilityNumber == 1)
-                {
-                    Main.NewText("Ability: Ice Wave");
-                    saidAbility = true;
-                }
-                if (abilityNumber == 2)
-                {
-                    Main.NewText("Ability: Ice Globe");
-                    saidAbility = true;
-                }
-                if (abilityNumber == 3)
-                {
-                    Main.NewText("Ability: Avalanche");
-                    saidAbility = true;
-                }
+                player.AddBuff(JoJoFanStands.JoJoStandsMod.BuffType("AbilityCooldown"), mPlayer.AbilityCooldownTime(10));
             }
         }
 
-        public virtual void SelectFrame()
+        public override void SelectAnimation()
         {
-            projectile.frameCounter++;
-            if (normalFrames)
+            if (secondaryAbilityFrames)     //so this takes effect above all else
             {
-                if (projectile.frameCounter >= 12)
-                {
-                    projectile.frame += 1;
-                    projectile.frameCounter = 0;
-                }
-                if (projectile.frame >= 8)
-                {
-                    projectile.frame = 0;
-                }
+                normalFrames = false;
+                attackFrames = false;
+                PlayAnimation("Slam");
+                projectile.frame = 0;
             }
             if (attackFrames)
             {
-                if (projectile.frameCounter >= 7)
-                {
-                    projectile.frame += 1;
-                    projectile.frameCounter = 0;
-                }
-                if (projectile.frame >= 7)
-                {
-                    projectile.frame = 8;
-                }
-                if (projectile.frame <= 12)
-                {
-                    projectile.frame = 8;
-                }
+                normalFrames = false;
+                PlayAnimation("Attack");
             }
-            if (slamFrames)
+            if (normalFrames)
             {
-                if (projectile.frameCounter >= 10)
-                {
-                    projectile.frame += 1;
-                    projectile.frameCounter = 0;
-                }
-                if (projectile.frame >= 14)
-                {
-                    projectile.frame = 15;
-                }
-                if (projectile.frame <= 18)
-                {
-                    projectile.frame = 15;
-                }
+                attackFrames = false;
+                PlayAnimation("Idle");
+            }
+            if (Main.player[projectile.owner].GetModPlayer<MyPlayer>().poseMode)
+            {
+                normalFrames = false;
+                attackFrames = false;
+                PlayAnimation("Idk");
+            }
+        }
+
+        public override void PlayAnimation(string animationName)
+        {
+            standTexture = mod.GetTexture("Projectiles/PlayerStands/CoolOut/CoolOut_" + animationName);
+            if (animationName == "Idle")
+            {
+                AnimationStates(animationName, 8, 15, true);
+            }
+            if (animationName == "Attack")
+            {
+                AnimationStates(animationName, 4, 14, true);
+            }
+            if (animationName == "Slam")
+            {
+                AnimationStates(animationName, 1, 180, true);
+            }
+            if (animationName == "Idk")
+            {
+                AnimationStates(animationName, 2, 60, true);
             }
         }
     }

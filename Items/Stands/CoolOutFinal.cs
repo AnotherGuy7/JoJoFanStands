@@ -3,20 +3,26 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using JoJoStands;
 using System.Collections.Generic;
+using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Stands
 {
-	public class CoolOutT1 : ModItem
+	public class CoolOutFinal : ModItem
 	{
+        public override string Texture
+        {
+            get { return mod.Name + "/Items/Stands/CoolOutT1"; }
+        }
+
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Cool Out (Tier 1)");
-            Tooltip.SetDefault("Left-click to shoot an Ice Bolt and right-click to charge and throw an Ice Spear!\nSpecial: Summon an infinite Ice Wave!\nUser Name: NekroSektor \nReference: Cool Out and Natural by Imagine Dragons");
+            DisplayName.SetDefault("Cool Out (Final Tier)");
+            Tooltip.SetDefault("Left-click to shoot an Ice Bolt and hold right-click to charge up a spear!\nSpecial: Send out an ice wave!\nUser Name: NekroSektor \nReference: Cool Out and Natural by Imagine Dragons");
         }
 
         public override void SetDefaults()
         {
-            item.damage = 15;
+            item.damage = 51;
             item.width = 32;
             item.height = 32;
             item.useTime = 12;
@@ -31,7 +37,7 @@ namespace JoJoFanStands.Items.Stands
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             MyPlayer mPlayer = Main.player[Main.myPlayer].GetModPlayer<MyPlayer>();
-            TooltipLine tooltipAddition = new TooltipLine(mod, "Speed", "Shoot Speed: " + (40 - mPlayer.standSpeedBoosts));
+            TooltipLine tooltipAddition = new TooltipLine(mod, "Speed", "Shoot Speed: " + (20 - mPlayer.standSpeedBoosts));
             tooltips.Add(tooltipAddition);
         }
 
@@ -42,12 +48,14 @@ namespace JoJoFanStands.Items.Stands
 
         public override void AddRecipes()
         {
-            Mod JoJoStands = JoJoFanStands.JoJoStandsMod;
+            Mod JoJoStands = ModLoader.GetMod("JoJoStands");
             ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(JoJoStands.ItemType("StandArrow"));
-            recipe.AddIngredient(ItemID.IceBlock, 15);
-            recipe.AddIngredient(ItemID.Shiverthorn, 3);
-            recipe.AddIngredient(JoJoStands.ItemType("WillToProtect"));
+            recipe.AddIngredient(ItemType<CoolOutT3>());
+            recipe.AddIngredient(ItemID.PearlstoneBlock, 20);
+            recipe.AddIngredient(ItemID.FrostCore);
+            recipe.AddIngredient(ItemID.CrystalShard, 8);
+            recipe.AddIngredient(JoJoStands.ItemType("WillToProtect"), 2);
+            recipe.AddIngredient(JoJoStands.ItemType("WillToControl"), 2);
             recipe.SetResult(this);
             recipe.AddRecipe();
         }
