@@ -17,8 +17,6 @@ namespace JoJoFanStands
 
 		private UserInterface _abilityui;
 
-        public static ModHotKey AccessorySpecialKey;
-
 		internal AbilityChooserUI AbilityUI;
 
         public JoJoFanStands()
@@ -28,7 +26,6 @@ namespace JoJoFanStands
 
 		public override void Load()
 		{
-            AccessorySpecialKey = RegisterHotKey("JoJoFanStands: Accessory Special", "L");
             JoJoStandsMod = ModLoader.GetMod("JoJoStands");
 
             if (!Main.dedServ)

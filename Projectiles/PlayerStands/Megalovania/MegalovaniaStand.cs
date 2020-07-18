@@ -16,11 +16,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
         public override int shootTime => 40;
         public override int altDamage => 96;
         public override int halfStandHeight => 34;      //28
-        public override int standOffset => 45;
+        public override int standOffset => -25;
+        public override float maxDistance => 0f;
 
         public static int abilityNumber = 0;
 
-        private string abilityName;
+        private string abilityName = "PushBack";
         private string direction = "Straight";
         private float mouseDistance = 0f;
         private int maxFrames = 0;
@@ -259,6 +260,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             }
             else
             {
+                projectile.frame = 0;
                 PlayAnimation(abilityName);
                 maxFrames = 1;
                 if (projectile.frame >= maxFrames)

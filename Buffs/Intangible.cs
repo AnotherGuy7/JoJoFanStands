@@ -42,7 +42,7 @@ namespace JoJoFanStands.Buffs
             }
             else
             {
-                player.AddBuff(mod.BuffType("IntangibleCooldown"), 1800);
+                player.AddBuff(JoJoFanStands.JoJoStandsMod.BuffType("AbilityCooldown"), 1800);
             }
         }
     }

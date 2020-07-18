@@ -1,3 +1,4 @@
+using JoJoStands;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
@@ -39,14 +40,6 @@ namespace JoJoFanStands.Mounts
 
             mountData.textureWidth = mountData.backTexture.Width;
             mountData.textureHeight = mountData.backTexture.Height / mountData.totalFrames;
-        }
-
-        public override void UpdateEffects(Player player)
-        {
-            if (player.GetModPlayer<FanPlayer>().SpinBoost)
-            {
-                
-            }
         }
     }
 }

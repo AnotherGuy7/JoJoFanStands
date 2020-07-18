@@ -10,28 +10,28 @@ namespace JoJoFanStands.Mounts
     {
         public override void SetDefaults()
         {
-            mountData.heightBoost = -15;
+            mountData.heightBoost = 0;      //the height the mount gains
             mountData.fallDamage = 0.5f;
-            mountData.runSpeed = 11f;
-            mountData.dashSpeed = 8f;
+            mountData.runSpeed = 7f;
+            mountData.dashSpeed = 4f;
             mountData.flightTimeMax = 0;
             mountData.fatigueMax = 0;
             mountData.jumpHeight = 5;
-            mountData.acceleration = 0.19f;
-            mountData.jumpSpeed = 4f;
+            mountData.acceleration = 0.08f;
+            mountData.jumpSpeed = 5f;
             mountData.blockExtraJumps = false;
             mountData.totalFrames = 2;
             mountData.constantJump = true;
             int[] array = new int[mountData.totalFrames];
             for (int l = 0; l < array.Length; l++)
             {
-                array[l] = 20;
+                array[l] = 0;
             }
             mountData.playerYOffsets = array;
             mountData.xOffset = -10;
             mountData.bodyFrame = 3;
-            mountData.yOffset = -32;
-            mountData.playerHeadOffset = 22;
+            mountData.yOffset = 0;        //mount Y draw offset
+            mountData.playerHeadOffset = 0;     //player head in the map offset
             mountData.swimFrameCount = 2;
             mountData.swimFrameDelay = 12;
             mountData.swimFrameStart = 0;
@@ -51,13 +51,9 @@ namespace JoJoFanStands.Mounts
             if (!player.wet)
             {
                 player.moveSpeed = 0f;
-                mountData.acceleration = 0f;
-                mountData.runSpeed = 0f;
-                mountData.dashSpeed = 0f;
-                player.accFlipper = false;
             }
             player.breathCD = 1;
-            player.accFlipper = true;
+            player.accFlipper = player.wet;
         }
     }
 }

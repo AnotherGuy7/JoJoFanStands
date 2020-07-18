@@ -20,6 +20,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands
         public override void AI()
         {
             SelectAnimation();
+            UpdateStandInfo();
             if (shootCount > 0)
             {
                 shootCount--;

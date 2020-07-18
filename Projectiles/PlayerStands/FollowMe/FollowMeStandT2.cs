@@ -12,16 +12,17 @@ using System.IO;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
 {
-    public class FollowMeStandT1 : StandClass
+    public class FollowMeStandT2 : StandClass
     {
-        public override int punchDamage => 16;
-        public override int altDamage => 31;
+        public override int punchDamage => 28;
+        public override int altDamage => 45;
         public override int halfStandHeight => 39;
         public override int standType => 1;
 
         private Vector2 velocityAddition;
         private float mouseDistance;
         private bool grabbing = false;
+        private bool intangible = false;
         private float windUpForce = 1f;
 
         public override void AI()
@@ -38,6 +39,16 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
             if (mPlayer.StandOut)
             {
                 projectile.timeLeft = 2;
+            }
+            drawOriginOffsetY = -halfStandHeight;
+
+            if (projectile.direction == -1)
+            {
+                drawOffsetX = -30;
+            }
+            else
+            {
+                drawOffsetX = 0;
             }
 
             if (Main.mouseLeft || Main.mouseRight && !grabbing)
@@ -161,20 +172,31 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
                     grabbing = false;
                 }
             }
+            if (JoJoStands.JoJoStands.SpecialHotKey.JustPressed && !player.HasBuff(mod.BuffType("Intangible")) && !player.HasBuff(JoJoFanStands.JoJoStandsMod.BuffType("AbilityCooldown")))
+            {
+                player.AddBuff(mod.BuffType("Intangible"), 7200);
+            }
+            intangible = player.HasBuff(mod.BuffType("Intangible"));
             if (!grabbing)
             {
                 LimitDistance();
+            }
+            if (intangible)
+            {
+                projectile.alpha = 80;
             }
         }
 
         public override void SendExtraStates(BinaryWriter writer)
         {
             writer.Write(grabbing);
+            writer.Write(intangible);
         }
 
         public override void ReceiveExtraStates(BinaryReader reader)
         {
             grabbing = reader.ReadBoolean();
+            intangible = reader.ReadBoolean();
         }
 
         public override void SelectAnimation()
@@ -187,7 +209,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
             if (normalFrames)
             {
                 attackFrames = false;
-                PlayAnimation("Idle");
+                if (!intangible)
+                {
+                    PlayAnimation("Idle");
+                }
+                else
+                {
+                    PlayAnimation("NoClip");
+                }
             }
             if (grabbing)
             {
@@ -223,6 +252,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
             if (animationName == "Grab")
             {
                 AnimationStates(animationName, 9, 12, false);
+            }
+            if (animationName == "NoClip")
+            {
+                AnimationStates(animationName, 5, 15, true);
             }
         }
     }

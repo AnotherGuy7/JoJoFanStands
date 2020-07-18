@@ -1,7 +1,7 @@
-using Microsoft.Xna.Framework;
-using Terraria;
 using Terraria.ModLoader;
-using Terraria.DataStructures;
+using Terraria.ID;
+using JoJoStands.Items.CraftingMaterials;
+using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Armor
 {
@@ -12,7 +12,7 @@ namespace JoJoFanStands.Items.Armor
         public void SetStaticDefault()
         {
             DisplayName.SetDefault("Brian Eno (Act 3, Mother Whale Eyeless)");
-            Tooltip.SetDefault("Use the special ability key to make yourself immune to damage, but unable to move or use items.");
+            Tooltip.SetDefault("While using any mount gain +10% movement speed, +5% chance to dodge attacks, and a +10% critical strike chance!\nPress special while in a mount to move faster and dodge all attacks!\nPress special while there is no mount to have Brain Eno carry you!");
         }
 
         public override void SetDefaults()
@@ -20,58 +20,27 @@ namespace JoJoFanStands.Items.Armor
             item.width = 30;
             item.height = 30;
             item.accessory = true;
-            item.rare = 6;
-        }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            player.GetModPlayer<FanPlayer>().wearingStandAccessory = true;
-            player.GetModPlayer<FanPlayer>().BrianEnoAct3 = true;
-            abilityDuration--;
-            if (abilityDuration <= 0)
-            {
-                abilityDuration = 0;
-            }
-            if (abilityDuration > 0)
-            {
-                player.meleeCrit += 20;
-                player.immune = true;
-            }
-            if (player.mount.Type != Mount.None)
-            {
-                player.moveSpeed += 0.1f;
-                player.meleeCrit += 10;
-            }
-            if (JoJoFanStands.AccessorySpecialKey.JustPressed && /*JoJoStands.MyPlayer.HamonCounter >= 60 &&*/ player.mount.Type != Mount.None)
-            {
-                //JoJoStands.MyPlayer.HamonCounter -= 60;
-                abilityDuration = 90;
-            }
-            if (JoJoFanStands.AccessorySpecialKey.JustPressed && player.mount.Type == Mount.None && !player.wet)
-            {
-                player.mount.SetMount(mod.MountType("SkySawMount"), Main.player[Main.myPlayer]);
-            }
-            if (JoJoFanStands.AccessorySpecialKey.JustPressed && player.mount.Type == Mount.None && player.wet)
-            {
-                player.mount.SetMount(mod.MountType("BathysphereMount"), Main.player[Main.myPlayer]);
-            }
-        }
-
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (player.GetModPlayer<FanPlayer>().wearingStandAccessory)
-            {
-                return false;
-            }
-            return true;
+            item.rare = ItemRarityID.LightPurple;
         }
 
         public override void AddRecipes()
 		{
 			ModRecipe recipe = new ModRecipe(mod);
-			recipe.AddIngredient(mod.ItemType("StandArrow"));
+			recipe.AddIngredient(ItemType<BrianEnoAct2>());
+            recipe.AddIngredient(ItemID.PalladiumBar, 12);
+            recipe.AddIngredient(ItemType<SunDroplet>(), 5);
+            recipe.AddIngredient(ItemID.SoulofFlight, 20);
+            recipe.AddIngredient(ItemType<WillToEscape>(), 2);
 			recipe.SetResult(this);
 			recipe.AddRecipe();
-		}
+            recipe = new ModRecipe(mod);
+            recipe.AddIngredient(ItemType<BrianEnoAct2>());
+            recipe.AddIngredient(ItemID.CobaltBar, 12);
+            recipe.AddIngredient(ItemType<SunDroplet>(), 5);
+            recipe.AddIngredient(ItemID.SoulofFlight, 20);
+            recipe.AddIngredient(ItemType<WillToEscape>(), 2);
+            recipe.SetResult(this);
+            recipe.AddRecipe();
+        }
     }
 }

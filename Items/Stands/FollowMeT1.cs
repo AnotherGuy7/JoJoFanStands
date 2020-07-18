@@ -4,6 +4,9 @@ using Terraria.ModLoader;
 using JoJoStands;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using static Terraria.ModLoader.ModContent;
+using JoJoStands.Items;
+using JoJoStands.Items.CraftingMaterials;
 
 namespace JoJoFanStands.Items.Stands
 {
@@ -12,7 +15,7 @@ namespace JoJoFanStands.Items.Stands
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Follow Me (Tier 1)");
-            Tooltip.SetDefault("Left-click to wind-up a punch and Right-click to grab enemies!\nSpecial: Intangible\nUser Name: Agatha/Betty/Thabita/Mrs Destiny/Hot Pants \nReference: ???");
+            Tooltip.SetDefault("Left-click to wind-up a punch and Right-click to grab enemies!\nUser Name: Agatha/Betty/Thabita/Mrs Destiny/Hot Pants \nReference: ???");
         }
 
         public override void SetDefaults()
@@ -43,10 +46,10 @@ namespace JoJoFanStands.Items.Stands
 
         public override void AddRecipes()
         {
-            Mod JoJoStands = ModLoader.GetMod("JoJoStands");
+            Mod JoJoStands = JoJoFanStands.JoJoStandsMod;
             ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(JoJoStands.ItemType("StandArrow"));
-            recipe.AddIngredient(JoJoStands.ItemType("WillToChange"));
+            recipe.AddIngredient(ItemType<StandArrow>());
+            recipe.AddIngredient(ItemType<WillToChange>());
             recipe.SetResult(this);
             recipe.AddRecipe();
         }

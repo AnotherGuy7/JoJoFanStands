@@ -24,13 +24,13 @@ namespace JoJoFanStands.Mounts
             int[] array = new int[mountData.totalFrames];
             for (int l = 0; l < array.Length; l++)
             {
-                array[l] = 20;
+                array[l] = 0;
             }
             mountData.playerYOffsets = array;
             mountData.xOffset = 0;
             mountData.bodyFrame = 3;
             mountData.yOffset = -22;
-            mountData.playerHeadOffset = -22;
+            mountData.playerHeadOffset = 5;
             mountData.standingFrameCount = 0;
             mountData.standingFrameDelay = 12;
             mountData.standingFrameStart = 0;

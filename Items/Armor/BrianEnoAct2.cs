@@ -1,7 +1,7 @@
-using Microsoft.Xna.Framework;
-using Terraria;
 using Terraria.ModLoader;
-using Terraria.DataStructures;
+using Terraria.ID;
+using JoJoStands.Items.CraftingMaterials;
+using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Armor
 {
@@ -12,7 +12,7 @@ namespace JoJoFanStands.Items.Armor
         public void SetStaticDefault()
         {
             DisplayName.SetDefault("Brian Eno (Act 2, Mother Whale Eyeless)");
-            Tooltip.SetDefault("Use the special ability key to make yourself immune to damage, but unable to move or use items.");
+            Tooltip.SetDefault("While using any mount gain +10% movement speed, +5% chance to dodge attacks, and a +10% critical strike chance!\nPress special while in a mount to move faster and dodge all attacks!\nPress special while there is no mount to have Brain Eno carry you!");
         }
 
         public override void SetDefaults()
@@ -20,57 +20,17 @@ namespace JoJoFanStands.Items.Armor
             item.width = 30;
             item.height = 30;
             item.accessory = true;
-            item.rare = 6;
-        }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            player.GetModPlayer<FanPlayer>().wearingStandAccessory = true;
-            player.GetModPlayer<FanPlayer>().BrianEnoAct2 = true;
-            abilityDuration--;
-            if (abilityDuration <= 0)
-            {
-                abilityDuration = 0;
-            }
-            if (abilityDuration > 0)
-            {
-                player.GetModPlayer<FanPlayer>().SpinBoost = true;
-                player.meleeCrit += 20;
-                player.immune = true;
-            }
-            if (player.mount.Type != Mount.None)
-            {
-                player.moveSpeed += 0.1f;
-                player.meleeCrit += 10;
-            }
-            if (JoJoFanStands.AccessorySpecialKey.JustPressed && /*JoJoStands.MyPlayer.HamonCounter >= 75 &&*/ player.mount.Type != Mount.None)
-            {
-                //JoJoStands.MyPlayer.HamonCounter -= 75;
-                abilityDuration = 90;
-            }
-            if (JoJoFanStands.AccessorySpecialKey.JustPressed && player.mount.Type == Mount.None && !player.wet)
-            {
-                player.mount.SetMount(mod.MountType("BrianEnoMount"), Main.player[Main.myPlayer]);
-            }
-            if (JoJoFanStands.AccessorySpecialKey.JustPressed && player.mount.Type == Mount.None && player.wet)
-            {
-                player.mount.SetMount(mod.MountType("BathysphereMount"), Main.player[Main.myPlayer]);
-            }
-        }
-
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (player.GetModPlayer<FanPlayer>().wearingStandAccessory)
-            {
-                return false;
-            }
-            return true;
+            item.rare = ItemRarityID.LightPurple;
         }
 
         public override void AddRecipes()
 		{
 			ModRecipe recipe = new ModRecipe(mod);
-			recipe.AddIngredient(mod.ItemType("StandArrow"));
+			recipe.AddIngredient(ItemType<BrianEnoAct1>());
+            recipe.AddIngredient(ItemID.HellstoneBar, 8);
+            recipe.AddIngredient(ItemID.Coral, 5);
+            recipe.AddIngredient(ItemType<SunDroplet>(), 5);
+            recipe.AddIngredient(ItemID.Bone, 30);
 			recipe.SetResult(this);
 			recipe.AddRecipe();
 		}

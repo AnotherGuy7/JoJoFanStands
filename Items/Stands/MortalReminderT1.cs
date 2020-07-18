@@ -6,6 +6,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.ModLoader;
 using JoJoStands;
 using System.Collections.Generic;
+using static Terraria.ModLoader.ModContent;
+using JoJoStands.Items;
+using JoJoStands.Items.CraftingMaterials;
 
 namespace JoJoFanStands.Items.Stands
 {
@@ -34,7 +37,7 @@ namespace JoJoFanStands.Items.Stands
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             MyPlayer mPlayer = Main.player[Main.myPlayer].GetModPlayer<MyPlayer>();
-            TooltipLine tooltipAddition = new TooltipLine(mod, "Speed", "Punch Speed: " + (12 - mPlayer.standSpeedBoosts));
+            TooltipLine tooltipAddition = new TooltipLine(mod, "Speed", "Punch Speed: " + (17 - mPlayer.standSpeedBoosts));
             tooltips.Add(tooltipAddition);
         }
 
@@ -45,9 +48,9 @@ namespace JoJoFanStands.Items.Stands
 
         public override void AddRecipes()
         {
-            Mod JoJoStands = ModLoader.GetMod("JoJoStands");
             ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(JoJoStands.ItemType("StandArrow"));
+            recipe.AddIngredient(ItemType<StandArrow>());
+            recipe.AddIngredient(ItemType<WillToChange>());
             recipe.SetResult(this);
             recipe.AddRecipe();
         }

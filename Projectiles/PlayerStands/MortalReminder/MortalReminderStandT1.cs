@@ -1,10 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terraria;
-using Terraria.Graphics.Effects;
-using Terraria.ID;
-using Terraria.ModLoader;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
 
@@ -15,36 +11,40 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MortalReminder
         public override int punchDamage => 18;
         public override int altDamage => 96;
         public override int halfStandHeight => 28;
+        public override int punchTime => 17;
         public override int standType => 1;
+        public override int standOffset => -25;
 
         private int afterImageTimer = 60;
 
-
         public override void AI()
         {
+            Player player = Main.player[projectile.owner];
+            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
+            SelectAnimation();
+            UpdateStandInfo();
+            if (mPlayer.StandOut)
+            {
+                projectile.timeLeft = 2;
+            }
             if (projectile.ai[0] == 0f)
             {
                 if (shootCount > 0)
                 {
                     shootCount--;
                 }
-                Player player = Main.player[projectile.owner];
-                MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-                if (mPlayer.StandOut)
-                {
-                    projectile.timeLeft = 2;
-                }
-                drawOriginOffsetY = -halfStandHeight;
 
                 if (Main.mouseLeft)
                 {
                     attackFrames = true;
                     Punch();
+                    projectile.ai[1] = 3f;
                 }
                 else
                 {
                     normalFrames = true;
                     StayBehind();
+                    projectile.ai[1] = 1f;
                 }
 
                 afterImageTimer--;
@@ -82,7 +82,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MortalReminder
             if (projectile.ai[0] == 1f)
             {
                 int frameHeight = standTexture.Height / Main.projFrames[projectile.whoAmI];
-                spriteBatch.Draw(standTexture, projectile.Center - Main.screenPosition + new Vector2(19f, 1f), new Rectangle(0, frameHeight * projectile.frame, standTexture.Width, frameHeight), Color.White * (((float)projectile.alpha * 3.9215f) / 1000f), 0f, new Vector2(standTexture.Width / 2f, frameHeight / 2f), 1f, effects, 0);
+                spriteBatch.Draw(standTexture, projectile.Center - Main.screenPosition + new Vector2(19f, 1f), new Rectangle(0, frameHeight * projectile.frame, standTexture.Width, frameHeight), Color.White * projectile.alpha, 0f, new Vector2(standTexture.Width / 2f, frameHeight / 2f), 1f, effects, 0);
             }
             return true;
         }
@@ -115,15 +115,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MortalReminder
             standTexture = mod.GetTexture("Projectiles/PlayerStands/MortalReminder/MortalReminder_" + animationName);
             if (animationName == "Idle")
             {
-                AnimationStates(animationName, 4, 4, true);
+                AnimationStates(animationName, 4, 12, true);
             }
             if (animationName == "Attack")
             {
-                AnimationStates(animationName, 12, 3, true);
+                AnimationStates(animationName, 12, newPunchTime / 2, true);
             }
             if (animationName == "Dash")
             {
-                AnimationStates(animationName, 4, 4, true);
+                AnimationStates(animationName, 4, 10, true);
             }
         }
     }

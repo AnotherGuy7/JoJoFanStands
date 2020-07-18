@@ -3,6 +3,9 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using JoJoStands;
 using Microsoft.Xna.Framework;
+using static Terraria.ModLoader.ModContent;
+using JoJoStands.Items;
+using JoJoStands.Items.CraftingMaterials;
 
 namespace JoJoFanStands.Items.Stands
 {
@@ -94,9 +97,9 @@ namespace JoJoFanStands.Items.Stands
 
         public override void AddRecipes()
         {
-            Mod JoJoStands = ModLoader.GetMod("JoJoStands");
             ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(JoJoStands.ItemType("StandArrow"));
+            recipe.AddIngredient(ItemType<StandArrow>());
+            recipe.AddIngredient(ItemType<WillToFight>());
             recipe.SetResult(this);
             recipe.AddRecipe();
         }

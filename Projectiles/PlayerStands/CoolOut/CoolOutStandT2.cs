@@ -15,6 +15,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands
         public override int standType => 2;
         public override int standOffset => 20;
         public override int halfStandHeight => 32;
+        public override float maxDistance => 0f;
 
         private int specialDamage = 41;
         private int spearWhoAmI = -1;
