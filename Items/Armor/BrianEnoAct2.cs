@@ -9,7 +9,7 @@ namespace JoJoFanStands.Items.Armor
     {
         public int abilityDuration = 0;
 
-        public void SetStaticDefault()
+        public override void SetStaticDefault()
         {
             DisplayName.SetDefault("Brian Eno (Act 2, Mother Whale Eyeless)");
             Tooltip.SetDefault("While using any mount gain +10% movement speed, +5% chance to dodge attacks, and a +10% critical strike chance!\nPress special while in a mount to move faster and dodge all attacks!\nPress special while there is no mount to have Brain Eno carry you!");
