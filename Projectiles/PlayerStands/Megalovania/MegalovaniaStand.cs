@@ -7,6 +7,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
+using Microsoft.Xna.Framework.Audio;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
 {
@@ -25,6 +26,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
         private string direction = "Straight";
         private float mouseDistance = 0f;
         private int maxFrames = 0;
+        private int volumeTimer = 0;
+        private float savedMusicVolume = -1f;
+
+        private SoundEffectInstance noise = null;
+        private SoundEffectInstance backgroundNoise = null;
 
         public override void AI()
         {
@@ -42,7 +48,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             }
             drawOriginOffsetY = -halfStandHeight;
             StayBehind();
-
+            if (savedMusicVolume == -1f)
+            {
+                savedMusicVolume = Main.musicVolume;
+            }
 
             if (Main.mouseLeft && abilityNumber == 0 && player.whoAmI == Main.myPlayer)
             {
@@ -221,6 +230,51 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                             }
                         }
                     }
+                }
+            }
+
+            if (abilityNumber == 6)
+            {
+                abilityName = "DistortedReality";
+                volumeTimer++;
+                if (volumeTimer >= 360000)
+                {
+                    volumeTimer = 0;
+                }
+                if (noise == null)
+                {
+                    Main.PlaySound(mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/DistortedRealityStart"));
+                    SoundEffect noiseEffect = mod.GetSound("Sounds/Noise");
+                    noise = noiseEffect.CreateInstance();
+                    SoundEffect noiseEffect2 = mod.GetSound("Sounds/BackgroundNoise");
+                    backgroundNoise = noiseEffect2.CreateInstance();
+                }
+
+
+                noise.Volume = MathHelper.Clamp((float)Math.Sin(volumeTimer / 180) - 0.6f, 0f, 1f);
+                backgroundNoise.Volume = 0.08f;
+                Main.PlaySoundInstance(noise);
+                Main.PlaySoundInstance(backgroundNoise);
+                Main.musicVolume = 0f;
+
+                if (!Main.dedServ)
+                {
+                    if (!Filters.Scene["DistortedRealityEffect"].IsActive())
+                    {
+                        Filters.Scene.Activate("DistortedRealityEffect");
+                    }
+                }
+                if (Main.mouseRight)
+                {
+                    abilityNumber = 0;
+                    Main.musicVolume = savedMusicVolume;
+                }
+            }
+            else
+            {
+                if (Filters.Scene["DistortedRealityEffect"].IsActive())
+                {
+                    Filters.Scene["DistortedRealityEffect"].Deactivate();
                 }
             }
         }

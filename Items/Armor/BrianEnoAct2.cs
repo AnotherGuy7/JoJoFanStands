@@ -2,14 +2,15 @@ using Terraria.ModLoader;
 using Terraria.ID;
 using JoJoStands.Items.CraftingMaterials;
 using static Terraria.ModLoader.ModContent;
+using JoJoStands.Items;
 
 namespace JoJoFanStands.Items.Armor
 {
-    public class BrianEnoAct2 : ModItem
+    public class BrianEnoAct2 : StandItemClass
     {
-        public int abilityDuration = 0;
+        private int abilityDuration = 0;
 
-        public override void SetStaticDefault()
+        public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Brian Eno (Act 2, Mother Whale Eyeless)");
             Tooltip.SetDefault("While using any mount gain +10% movement speed, +5% chance to dodge attacks, and a +10% critical strike chance!\nPress special while in a mount to move faster and dodge all attacks!\nPress special while there is no mount to have Brain Eno carry you!");

@@ -1,14 +1,14 @@
-using Terraria;
+using JoJoStands.Items;
 using Terraria.ID;
-using JoJoStands;
 using Terraria.ModLoader;
-using Microsoft.Xna.Framework;
-using System.Collections.Generic;
 
 namespace JoJoFanStands.Items.Stands
 {
-	public class  Megalovania : ModItem
-	{
+    public class Megalovania : StandItemClass
+    {
+        public override int standSpeed => 60;
+        public override int standType => 2;
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Megalovania");
@@ -27,18 +27,6 @@ namespace JoJoFanStands.Items.Stands
             item.value = 0;
             item.noUseGraphic = true;
             item.rare = ItemRarityID.LightPurple;
-        }
-
-        public override void ModifyTooltips(List<TooltipLine> tooltips)
-        {
-            MyPlayer mPlayer = Main.player[Main.myPlayer].GetModPlayer<MyPlayer>();
-            TooltipLine tooltipAddition = new TooltipLine(mod, "Speed", "Attack? Speed: " + (60 - mPlayer.standSpeedBoosts));
-            tooltips.Add(tooltipAddition);
-        }
-
-        public override void ModifyWeaponDamage(Player player, ref float add, ref float mult, ref float flat)
-        {
-            mult *= (float)player.GetModPlayer<MyPlayer>().standDamageBoosts;
         }
 
         public override void AddRecipes()

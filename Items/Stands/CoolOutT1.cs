@@ -1,13 +1,14 @@
-using Terraria;
+using JoJoStands.Items;
 using Terraria.ID;
 using Terraria.ModLoader;
-using JoJoStands;
-using System.Collections.Generic;
 
 namespace JoJoFanStands.Items.Stands
 {
-	public class CoolOutT1 : ModItem
-	{
+    public class CoolOutT1 : StandItemClass
+    {
+        public override int standSpeed => 40;
+        public override int standType => 2;
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Cool Out (Tier 1)");
@@ -26,18 +27,6 @@ namespace JoJoFanStands.Items.Stands
             item.value = 0;
             item.noUseGraphic = true;
             item.rare = ItemRarityID.LightPurple;
-        }
-
-        public override void ModifyTooltips(List<TooltipLine> tooltips)
-        {
-            MyPlayer mPlayer = Main.player[Main.myPlayer].GetModPlayer<MyPlayer>();
-            TooltipLine tooltipAddition = new TooltipLine(mod, "Speed", "Shoot Speed: " + (40 - mPlayer.standSpeedBoosts));
-            tooltips.Add(tooltipAddition);
-        }
-
-        public override void ModifyWeaponDamage(Player player, ref float add, ref float mult, ref float flat)
-        {
-            mult *= (float)player.GetModPlayer<MyPlayer>().standDamageBoosts;
         }
 
         public override void AddRecipes()

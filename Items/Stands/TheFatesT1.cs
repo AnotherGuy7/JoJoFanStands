@@ -1,17 +1,16 @@
-using Terraria.ID;
-using Terraria;
-using Microsoft.Xna.Framework;
-using Terraria.ModLoader;
-using System.Collections.Generic;
-using JoJoStands;
-using static Terraria.ModLoader.ModContent;
 using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
+using Terraria.ID;
+using Terraria.ModLoader;
+using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Stands
 {
-    public class TheFatesT1 : ModItem
+    public class TheFatesT1 : StandItemClass
     {
+        public override int standSpeed => 12;
+        public override int standType => 1;
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("The Fates (Tier 1)");
@@ -30,18 +29,6 @@ namespace JoJoFanStands.Items.Stands
             item.value = 0;
             item.noUseGraphic = true;
             item.rare = ItemRarityID.LightPurple;
-        }
-
-        public override void ModifyTooltips(List<TooltipLine> tooltips)
-        {
-            MyPlayer mPlayer = Main.player[Main.myPlayer].GetModPlayer<MyPlayer>();
-            TooltipLine tooltipAddition = new TooltipLine(mod, "Speed", "Shoot Speed: " + (12 - mPlayer.standSpeedBoosts));
-            tooltips.Add(tooltipAddition);
-        }
-
-        public override void ModifyWeaponDamage(Player player, ref float add, ref float mult, ref float flat)
-        {
-            mult *= (float)player.GetModPlayer<MyPlayer>().standDamageBoosts;
         }
 
         public override void AddRecipes()

@@ -1,16 +1,17 @@
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
-using JoJoStands;
-using Microsoft.Xna.Framework;
-using static Terraria.ModLoader.ModContent;
 using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
+using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.ModLoader;
+using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Stands
 {
-	public class RoseColoredBoy : ModItem
-	{
+    public class RoseColoredBoy : StandItemClass
+    {
+        public override int standSpeed => 12;
+        public override int standType => 1;
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Rose Colored Boy");

@@ -5,12 +5,15 @@ using JoJoStands;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using static Terraria.ModLoader.ModContent;
+using JoJoStands.Items;
 
 namespace JoJoFanStands.Items.Stands
 {
-	public class FollowMeBetweenT1 : ModItem
+	public class FollowMeBetweenT1 : StandItemClass
 	{
         public override string Texture => mod.Name + "/Items/Stands/FollowMeT1";
+        public override int standSpeed => 12;
+        public override int standType => 1;
 
         public override void SetStaticDefaults()
         {
@@ -30,18 +33,6 @@ namespace JoJoFanStands.Items.Stands
             item.value = 0;
             item.noUseGraphic = true;
             item.rare = ItemRarityID.LightPurple;
-        }
-
-        public override void ModifyTooltips(List<TooltipLine> tooltips)
-        {
-            MyPlayer mPlayer = Main.player[Main.myPlayer].GetModPlayer<MyPlayer>();
-            TooltipLine tooltipAddition = new TooltipLine(mod, "Speed", "Punch Speed: " + (12 - mPlayer.standSpeedBoosts));
-            tooltips.Add(tooltipAddition);
-        }
-
-        public override void ModifyWeaponDamage(Player player, ref float add, ref float mult, ref float flat)
-        {
-            mult *= (float)player.GetModPlayer<MyPlayer>().standDamageBoosts;
         }
 
         public override void AddRecipes()

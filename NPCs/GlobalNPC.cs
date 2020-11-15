@@ -84,8 +84,6 @@ namespace JoJoFanStands.NPCs
         {
             if (welded)
                 npc.color = Color.DarkGray;
-            else
-                npc.color = drawColor;
         }
     }
 }

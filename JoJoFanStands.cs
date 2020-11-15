@@ -6,6 +6,9 @@ using Terraria;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using JoJoFanStands.Items.Stands;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria.Graphics.Effects;
+using Terraria.Graphics.Shaders;
 
 namespace JoJoFanStands
 {
@@ -34,6 +37,11 @@ namespace JoJoFanStands
                 AbilityUI.Activate();
                 _abilityui = new UserInterface();
                 _abilityui.SetState(AbilityUI);
+
+                //Shader stuff
+                Ref<Effect> distortedReality = new Ref<Effect>(GetEffect("Effects/DistortedRealityShader"));
+                Filters.Scene["DistortedRealityEffect"] = new Filter(new ScreenShaderData(distortedReality, "DistortedRealityEffect"), EffectPriority.VeryHigh);
+                Filters.Scene["DistortedRealityEffect"].Load();
             }
             MyPlayer.standTier1List.Add(ModContent.ItemType<CoolOutT1>());
             MyPlayer.standTier1List.Add(ModContent.ItemType<FollowMeT1>());
