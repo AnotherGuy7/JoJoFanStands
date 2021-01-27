@@ -66,12 +66,12 @@ namespace JoJoFanStands.UI
             genocide.OnClick += new MouseEvent(GenocideClicked);
             AbilityUI.Append(genocide);
 
-            UIImageButton distortedReality = new UIImageButton(ModContent.GetTexture("JoJoFanStands/UI/DistortedReality"));
+            UIImageButton distortedReality = new UIImageButton(ModContent.GetTexture("JoJoFanStands/UI/MonotoneReality"));
             distortedReality.HAlign = 0.6f;
             distortedReality.VAlign = 0.2f;
             distortedReality.Width.Set(48f, 0f);
             distortedReality.Height.Set(48f, 0f);
-            distortedReality.OnClick += new MouseEvent(DistortedRealityClicked);
+            distortedReality.OnClick += new MouseEvent(MonotoneRealityClicked);
             AbilityUI.Append(distortedReality);
 
             UITextBox chooseText = new UITextBox("Choose an ability...");
@@ -112,7 +112,7 @@ namespace JoJoFanStands.UI
             Visible = false;
         }
 
-        private void DistortedRealityClicked(UIMouseEvent evt, UIElement listeningElement)
+        private void MonotoneRealityClicked(UIMouseEvent evt, UIElement listeningElement)
         {
             Projectiles.PlayerStands.Megalovania.MegalovaniaStand.abilityNumber = 6;
             Visible = false;

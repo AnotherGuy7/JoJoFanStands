@@ -5,7 +5,7 @@ using Terraria;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
 
-namespace JoJoFanStands.Projectiles.PlayerStands
+namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
 {
     public class SlavesOfFearStandT2 : StandClass
     {

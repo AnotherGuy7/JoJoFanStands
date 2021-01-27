@@ -1,14 +1,8 @@
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using Terraria;
-using Terraria.Graphics.Effects;
-using Terraria.ID;
-using Terraria.ModLoader;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
-using System.Data.SqlTypes;
+using Microsoft.Xna.Framework;
 using System.IO;
+using Terraria;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
 {

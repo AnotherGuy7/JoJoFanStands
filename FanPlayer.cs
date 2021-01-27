@@ -9,6 +9,15 @@ using JoJoFanStands.Items.Armor;
 using JoJoFanStands.Mounts;
 using JoJoStands.Items.Hamon;
 using JoJoFanStands.Buffs;
+using JoJoFanStands.Projectiles.PlayerStands;
+using JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear;
+using JoJoFanStands.Projectiles.PlayerStands.TheFates;
+using JoJoFanStands.Projectiles.PlayerStands.MortalReminder;
+using JoJoFanStands.Projectiles.PlayerStands.Megalovania;
+using JoJoFanStands.Projectiles.PlayerStands.FollowMe;
+using JoJoFanStands.Projectiles.PlayerStands.CoolOut;
+using JoJoFanStands.Projectiles.PlayerStands.BackInBlack;
+using JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy;
 
 namespace JoJoFanStands
 {
@@ -64,22 +73,22 @@ namespace JoJoFanStands
                 else
                 {
                     if (BrianEnoAct1 && !player.wet)
-                        player.mount.SetMount(MountType<BrianEnoMount>(), Main.player[Main.myPlayer]);
+                        player.mount.SetMount(MountType<BrianEnoMount>(), player);
                     if (BrianEnoAct2)
                         if (player.wet)
-                            player.mount.SetMount(MountType<BathysphereMount>(), Main.player[Main.myPlayer]);
+                            player.mount.SetMount(MountType<BathysphereMount>(), player);
                         else
-                            player.mount.SetMount(MountType<BrianEnoMount>(), Main.player[Main.myPlayer]);
+                            player.mount.SetMount(MountType<BrianEnoMount>(), player);
                     if (BrianEnoAct3)
                         if (player.wet)
-                            player.mount.SetMount(MountType<BathysphereMount>(), Main.player[Main.myPlayer]);
+                            player.mount.SetMount(MountType<BathysphereMount>(), player);
                         else
-                            player.mount.SetMount(MountType<SkySawMount>(), Main.player[Main.myPlayer]);
+                            player.mount.SetMount(MountType<SkySawMount>(), player);
                 }
             }
-            if (anyBrianEno && JoJoStands.JoJoStands.SpecialHotKey.Current && !player.wet && hPlayer.HamonCounter > 0)
+            if (anyBrianEno && JoJoStands.JoJoStands.SpecialHotKey.Current && !player.wet && hPlayer.amountOfHamon > 0)
             {
-                hPlayer.HamonCounter -= 1;
+                hPlayer.amountOfHamon -= 1;
                 SpinBoost = true;
             }
         }
@@ -87,8 +96,6 @@ namespace JoJoFanStands
         public override void PreUpdate()
         {
             Player player = Main.player[Main.myPlayer];
-            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-            HamonPlayer hPlayer = player.GetModPlayer<HamonPlayer>();
 
             anyBrianEno = BrianEnoAct1 || BrianEnoAct2 || BrianEnoAct3;
             if (activationTimer > 0)
@@ -156,63 +163,63 @@ namespace JoJoFanStands
             }
             else if (inputItemtype == ItemType<BackInBlack>())
             {
-                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("BackInBlackStand"), 0, 0f, Main.myPlayer);
+                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<BackInBlackStand>(), 0, 0f, Main.myPlayer);
             }
             if (inputItemtype == ItemType<CoolOutT1>())
             {
-                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("CoolOutStandT1"), 0, 0f, Main.myPlayer);
+                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<CoolOutStandT1>(), 0, 0f, Main.myPlayer);
             }
             else if (inputItemtype == ItemType<CoolOutT2>())
             {
-                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("CoolOutStandT2"), 0, 0f, Main.myPlayer);
+                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<CoolOutStandT2>(), 0, 0f, Main.myPlayer);
             }
             else if (inputItemtype == ItemType<CoolOutT3>())
             {
-                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("CoolOutStandT3"), 0, 0f, Main.myPlayer);
+                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<CoolOutStandT3>(), 0, 0f, Main.myPlayer);
             }
             else if (inputItemtype == ItemType<CoolOutFinal>())
             {
-                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("CoolOutStandFinal"), 0, 0f, Main.myPlayer);
+                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<CoolOutStandFinal>(), 0, 0f, Main.myPlayer);
             }
             else if (inputItemtype == ItemType<FollowMeT1>())
             {
-                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("FollowMeStandT1"), 0, 0f, Main.myPlayer);
+                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<FollowMeStandT1>(), 0, 0f, Main.myPlayer);
             }
             else if (inputItemtype == ItemType<FollowMeT2>())
             {
-                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("FollowMeStandT2"), 0, 0f, Main.myPlayer);
+                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<FollowMeStandT2>(), 0, 0f, Main.myPlayer);
             }
             else if (inputItemtype == ItemType<Megalovania>())
             {
-                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("MegalovaniaStand"), 0, 0f, Main.myPlayer);
+                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<MegalovaniaStand>(), 0, 0f, Main.myPlayer);
             }
             else if (inputItemtype == ItemType<MortalReminderT1>())
             {
-                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("MortalReminderStandT1"), 0, 0f, Main.myPlayer);
+                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<MortalReminderStandT1>(), 0, 0f, Main.myPlayer);
             }
-            /*else if (inputItemtype == ItemType<RoseColoredBoy>())
+            else if (inputItemtype == ItemType<RoseColoredBoy>())
             {
-                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("FollowMeStandT2"), 0, 0f, Main.myPlayer);
-            }*/
+                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<RoseColoredBoyStand>(), 0, 0f, Main.myPlayer);
+            }
             else if (inputItemtype == ItemType<SlavesOfFearT1>())
             {
-                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("SlavesOfFearStandT1"), 0, 0f, Main.myPlayer);
+                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<SlavesOfFearStandT1>(), 0, 0f, Main.myPlayer);
             }
             else if (inputItemtype == ItemType<SlavesOfFearT2>())
             {
-                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("SlavesOfFearStandT2"), 0, 0f, Main.myPlayer);
+                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<SlavesOfFearStandT2>(), 0, 0f, Main.myPlayer);
             }
             else if (inputItemtype == ItemType<SlavesOfFearT3>())
             {
-                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("SlavesOfFearStandT3"), 0, 0f, Main.myPlayer);
+                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<SlavesOfFearStandT3>(), 0, 0f, Main.myPlayer);
             }
             else if (inputItemtype == ItemType<SlavesOfFearFinal>())
             {
-                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("SlavesOfFearStandFinal"), 0, 0f, Main.myPlayer);
+                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<SlavesOfFearStandFinal>(), 0, 0f, Main.myPlayer);
             }
             else if (inputItemtype == ItemType<TheFatesT1>())
             {
-                Projectile.NewProjectile(player.position, player.velocity, mod.ProjectileType("TheFatesStand"), 0, 0f, Main.myPlayer);
+                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<TheFates>(), 0, 0f, Main.myPlayer);
             }
             else
             {
@@ -220,21 +227,14 @@ namespace JoJoFanStands
             }
         }
 
-        public override void OnHitByNPC(NPC npc, int damage, bool crit)
+        public override void ModifyHitByNPC(NPC npc, ref int damage, ref bool crit)
         {
             if (anyBrianEno && player.mount.Type != Mount.None && !player.wet)
             {
                 if (BrianEnoAct1 && (Main.rand.NextFloat(0, 101) <= 5f || SpinBoost))
                 {
-                    player.immune = true;
-                    if (player.direction == 1)
-                    {
-                        player.velocity.X += 5f;
-                    }
-                    if (player.direction == -1)
-                    {
-                        player.velocity.X -= 5f;
-                    }
+                    damage = 0;
+                    player.velocity.X -= 5f * player.direction;
                 }
             }
         }

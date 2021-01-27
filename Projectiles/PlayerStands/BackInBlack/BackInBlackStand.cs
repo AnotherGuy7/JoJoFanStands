@@ -4,7 +4,7 @@ using Terraria.ID;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
 
-namespace JoJoFanStands.Projectiles.PlayerStands
+namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
 {
     public class BackInBlackStand : StandClass
     {

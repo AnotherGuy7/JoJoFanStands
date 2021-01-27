@@ -39,9 +39,9 @@ namespace JoJoFanStands
                 _abilityui.SetState(AbilityUI);
 
                 //Shader stuff
-                Ref<Effect> distortedReality = new Ref<Effect>(GetEffect("Effects/DistortedRealityShader"));
-                Filters.Scene["DistortedRealityEffect"] = new Filter(new ScreenShaderData(distortedReality, "DistortedRealityEffect"), EffectPriority.VeryHigh);
-                Filters.Scene["DistortedRealityEffect"].Load();
+                Ref<Effect> distortedReality = new Ref<Effect>(GetEffect("Effects/MonotoneRealityShader"));
+                Filters.Scene["MonotoneRealityEffect"] = new Filter(new ScreenShaderData(distortedReality, "MonotoneRealityEffect"), EffectPriority.VeryHigh);
+                Filters.Scene["MonotoneRealityEffect"].Load();
             }
             MyPlayer.standTier1List.Add(ModContent.ItemType<CoolOutT1>());
             MyPlayer.standTier1List.Add(ModContent.ItemType<FollowMeT1>());

@@ -23,17 +23,31 @@ float2 uImageSize3;
 float4 PixelShaderFunction(float2 coords : TEXCOORD0) : COLOR0
 {
     //float2 uv = coords / uScreenResolution;
-    float amplitude = 0.1;
-    float period = 2 * 3.14;
-    coords.x += amplitude * sin((coords.y + uTime));
-    float4 Color = tex2D(uImage0, coords);
-    Color.rgb = 1 - Color.rgb;
-	return Color; 
+    //float amplitude = 0.1;
+    //float period = 2 * 3.14;
+    //coords.x += amplitude * sin((coords.y + uTime));
+    float4 color = tex2D(uImage0, coords);
+    //Color.rgb = 1 - Color.rgb;
+    float3 white = (1.0, 1.0, 1.0);
+    float3 black = (0.0, 0.0, 0.0);
+    
+    float average = (color.r + color.g + color.b) / 3.0;
+  
+    if (average <= 0.3 || average >= 0.55)
+    {
+        color.rgb = black;
+    }
+    else
+    {
+        color.rgb = white;
+    }
+    
+	return color; 
 }
 
 technique Technique1
 {
-    pass DistortedRealityEffect
+    pass MonotoneRealityEffect
     {
         PixelShader = compile ps_2_0 PixelShaderFunction();
     }

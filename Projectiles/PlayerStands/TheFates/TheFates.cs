@@ -1,13 +1,9 @@
 using JoJoStands;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terraria;
-using Terraria.Graphics.Effects;
-using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace JoJoFanStands.Projectiles.PlayerStands
+namespace JoJoFanStands.Projectiles.PlayerStands.TheFates
 {
     public class TheFates : ModProjectile
     {

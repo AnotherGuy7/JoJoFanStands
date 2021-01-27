@@ -5,7 +5,7 @@ using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
 using Terraria.ModLoader;
 
-namespace JoJoFanStands.Projectiles.PlayerStands
+namespace JoJoFanStands.Projectiles.PlayerStands.CoolOut
 {  
     public class CoolOutStandT1 : StandClass
     {

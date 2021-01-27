@@ -9,13 +9,12 @@ namespace JoJoFanStands.Projectiles
     {
         public override void SetDefaults()
         {
-            projectile.width = 6;
-            projectile.height = 12;
+            projectile.width = 20;
+            projectile.height = 22;
             projectile.aiStyle = 0;
             projectile.timeLeft = 600;
             projectile.friendly = true;
             projectile.tileCollide = true;
-            projectile.alpha = 0;
         }
 
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)

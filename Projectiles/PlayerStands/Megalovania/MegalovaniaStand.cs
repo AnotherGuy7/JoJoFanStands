@@ -1,13 +1,8 @@
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using Terraria;
-using Terraria.Graphics.Effects;
-using Terraria.ID;
-using Terraria.ModLoader;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
-using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.Graphics.Effects;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
 {
@@ -26,11 +21,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
         private string direction = "Straight";
         private float mouseDistance = 0f;
         private int maxFrames = 0;
-        private int volumeTimer = 0;
-        private float savedMusicVolume = -1f;
 
-        private SoundEffectInstance noise = null;
-        private SoundEffectInstance backgroundNoise = null;
 
         public override void AI()
         {
@@ -48,29 +39,30 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             }
             drawOriginOffsetY = -halfStandHeight;
             StayBehind();
-            if (savedMusicVolume == -1f)
+
+            if (JoJoStands.JoJoStands.SpecialHotKey.JustPressed && !UI.AbilityChooserUI.Visible)
             {
-                savedMusicVolume = Main.musicVolume;
+                UI.AbilityChooserUI.Visible = true;
             }
 
             if (Main.mouseLeft && abilityNumber == 0 && player.whoAmI == Main.myPlayer)
             {
                 if (shootCount <= 0)
                 {
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    for (int n = 0; n < Main.maxNPCs; n++)
                     {
-                        float NPCdist = Vector2.Distance(Main.MouseWorld, Main.npc[i].position);
-                        if (NPCdist < 25f)
+                        NPC npc = Main.npc[n];
+                        if (npc.active)
                         {
-                            shootCount += newShootTime;
-                            Main.npc[i].StrikeNPC(97, 0f, projectile.direction * -1);
+                            float npcDist = Vector2.Distance(Main.MouseWorld, npc.position);
+                            if (npcDist <= 25f)
+                            {
+                                shootCount += newShootTime;
+                                npc.StrikeNPC(97, 0f, projectile.direction * -1);
+                            }
                         }
                     }
                 }
-            }
-            if (JoJoStands.JoJoStands.SpecialHotKey.JustPressed && !UI.AbilityChooserUI.Visible)
-            {
-                UI.AbilityChooserUI.Visible = true;
             }
             if (player.whoAmI == Main.myPlayer)
             {
@@ -87,50 +79,35 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                     if (Main.mouseY <= Main.screenHeight / 5)
                     {
                         direction = "Up";
-                        //AnimationStates(2, 1.5f, true, false);
                     }
-                    if (Main.mouseY > Main.screenHeight / 5 && Main.mouseY < (Main.screenHeight / 5) * 2)
+                    else if (Main.mouseY > Main.screenHeight / 5 && Main.mouseY < (Main.screenHeight / 5) * 2)
                     {
                         direction = "SlightUp";
-                        //AnimationStates(2, 1.5f, true, false);
                     }
-                    if (Main.mouseY > (Main.screenHeight / 5) * 2 && Main.mouseY < (Main.screenHeight / 5) * 4)
+                    else if (Main.mouseY > (Main.screenHeight / 5) * 2 && Main.mouseY < (Main.screenHeight / 5) * 4)
                     {
                         direction = "Straight";
-                        //AnimationStates(2, 1.5f, true, false);
                     }
-                    if (Main.mouseY > (Main.screenHeight / 5) * 4)
+                    else if (Main.mouseY > (Main.screenHeight / 5) * 4)
                     {
                         direction = "Down";
-                        //AnimationStates(2, 1.5f, true, false);
                     }
                 }
             }
-            //Main.NewText(Main.mouseY);
 
 
             if (abilityNumber == 1)     //push everything away
             {
                 abilityName = "PushBack";
-                //AnimationStates(1, 0.5f, false, true);
-                for (int i = 0; i < Main.maxNPCs; i++)
+                for (int n = 0; n < Main.maxNPCs; n++)
                 {
-                    NPC npc = Main.npc[i];
-                    if (npc.position.X >= projectile.position.X)
+                    NPC npc = Main.npc[n];
+                    if (npc.active)
                     {
-                        npc.velocity.X = 25f;
-                    }
-                    if (npc.position.X < projectile.position.X)
-                    {
-                        npc.velocity.X = -25f;
-                    }
-                    if (npc.position.Y >= projectile.position.Y)
-                    {
-                        npc.velocity.Y = 25f;
-                    }
-                    if (npc.position.Y < projectile.position.Y)
-                    {
-                        npc.velocity.Y = -25f;
+                        Vector2 pushBackVelocity = npc.position - projectile.position;
+                        pushBackVelocity.Normalize();
+                        pushBackVelocity *= 25f;
+                        npc.velocity += pushBackVelocity;
                     }
                 }
             }
@@ -139,30 +116,26 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             {
                 abilityName = "ForceField";
                 //AnimationStates(1, 0.05f, false, true);
-                for (int i = 0; i < Main.maxNPCs; i++)
+                for (int n = 0; n < Main.maxNPCs; n++)
                 {
-                    NPC npc = Main.npc[i];
-                    float npcDist = Vector2.Distance(npc.Center, player.Center);
-                    if (npcDist <= 60f)
+                    NPC npc = Main.npc[n];
+                    if (npc.active && projectile.Distance(npc.Center) <= 60f)
                     {
-                        npc.velocity.X = 10f * -npc.direction;
-                        if (npc.position.Y >= projectile.position.Y)
-                        {
-                            npc.velocity.Y = 10f;
-                        }
-                        if (npc.position.Y < projectile.position.Y)
-                        {
-                            npc.velocity.Y = -10f;
-                        }
+                        Vector2 pushBackVelocity = npc.position - projectile.position;
+                        pushBackVelocity.Normalize();
+                        pushBackVelocity *= 10f;
+                        npc.velocity += pushBackVelocity;
                     }
                 }
-                for (int i = 0; i < Main.maxProjectiles; i++)
+                for (int p = 0; p < Main.maxProjectiles; p++)
                 {
-                    Projectile otherProjectile = Main.projectile[i];
-                    float projectileDist = Vector2.Distance(otherProjectile.Center, player.Center);
-                    if (projectileDist <= 60f && otherProjectile.hostile)
+                    Projectile otherProj = Main.projectile[p];
+                    if (otherProj.active && otherProj.hostile && projectile.Distance(otherProj.Center) <= 60f)
                     {
-                        projectile.velocity = -projectile.velocity * 10f;
+                        Vector2 pushBackVelocity = otherProj.position - projectile.position;
+                        pushBackVelocity.Normalize();
+                        pushBackVelocity *= 25f;
+                        otherProj.velocity += pushBackVelocity;
                     }
                 }
             }
@@ -170,37 +143,23 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             if (abilityNumber == 3)     //crystal shower
             {
                 abilityName = "Crystal";
-                //AnimationStates(1, 0.16f, false, true);
-                if (shootCount <= 0)
-                {
-                    shootCount += 85;
-                    Projectile.NewProjectile(projectile.position.X + 5f, projectile.position.Y, 0f, 0f, mod.ProjectileType("Crystal"), 82, 2f, Main.myPlayer);
-                    Projectile.NewProjectile(projectile.position.X, projectile.position.Y - 5f, 0f, 0f, mod.ProjectileType("Crystal"), 82, 2f, Main.myPlayer);
-                    Projectile.NewProjectile(projectile.position.X, projectile.position.Y + 5f, 0f, 0f, mod.ProjectileType("Crystal"), 82, 2f, Main.myPlayer);
-                    Projectile.NewProjectile(projectile.position.X - 5f, projectile.position.Y, 0f, 0f, mod.ProjectileType("Crystal"), 82, 2f, Main.myPlayer);
-                }
             }
 
             if (abilityNumber == 4)     //make NPCs reverse gravity
             {
                 abilityName = "Gravity";
-                //AnimationStates(1, 0.5f, false, true);
-                if (shootCount <= 0)
+                for (int n = 0; n < Main.maxNPCs; n++)
                 {
-                    shootCount += 120;
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    NPC npc = Main.npc[n];
+                    if (!npc.noGravity)
                     {
-                        NPC npc = Main.npc[i];
-                        if (!npc.noGravity)
-                        {
-                            npc.noGravity = true;
-                            npc.velocity.Y -= 0.1f;
-                        }
-                        if (npc.noGravity)
-                        {
-                            npc.noGravity = false;
-                            npc.velocity.Y += 1f;
-                        }
+                        npc.noGravity = true;
+                        npc.velocity.Y -= 0.1f;
+                    }
+                    if (npc.noGravity)
+                    {
+                        npc.noGravity = false;
+                        npc.velocity.Y += 1f;
                     }
                 }
             }
@@ -211,18 +170,18 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                 //AnimationStates(1, 0.16f, false, true);
                 if (shootCount <= 0)
                 {
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    for (int n = 0; n < Main.maxNPCs; n++)
                     {
-                        float NPCdist = Vector2.Distance(Main.MouseWorld, Main.npc[i].position);
-                        if (NPCdist < 25f)
+                        NPC npc = Main.npc[n];
+                        if (npc.active && Vector2.Distance(Main.MouseWorld, npc.position) < 25f)
                         {
                             shootCount += 60;
                             //Main.npc[i].StrikeNPC(10, 0f, projectile.direction * -1);
-                            Main.npc[i].GetGlobalNPC<NPCs.FanGlobalNPC>().nonExistant = true;
+                            npc.GetGlobalNPC<NPCs.FanGlobalNPC>().nonExistant = true;
                             if (NPCs.FanGlobalNPC.nonExistantTypes.Count != NPCs.FanGlobalNPC.nonExistantTypes.Capacity)
                             {
-                                NPCs.FanGlobalNPC.nonExistantTypes.Add(Main.npc[i].type);
-                                Main.NewText(Main.npc[i].TypeName + "s don't exist anymore.");
+                                NPCs.FanGlobalNPC.nonExistantTypes.Add(npc.type);
+                                Main.NewText(npc.TypeName + "s don't exist anymore.");
                             }
                             else
                             {
@@ -235,46 +194,28 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
 
             if (abilityNumber == 6)
             {
-                abilityName = "DistortedReality";
-                volumeTimer++;
-                if (volumeTimer >= 360000)
-                {
-                    volumeTimer = 0;
-                }
-                if (noise == null)
-                {
-                    Main.PlaySound(mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/DistortedRealityStart"));
-                    SoundEffect noiseEffect = mod.GetSound("Sounds/Noise");
-                    noise = noiseEffect.CreateInstance();
-                    SoundEffect noiseEffect2 = mod.GetSound("Sounds/BackgroundNoise");
-                    backgroundNoise = noiseEffect2.CreateInstance();
-                }
-
-
-                noise.Volume = MathHelper.Clamp((float)Math.Sin(volumeTimer / 180) - 0.6f, 0f, 1f);
-                backgroundNoise.Volume = 0.08f;
-                Main.PlaySoundInstance(noise);
-                Main.PlaySoundInstance(backgroundNoise);
-                Main.musicVolume = 0f;
+                abilityName = "MonotoneReality";
 
                 if (!Main.dedServ)
                 {
-                    if (!Filters.Scene["DistortedRealityEffect"].IsActive())
+                    if (!Filters.Scene["MonotoneRealityEffect"].IsActive())
                     {
-                        Filters.Scene.Activate("DistortedRealityEffect");
+                        Filters.Scene.Activate("MonotoneRealityEffect");
                     }
                 }
                 if (Main.mouseRight)
                 {
                     abilityNumber = 0;
-                    Main.musicVolume = savedMusicVolume;
                 }
             }
             else
             {
-                if (Filters.Scene["DistortedRealityEffect"].IsActive())
+                if (!Main.dedServ)
                 {
-                    Filters.Scene["DistortedRealityEffect"].Deactivate();
+                    if (Filters.Scene["MonotoneRealityEffect"].IsActive())
+                    {
+                        Filters.Scene["MonotoneRealityEffect"].Deactivate();
+                    }
                 }
             }
         }
