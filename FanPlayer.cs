@@ -18,6 +18,7 @@ using JoJoFanStands.Projectiles.PlayerStands.FollowMe;
 using JoJoFanStands.Projectiles.PlayerStands.CoolOut;
 using JoJoFanStands.Projectiles.PlayerStands.BackInBlack;
 using JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy;
+using JoJoFanStands.Projectiles.PlayerStands.Banks;
 
 namespace JoJoFanStands
 {
@@ -165,7 +166,11 @@ namespace JoJoFanStands
             {
                 Projectile.NewProjectile(player.position, player.velocity, ProjectileType<BackInBlackStand>(), 0, 0f, Main.myPlayer);
             }
-            if (inputItemtype == ItemType<CoolOutT1>())
+            else if (inputItemtype == ItemType<BanksT1>())
+            {
+                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<BanksStandT1>(), 0, 0f, Main.myPlayer);
+            }
+            else if (inputItemtype == ItemType<CoolOutT1>())
             {
                 Projectile.NewProjectile(player.position, player.velocity, ProjectileType<CoolOutStandT1>(), 0, 0f, Main.myPlayer);
             }
