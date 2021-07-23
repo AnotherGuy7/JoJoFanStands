@@ -6,11 +6,11 @@ using JoJoStands.Projectiles.PlayerStands;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.Banks
 {
-    public class BanksStandT1 : StandClass
+    public class BanksStandT2 : StandClass
     {
         public override float shootSpeed => 16f;
-        public override int shootTime => 12;
-        public override int projectileDamage => 5;
+        public override int shootTime => 10;
+        public override int projectileDamage => 7;
         public override int standType => 2;
         public override int halfStandHeight => 32;
         public override int standOffset => 0;
@@ -18,6 +18,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
 
         private const float TargetDetectionRange = 32f * 16f;
         private NPC target = null;
+        private int shotgunChargeTimer = 0;
 
         public override void AI()
         {
@@ -57,14 +58,54 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
                     }
                 }
             }
-            else
+            if (Main.mouseRight && player.whoAmI == projectile.owner && !attackFrames)
             {
-                attackFrames = false;
+                if (target == null)
+                {
+                    shotgunChargeTimer = 0;
+                    target = FindNearestTarget(TargetDetectionRange);
+                }
+                else
+                {
+                    secondaryAbilityFrames = true;
+                    projectile.Center = target.Center + new Vector2(((target.width / 2f) + projectile.width) * -target.direction, 0f);
+                    projectile.direction = target.direction;
+                    if (projectile.Distance(target.Center) >= TargetDetectionRange)
+                    {
+                        target = null;
+                    }
+
+                    shotgunChargeTimer++;
+                    if (shotgunChargeTimer >= 90)
+                    {
+                        shootCount += newShootTime;
+                        Vector2 shootVel = target.Center - projectile.Center;
+                        shootVel.Normalize();
+                        shootVel *= shootSpeed;
+
+                        float numberProjectiles = 6;
+                        float rotation = MathHelper.ToRadians(30f);
+                        float random = Main.rand.NextFloat(-6f, 6f + 1f);
+                        for (int i = 0; i < numberProjectiles; i++)
+                        {
+                            Vector2 perturbedSpeed = new Vector2(shootVel.X + random, shootVel.Y).RotatedBy(MathHelper.Lerp(-rotation, rotation, i / (numberProjectiles - 1))) * .2f;
+                            int proj = Projectile.NewProjectile(projectile.Center, perturbedSpeed, ProjectileID.Bullet, newProjectileDamage * 2, 1f, player.whoAmI);
+                            Main.projectile[proj].netUpdate = true;
+                        }
+                        shotgunChargeTimer = 0;
+                        Main.PlaySound(2, projectile.position, 36);
+                    }
+                }
+            }
+            if (!Main.mouseLeft && !Main.mouseRight)
+            {
                 normalFrames = true;
+                attackFrames = false;
+                secondaryAbilityFrames = false;
                 target = null;
             }
 
-            if (!attackFrames)
+            if (!attackFrames && !secondaryAbilityFrames)
             {
                 StayBehind();
             }
@@ -87,7 +128,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
             {
                 normalFrames = false;
                 attackFrames = false;
-                PlayAnimation("Pose");
+                PlayAnimation("Secondary");
             }
             if (Main.player[projectile.owner].GetModPlayer<MyPlayer>().poseMode)
             {
@@ -107,6 +148,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
             if (animationName == "Attack")
             {
                 AnimateStand(animationName, 5, shootTime / 5, true);
+            }
+            if (animationName == "Secondary")
+            {
+                AnimateStand(animationName, 1, 60, true);
             }
             if (animationName == "Pose")
             {

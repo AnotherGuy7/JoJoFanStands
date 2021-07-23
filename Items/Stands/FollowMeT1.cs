@@ -6,10 +6,13 @@ using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Stands
 {
-    public class FollowMeT1 : StandItemClass
+    public class FollowMeT1 : FanStandItemClass
     {
         public override int standSpeed => 12;
         public override int standType => 1;
+        public override string standProjectileName => "FollowMe";
+        public override int standTier => 1;
+        public override bool fanStandItem => true;
 
         public override void SetStaticDefaults()
         {

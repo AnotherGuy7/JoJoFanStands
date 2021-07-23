@@ -210,19 +210,19 @@ namespace JoJoFanStands.Projectiles.PlayerStands.CoolOut
             standTexture = mod.GetTexture("Projectiles/PlayerStands/CoolOut/CoolOut_" + animationName);
             if (animationName == "Idle")
             {
-                AnimationStates(animationName, 8, 15, true);
+                AnimateStand(animationName, 8, 15, true);
             }
             if (animationName == "Attack")
             {
-                AnimationStates(animationName, 4, 14, true);
+                AnimateStand(animationName, 4, 14, true);
             }
             if (animationName == "Slam")
             {
-                AnimationStates(animationName, 1, 180, true);
+                AnimateStand(animationName, 1, 180, true);
             }
             if (animationName == "Idk")
             {
-                AnimationStates(animationName, 2, 60, true);
+                AnimateStand(animationName, 2, 60, true);
             }
         }
     }

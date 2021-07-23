@@ -1,15 +1,19 @@
+using JoJoFanStands.Projectiles.PlayerStands.TheFates;
 using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Stands
 {
-    public class TheFatesT1 : StandItemClass
+    public class TheFatesT1 : FanStandItemClass
     {
         public override int standSpeed => 12;
         public override int standType => 1;
+        public override int standTier => 1;
+        public override bool fanStandItem => true;
 
         public override void SetStaticDefaults()
         {
@@ -29,6 +33,12 @@ namespace JoJoFanStands.Items.Stands
             item.value = 0;
             item.noUseGraphic = true;
             item.rare = ItemRarityID.LightPurple;
+        }
+
+        public override bool ManualStandSpawning(Player player)
+        {
+            Projectile.NewProjectile(player.position, player.velocity, ProjectileType<TheFates>(), 0, 0f, Main.myPlayer);
+            return true;
         }
 
         public override void AddRecipes()

@@ -4,7 +4,7 @@ using Terraria.ModLoader;
 
 namespace JoJoFanStands.Items.Stands
 {
-    public class SlavesOfFearT3 : StandItemClass
+    public class SlavesOfFearT3 : FanStandItemClass
     {
         public override string Texture
         {
@@ -13,6 +13,9 @@ namespace JoJoFanStands.Items.Stands
 
         public override int standSpeed => 11;
         public override int standType => 1;
+        public override string standProjectileName => "SlavesOfFear";
+        public override int standTier => 3;
+        public override bool fanStandItem => true;
 
         public override void SetStaticDefaults()
         {

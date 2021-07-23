@@ -1,14 +1,19 @@
+using JoJoStands;
 using JoJoStands.Items;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Stands
 {
-    public class CoolOutFinal : StandItemClass
+    public class CoolOutFinal : FanStandItemClass
     {
         public override int standSpeed => 20;
         public override int standType => 2;
+        public override string standProjectileName => "CoolOut";
+        public override int standTier => 4;
+        public override bool fanStandItem => true;
 
         public override string Texture
         {
@@ -33,6 +38,12 @@ namespace JoJoFanStands.Items.Stands
             item.value = 0;
             item.noUseGraphic = true;
             item.rare = ItemRarityID.LightPurple;
+        }
+
+        public override bool ManualStandSpawning(Player player)
+        {
+            player.GetModPlayer<MyPlayer>().standDefenseToAdd = 4;
+            return false;
         }
 
         public override void AddRecipes()

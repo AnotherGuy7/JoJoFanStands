@@ -1,24 +1,16 @@
+using JoJoFanStands.Buffs;
+using JoJoFanStands.Items.Stands;
+using JoJoFanStands.Mounts;
+using JoJoStands;
+using JoJoStands.Items;
+using JoJoStands.Items.Hamon;
+using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameInput;
+using Terraria.ID;
 using Terraria.ModLoader;
-using JoJoStands;
 using static Terraria.ModLoader.ModContent;
-using JoJoFanStands.Items.Stands;
-using JoJoFanStands.Items.Armor;
-using JoJoFanStands.Mounts;
-using JoJoStands.Items.Hamon;
-using JoJoFanStands.Buffs;
-using JoJoFanStands.Projectiles.PlayerStands;
-using JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear;
-using JoJoFanStands.Projectiles.PlayerStands.TheFates;
-using JoJoFanStands.Projectiles.PlayerStands.MortalReminder;
-using JoJoFanStands.Projectiles.PlayerStands.Megalovania;
-using JoJoFanStands.Projectiles.PlayerStands.FollowMe;
-using JoJoFanStands.Projectiles.PlayerStands.CoolOut;
-using JoJoFanStands.Projectiles.PlayerStands.BackInBlack;
-using JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy;
-using JoJoFanStands.Projectiles.PlayerStands.Banks;
 
 namespace JoJoFanStands
 {
@@ -26,7 +18,7 @@ namespace JoJoFanStands
     {
         public static bool spawnPao = false;
 
-        private int activationTimer = 0;
+        private int standKeyPressTimer = 0;
 
         public bool BrianEnoAct1 = false;
         public bool BrianEnoAct2 = false;
@@ -34,6 +26,8 @@ namespace JoJoFanStands
         public bool anyBrianEno = false;
         public bool SpinBoost = false;
         public bool RoseColoredSunActive = false;
+
+        public int banksDefenseReduction = 0;
 
         public override void ResetEffects()
         {
@@ -47,15 +41,14 @@ namespace JoJoFanStands
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             HamonPlayer hPlayer = player.GetModPlayer<HamonPlayer>();
 
-            if (JoJoStands.JoJoStands.StandOut.JustPressed && !mPlayer.StandOut && activationTimer <= 0)
+            if (JoJoStands.JoJoStands.StandOut.JustPressed && !mPlayer.StandOut && standKeyPressTimer <= 0)
             {
-                SpawnStand();       //this is
-                MyPlayer.spawningOtherStands = true;
-                activationTimer += 30;
+                SpawnFanStand();
+                standKeyPressTimer += 30;
             }
-            if (JoJoStands.JoJoStands.StandOut.JustPressed && mPlayer.StandOut && activationTimer <= 0)
+            if (JoJoStands.JoJoStands.StandOut.JustPressed && mPlayer.StandOut && standKeyPressTimer <= 0)
             {
-                activationTimer += 30;
+                standKeyPressTimer += 30;
                 if (anyBrianEno)
                 {
                     BrianEnoAct1 = false;
@@ -99,10 +92,9 @@ namespace JoJoFanStands
             Player player = Main.player[Main.myPlayer];
 
             anyBrianEno = BrianEnoAct1 || BrianEnoAct2 || BrianEnoAct3;
-            if (activationTimer > 0)
-            {
-                activationTimer--;
-            }
+            if (standKeyPressTimer > 0)
+                standKeyPressTimer--;
+
             if (BrianEnoAct1)
             {
                 if (player.mount.Type != Mount.None && !player.wet)
@@ -141,94 +133,58 @@ namespace JoJoFanStands
             }
         }
 
-        public void SpawnStand()
+        public void SpawnFanStand()
         {
-            Player player = Main.player[Main.myPlayer];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-            int inputItemtype = mPlayer.StandSlot.Item.type;
+            Item inputItem = mPlayer.StandSlot.Item;
 
-            if (inputItemtype == ItemType<BrianEnoAct1>())
+            if (inputItem.IsAir)
             {
-                BrianEnoAct1 = true;
-                player.AddBuff(BuffType<BrianEnoActiveBuff>(), 2);
+                Main.NewText("There is no stand in the Stand Slot!", Color.Red);
+                mPlayer.StandOut = false;
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                {
+                    JoJoStands.Networking.ModNetHandler.playerSync.SendStandOut(256, player.whoAmI, false, player.whoAmI);
+                }
+                return;
             }
-            if (inputItemtype == ItemType<BrianEnoAct2>())
+
+            if (!(inputItem.modItem is FanStandItemClass))
             {
-                BrianEnoAct2 = true;
-                player.AddBuff(BuffType<BrianEnoActiveBuff>(), 2);
+                mPlayer.StandOut = false;
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                {
+                    JoJoStands.Networking.ModNetHandler.playerSync.SendStandOut(256, player.whoAmI, false, player.whoAmI);
+                }
+                return;
             }
-            if (inputItemtype == ItemType<BrianEnoAct3>())
+
+            FanStandItemClass standItem = inputItem.modItem as FanStandItemClass;
+
+            mPlayer.StandOut = true;
+            mPlayer.standDefenseToAdd = 4 + (2 * standItem.standTier);
+            if (standItem.standType == 2)
+                mPlayer.standDefenseToAdd /= 2;
+
+            string standClassName = standItem.standProjectileName + "StandT" + standItem.standTier;
+            if (standClassName.Contains("T4"))
+                standClassName = standItem.standProjectileName + "StandFinal";
+
+            if (player.ownedProjectileCounts[mod.ProjectileType(standClassName)] > 0)
             {
-                BrianEnoAct3 = true;
-                player.AddBuff(BuffType<BrianEnoActiveBuff>(), 2);
+                mPlayer.StandOut = false;
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                {
+                    JoJoStands.Networking.ModNetHandler.playerSync.SendStandOut(256, player.whoAmI, false, player.whoAmI);
+                }
+                return;
             }
-            else if (inputItemtype == ItemType<BackInBlack>())
+
+            if (!standItem.ManualStandSpawning(player))
             {
-                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<BackInBlackStand>(), 0, 0f, Main.myPlayer);
-            }
-            else if (inputItemtype == ItemType<BanksT1>())
-            {
-                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<BanksStandT1>(), 0, 0f, Main.myPlayer);
-            }
-            else if (inputItemtype == ItemType<CoolOutT1>())
-            {
-                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<CoolOutStandT1>(), 0, 0f, Main.myPlayer);
-            }
-            else if (inputItemtype == ItemType<CoolOutT2>())
-            {
-                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<CoolOutStandT2>(), 0, 0f, Main.myPlayer);
-            }
-            else if (inputItemtype == ItemType<CoolOutT3>())
-            {
-                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<CoolOutStandT3>(), 0, 0f, Main.myPlayer);
-            }
-            else if (inputItemtype == ItemType<CoolOutFinal>())
-            {
-                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<CoolOutStandFinal>(), 0, 0f, Main.myPlayer);
-            }
-            else if (inputItemtype == ItemType<FollowMeT1>())
-            {
-                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<FollowMeStandT1>(), 0, 0f, Main.myPlayer);
-            }
-            else if (inputItemtype == ItemType<FollowMeT2>())
-            {
-                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<FollowMeStandT2>(), 0, 0f, Main.myPlayer);
-            }
-            else if (inputItemtype == ItemType<Megalovania>())
-            {
-                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<MegalovaniaStand>(), 0, 0f, Main.myPlayer);
-            }
-            else if (inputItemtype == ItemType<MortalReminderT1>())
-            {
-                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<MortalReminderStandT1>(), 0, 0f, Main.myPlayer);
-            }
-            else if (inputItemtype == ItemType<RoseColoredBoy>())
-            {
-                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<RoseColoredBoyStand>(), 0, 0f, Main.myPlayer);
-            }
-            else if (inputItemtype == ItemType<SlavesOfFearT1>())
-            {
-                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<SlavesOfFearStandT1>(), 0, 0f, Main.myPlayer);
-            }
-            else if (inputItemtype == ItemType<SlavesOfFearT2>())
-            {
-                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<SlavesOfFearStandT2>(), 0, 0f, Main.myPlayer);
-            }
-            else if (inputItemtype == ItemType<SlavesOfFearT3>())
-            {
-                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<SlavesOfFearStandT3>(), 0, 0f, Main.myPlayer);
-            }
-            else if (inputItemtype == ItemType<SlavesOfFearFinal>())
-            {
-                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<SlavesOfFearStandFinal>(), 0, 0f, Main.myPlayer);
-            }
-            else if (inputItemtype == ItemType<TheFatesT1>())
-            {
-                Projectile.NewProjectile(player.position, player.velocity, ProjectileType<TheFates>(), 0, 0f, Main.myPlayer);
-            }
-            else
-            {
-                MyPlayer.spawningOtherStands = false;
+                int standProjectileType = mod.ProjectileType(standClassName);
+
+                Projectile.NewProjectile(player.position, player.velocity, standProjectileType, 0, 0f, Main.myPlayer);
             }
         }
 

@@ -20,15 +20,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
             SelectAnimation();
             UpdateStandInfo();
             if (shootCount > 0)
-            {
                 shootCount--;
-            }
+
             Player player = Main.player[projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             if (mPlayer.StandOut)
-            {
                 projectile.timeLeft = 2;
-            }
 
             if (!mPlayer.StandAutoMode)
             {
@@ -86,13 +83,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
 
         public override void SelectAnimation()
         {
-            if (Main.player[projectile.owner].GetModPlayer<MyPlayer>().poseMode)
-            {
-                attackFrames = false;
-                normalFrames = false;
-                secondaryAbilityFrames = false;
-                PlayAnimation("Pose");
-            }
             if (attackFrames)
             {
                 normalFrames = false;
@@ -109,6 +99,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
                 normalFrames = false;
                 PlayAnimation("Secondary");
             }
+            if (Main.player[projectile.owner].GetModPlayer<MyPlayer>().poseMode)
+            {
+                attackFrames = false;
+                normalFrames = false;
+                secondaryAbilityFrames = false;
+                PlayAnimation("Pose");
+            }
         }
 
         public override void PlayAnimation(string animationName)
@@ -116,19 +113,19 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
             standTexture = mod.GetTexture("Projectiles/PlayerStands/RoseColoredBoy/RoseColoredBoy_" + animationName);
             if (animationName == "Idle")
             {
-                AnimationStates(animationName, 4, 12, true);
+                AnimateStand(animationName, 4, 12, true);
             }
             if (animationName == "Attack")
             {
-                AnimationStates(animationName, 7, newPunchTime, true);
+                AnimateStand(animationName, 7, newPunchTime, true);
             }
             if (animationName == "Secondary")
             {
-                AnimationStates(animationName, 1, 180, true);
+                AnimateStand(animationName, 1, 180, true);
             }
             if (animationName == "Pose")
             {
-                AnimationStates(animationName, 15, 20, true);
+                AnimateStand(animationName, 15, 20, true);
             }
         }
     }

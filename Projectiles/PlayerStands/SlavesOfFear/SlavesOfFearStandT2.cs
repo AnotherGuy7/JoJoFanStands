@@ -102,15 +102,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
             standTexture = mod.GetTexture("Projectiles/PlayerStands/SlavesOfFear/SlavesOfFear_" + animationName);
             if (animationName == "Idle")
             {
-                AnimationStates(animationName, 2, 14, true);
+                AnimateStand(animationName, 2, 14, true);
             }
             if (animationName == "Attack")
             {
-                AnimationStates(animationName, 4, newPunchTime, true);
+                AnimateStand(animationName, 4, newPunchTime, true);
             }
             if (animationName == "Secondary")
             {
-                AnimationStates(animationName, 2, 10, true);
+                AnimateStand(animationName, 2, 10, true);
             }
         }
     }

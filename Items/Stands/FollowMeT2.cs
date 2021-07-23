@@ -1,15 +1,21 @@
+using JoJoStands;
 using JoJoStands.Items;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Stands
 {
-    public class FollowMeT2 : StandItemClass
+    public class FollowMeT2 : FanStandItemClass
     {
         public override string Texture => mod.Name + "/Items/Stands/FollowMeT1";
         public override int standSpeed => 12;
         public override int standType => 1;
+        public override string standProjectileName => "FollowMe";
+        public override int standTier => 2;
+        public override bool fanStandItem => true;
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Follow Me (Tier 2)");
@@ -28,6 +34,12 @@ namespace JoJoFanStands.Items.Stands
             item.value = 0;
             item.noUseGraphic = true;
             item.rare = ItemRarityID.LightPurple;
+        }
+
+        public override bool ManualStandSpawning(Player player)
+        {
+            player.GetModPlayer<MyPlayer>().standDefenseToAdd = 6;
+            return false;
         }
 
         public override void AddRecipes()

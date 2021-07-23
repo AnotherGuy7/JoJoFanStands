@@ -19,7 +19,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
 
         private string abilityName = "PushBack";
         private string direction = "Straight";
-        private float mouseDistance = 0f;
         private int maxFrames = 0;
 
 
@@ -30,13 +29,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             Player player = Main.player[projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             if (shootCount > 0)
-            {
                 shootCount--;
-            }
             if (mPlayer.StandOut)
-            {
                 projectile.timeLeft = 2;
-            }
             drawOriginOffsetY = -halfStandHeight;
             StayBehind();
 
@@ -115,7 +110,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             if (abilityNumber == 2)     //forcefield
             {
                 abilityName = "ForceField";
-                //AnimationStates(1, 0.05f, false, true);
+                //AnimateStand(1, 0.05f, false, true);
                 for (int n = 0; n < Main.maxNPCs; n++)
                 {
                     NPC npc = Main.npc[n];
@@ -167,7 +162,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             if (abilityNumber == 5)     //non-existant: Whatever this projectile touches will no longer ever spawn in the game for the time you are in the world
             {
                 abilityName = "Genocide";
-                //AnimationStates(1, 0.16f, false, true);
+                //AnimateStand(1, 0.16f, false, true);
                 if (shootCount <= 0)
                 {
                     for (int n = 0; n < Main.maxNPCs; n++)
@@ -220,7 +215,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             }
         }
 
-        /*public virtual void AnimationStates(int frameAmount, float fps, bool loop, bool ability)        //remember that 'fps' refers to how many frames is supposed to play every second, not how fast it plays
+        /*public virtual void AnimateStand(int frameAmount, float fps, bool loop, bool ability)        //remember that 'fps' refers to how many frames is supposed to play every second, not how fast it plays
         {
             Main.projFrames[projectile.whoAmI] = frameAmount;
             projectile.frameCounter++;
@@ -292,39 +287,39 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             standTexture = mod.GetTexture("Projectiles/PlayerStands/Megalovania/M" + animationName);
             if (animationName == "Up")
             {
-                AnimationStates(animationName, 2, 30, true);
+                AnimateStand(animationName, 2, 30, true);
             }
             if (animationName == "SlightUp")
             {
-                AnimationStates(animationName, 2, 30, true);
+                AnimateStand(animationName, 2, 30, true);
             }
             if (animationName == "Straight")
             {
-                AnimationStates(animationName, 2, 30, true);
+                AnimateStand(animationName, 2, 30, true);
             }
             if (animationName == "Down")
             {
-                AnimationStates(animationName, 2, 30, true);
+                AnimateStand(animationName, 2, 30, true);
             }
             if (animationName == "PushBack")
             {
-                AnimationStates(animationName, 1, 120, false);
+                AnimateStand(animationName, 1, 120, false);
             }
             if (animationName == "ForceField")
             {
-                AnimationStates(animationName, 1, 1200, false);
+                AnimateStand(animationName, 1, 1200, false);
             }
             if (animationName == "Crystal")
             {
-                AnimationStates(animationName, 1, 375, false);
+                AnimateStand(animationName, 1, 375, false);
             }
             if (animationName == "Gravity")
             {
-                AnimationStates(animationName, 1, 120, false);
+                AnimateStand(animationName, 1, 120, false);
             }
             if (animationName == "Genocide")
             {
-                AnimationStates(animationName, 1, 375, false);
+                AnimateStand(animationName, 1, 375, false);
             }
         }
     }

@@ -1,5 +1,3 @@
-using Microsoft.Xna.Framework;
-using System.Drawing;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -51,7 +49,7 @@ namespace JoJoStands.Projectiles
             }
         }
 
-        public override void OnHitPvp(Player target, int damage, bool crit)
+        public override void ModifyHitPvp(Player target, ref int damage, ref bool crit)
         {
             Player player = Main.player[projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();

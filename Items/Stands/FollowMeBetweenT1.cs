@@ -9,11 +9,12 @@ using JoJoStands.Items;
 
 namespace JoJoFanStands.Items.Stands
 {
-	public class FollowMeBetweenT1 : StandItemClass
+	public class FollowMeBetweenT1 : FanStandItemClass
 	{
         public override string Texture => mod.Name + "/Items/Stands/FollowMeT1";
         public override int standSpeed => 12;
         public override int standType => 1;
+        public override bool fanStandItem => true;
 
         public override void SetStaticDefaults()
         {

@@ -6,10 +6,13 @@ using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Stands
 {
-    public class BanksT2 : StandItemClass
+    public class BanksT2 : FanStandItemClass
     {
-        public override int standSpeed => 12;           //5 shots/s
+        public override int standSpeed => 10;           //6 shots/s
         public override int standType => 2;
+        public override string standProjectileName => "Banks";
+        public override int standTier => 2;
+        public override bool fanStandItem => true;
 
         public override string Texture
         {

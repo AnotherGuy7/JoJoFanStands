@@ -3,6 +3,7 @@ using Terraria;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
 using System.IO;
+using JoJoFanStands.NPCs;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
 {
@@ -31,16 +32,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
             SelectAnimation();
             UpdateStandInfo();
             if (shootCount > 0)
-            {
                 shootCount--;
-            }
+
             Player player = Main.player[projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             projectile.frameCounter++;
             if (mPlayer.StandOut)
-            {
                 projectile.timeLeft = 2;
-            }
 
             if (Main.mouseLeft)
             {
@@ -77,8 +75,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
                     NPC npc = Main.npc[i];
                     if (npc.active && projectile.Distance(npc.Center) <= 40f)
                     {
-                        npc.GetGlobalNPC<NPCs.FanGlobalNPC>().welded = true;
-                        npc.GetGlobalNPC<NPCs.FanGlobalNPC>().weldMaxTimer = 600;
+                        npc.GetGlobalNPC<FanGlobalNPC>().welded = true;
+                        npc.GetGlobalNPC<FanGlobalNPC>().weldMaxTimer = 600;
                     }
                 }
             }
@@ -151,19 +149,19 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
             standTexture = mod.GetTexture("Projectiles/PlayerStands/SlavesOfFear/SlavesOfFear_" + animationName);
             if (animationName == "Idle")
             {
-                AnimationStates(animationName, 2, 14, true);
+                AnimateStand(animationName, 2, 14, true);
             }
             if (animationName == "Attack")
             {
-                AnimationStates(animationName, 4, newPunchTime, true);
+                AnimateStand(animationName, 4, newPunchTime, true);
             }
             if (animationName == "Secondary")
             {
-                AnimationStates(animationName, 2, 10, true);
+                AnimateStand(animationName, 2, 10, true);
             }
             if (animationName == "Weld")
             {
-                AnimationStates(animationName, 4, 13, true);
+                AnimateStand(animationName, 4, 13, true);
             }
         }
     }

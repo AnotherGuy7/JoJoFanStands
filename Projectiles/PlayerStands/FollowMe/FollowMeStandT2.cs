@@ -24,26 +24,18 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
             SelectAnimation();
             UpdateStandInfo();
             if (shootCount > 0)
-            {
                 shootCount--;
-            }
 
             Player player = Main.player[projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             if (mPlayer.StandOut)
-            {
                 projectile.timeLeft = 2;
-            }
             drawOriginOffsetY = -halfStandHeight;
 
             if (projectile.direction == -1)
-            {
                 drawOffsetX = -30;
-            }
             else
-            {
                 drawOffsetX = 0;
-            }
 
             if (Main.mouseLeft || Main.mouseRight && !grabbing)
             {
@@ -237,19 +229,19 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
             standTexture = mod.GetTexture("Projectiles/PlayerStands/FollowMe/FollowMe_" + animationName);
             if (animationName == "Idle")
             {
-                AnimationStates(animationName, 4, 15, true);
+                AnimateStand(animationName, 4, 15, true);
             }
             if (animationName == "WindUp")
             {
-                AnimationStates(animationName, 7, 6, false);
+                AnimateStand(animationName, 7, 6, false);
             }
             if (animationName == "Grab")
             {
-                AnimationStates(animationName, 9, 12, false);
+                AnimateStand(animationName, 9, 12, false);
             }
             if (animationName == "NoClip")
             {
-                AnimationStates(animationName, 5, 15, true);
+                AnimateStand(animationName, 5, 15, true);
             }
         }
     }

@@ -115,15 +115,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MortalReminder
             standTexture = mod.GetTexture("Projectiles/PlayerStands/MortalReminder/MortalReminder_" + animationName);
             if (animationName == "Idle")
             {
-                AnimationStates(animationName, 4, 12, true);
+                AnimateStand(animationName, 4, 12, true);
             }
             if (animationName == "Attack")
             {
-                AnimationStates(animationName, 12, newPunchTime / 2, true);
+                AnimateStand(animationName, 12, newPunchTime / 2, true);
             }
             if (animationName == "Dash")
             {
-                AnimationStates(animationName, 4, 10, true);
+                AnimateStand(animationName, 4, 10, true);
             }
         }
     }

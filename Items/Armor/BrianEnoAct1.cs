@@ -1,13 +1,18 @@
-using Terraria.ModLoader;
-using Terraria.ID;
-using JoJoStands.Items.CraftingMaterials;
-using static Terraria.ModLoader.ModContent;
+using JoJoFanStands.Buffs;
 using JoJoStands.Items;
+using JoJoStands.Items.CraftingMaterials;
+using Terraria;
+using Terraria.ID;
+using Terraria.ModLoader;
+using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Armor
 {
     public class BrianEnoAct1 : StandItemClass
     {
+        public override int standType => 2;
+        public override int standTier => 1;
+
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Brian Eno (Act 1, The True Wheel)");
@@ -16,20 +21,29 @@ namespace JoJoFanStands.Items.Armor
 
         public override void SetDefaults()
         {
-            item.width = 30;
-            item.height = 30;
+            item.width = 42;
+            item.height = 48;
             item.rare = ItemRarityID.LightPurple;
         }
 
+        public override bool ManualStandSpawning(Player player)
+        {
+            FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
+
+            fPlayer.BrianEnoAct1 = true;
+            player.AddBuff(BuffType<BrianEnoActiveBuff>(), 2);
+            return true;
+        }
+
         public override void AddRecipes()
-		{
-			ModRecipe recipe = new ModRecipe(mod);
-			recipe.AddIngredient(ItemType<StandArrow>());
+        {
+            ModRecipe recipe = new ModRecipe(mod);
+            recipe.AddIngredient(ItemType<StandArrow>());
             recipe.AddIngredient(ItemType<SunDroplet>(), 10);
             recipe.AddIngredient(ItemID.CopperBar, 15);
             //recipe.AddIngredient(ItemType<WillToEscape>());
-			recipe.SetResult(this);
-			recipe.AddRecipe();
+            recipe.SetResult(this);
+            recipe.AddRecipe();
             recipe = new ModRecipe(mod);
             recipe.AddIngredient(ItemType<StandArrow>());
             recipe.AddIngredient(ItemType<SunDroplet>(), 10);

@@ -6,10 +6,12 @@ using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Stands
 {
-    public class MortalReminderT1 : StandItemClass
+    public class MortalReminderT1 : FanStandItemClass
     {
         public override int standSpeed => 17;
         public override int standType => 1;
+        public override int standTier => 1;
+        public override bool fanStandItem => true;
 
         public override void SetStaticDefaults()
         {

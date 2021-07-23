@@ -146,15 +146,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
             standTexture = mod.GetTexture("Projectiles/PlayerStands/BackInBlack/BackInBlack_" + animationName);
             if (animationName == "Idle")
             {
-                AnimationStates(animationName, 2, 14, true);
+                AnimateStand(animationName, 2, 14, true);
             }
             if (animationName == "Attack")
             {
-                AnimationStates(animationName, 6, 8, true);
+                AnimateStand(animationName, 6, 8, true);
             }
             if (animationName == "Pose")
             {
-                AnimationStates(animationName, 2, 15, true);
+                AnimateStand(animationName, 2, 15, true);
             }
         }
     }

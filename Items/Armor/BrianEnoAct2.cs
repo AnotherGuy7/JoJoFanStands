@@ -1,14 +1,17 @@
-using Terraria.ModLoader;
-using Terraria.ID;
-using JoJoStands.Items.CraftingMaterials;
-using static Terraria.ModLoader.ModContent;
+using JoJoFanStands.Buffs;
 using JoJoStands.Items;
+using JoJoStands.Items.CraftingMaterials;
+using Terraria;
+using Terraria.ID;
+using Terraria.ModLoader;
+using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Armor
 {
     public class BrianEnoAct2 : StandItemClass
     {
-        private int abilityDuration = 0;
+        public override int standType => 2;
+        public override int standTier => 2;
 
         public override void SetStaticDefaults()
         {
@@ -18,22 +21,31 @@ namespace JoJoFanStands.Items.Armor
 
         public override void SetDefaults()
         {
-            item.width = 30;
-            item.height = 30;
+            item.width = 44;
+            item.height = 56;
             item.accessory = true;
             item.rare = ItemRarityID.LightPurple;
         }
 
+        public override bool ManualStandSpawning(Player player)
+        {
+            FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
+
+            fPlayer.BrianEnoAct2 = true;
+            player.AddBuff(BuffType<BrianEnoActiveBuff>(), 2);
+            return true;
+        }
+
         public override void AddRecipes()
-		{
-			ModRecipe recipe = new ModRecipe(mod);
-			recipe.AddIngredient(ItemType<BrianEnoAct1>());
+        {
+            ModRecipe recipe = new ModRecipe(mod);
+            recipe.AddIngredient(ItemType<BrianEnoAct1>());
             recipe.AddIngredient(ItemID.HellstoneBar, 8);
             recipe.AddIngredient(ItemID.Coral, 5);
             recipe.AddIngredient(ItemType<SunDroplet>(), 5);
             recipe.AddIngredient(ItemID.Bone, 30);
-			recipe.SetResult(this);
-			recipe.AddRecipe();
-		}
+            recipe.SetResult(this);
+            recipe.AddRecipe();
+        }
     }
 }

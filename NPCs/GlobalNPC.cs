@@ -1,6 +1,5 @@
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -9,13 +8,15 @@ namespace JoJoFanStands.NPCs
 {
     public class FanGlobalNPC : GlobalNPC
     {
+        public static List<int> nonExistantTypes = new List<int>(5);
+
         public bool welded = false;
         public int weldTimer = 0;
         public int weldMaxTimer = 0;
         public bool nonExistant = false;
         public bool affectedByAvalance = false;
         public int icicleTimer = 0;
-        public static List<int> nonExistantTypes = new List<int>(5);
+        public float banksCoinMultiplier = 1f;
 
         public override bool InstancePerEntity
         {
@@ -68,11 +69,17 @@ namespace JoJoFanStands.NPCs
             return true;
         }
 
+        public override void NPCLoot(NPC npc)
+        {
+            if (banksCoinMultiplier > 1f)
+                Item.NewItem(npc.getRect(), ItemID.CopperCoin, (int)(npc.value * (banksCoinMultiplier - 1f)));
+        }
+
         public override bool CheckActive(NPC npc)
         {
-            for (int i = 0; i < nonExistantTypes.Count; i++)
+            for (int n = 0; n < nonExistantTypes.Count; n++)
             {
-                if (npc.type == nonExistantTypes[i])
+                if (npc.type == nonExistantTypes[n])
                 {
                     npc.active = false;
                 }
@@ -80,10 +87,10 @@ namespace JoJoFanStands.NPCs
             return true;
         }
 
-        public override void PostDraw(NPC npc, SpriteBatch spriteBatch, Color drawColor)
+        public override void DrawEffects(NPC npc, ref Color drawColor)
         {
             if (welded)
-                npc.color = Color.DarkGray;
+                drawColor = Color.DarkGray;
         }
     }
 }

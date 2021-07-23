@@ -1,13 +1,18 @@
+using JoJoFanStands.Projectiles.PlayerStands.BackInBlack;
 using JoJoStands.Items;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Stands
 {
-    public class BackInBlack : StandItemClass
+    public class BackInBlack : FanStandItemClass
     {
         public override int standSpeed => 40;
         public override int standType => 2;
+        public override int standTier => 1;
+        public override bool fanStandItem => true;
 
         public override void SetStaticDefaults()
         {
@@ -27,6 +32,12 @@ namespace JoJoFanStands.Items.Stands
             item.value = 0;
             item.noUseGraphic = true;
             item.rare = ItemRarityID.LightPurple;
+        }
+
+        public override bool ManualStandSpawning(Player player)
+        {
+            Projectile.NewProjectile(player.position, player.velocity, ProjectileType<BackInBlackStand>(), 0, 0f, Main.myPlayer);
+            return true;
         }
 
         public override void AddRecipes()
