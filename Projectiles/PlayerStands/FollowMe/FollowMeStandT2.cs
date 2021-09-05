@@ -28,7 +28,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
 
             Player player = Main.player[projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-            if (mPlayer.StandOut)
+            if (mPlayer.standOut)
                 projectile.timeLeft = 2;
             drawOriginOffsetY = -halfStandHeight;
 
@@ -41,16 +41,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
             {
                 float rotaY = Main.MouseWorld.Y - projectile.Center.Y;
                 projectile.rotation = MathHelper.ToRadians((rotaY * projectile.spriteDirection) / 6f);
-                if (Main.MouseWorld.X > projectile.position.X)
-                {
-                    projectile.spriteDirection = 1;
-                    projectile.direction = 1;
-                }
+
+                projectile.direction = 1;
                 if (Main.MouseWorld.X < projectile.position.X)
-                {
-                    projectile.spriteDirection = -1;
                     projectile.direction = -1;
-                }
+                projectile.spriteDirection = projectile.direction;
                 /*if (projectile.position.X < Main.MouseWorld.X - 5f)
                 {
                     velocityAddition.X = 5f;

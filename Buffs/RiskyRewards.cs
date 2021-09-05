@@ -17,7 +17,7 @@ namespace JoJoFanStands.Buffs
         public override void Update(Player player, ref int buffIndex)
         {
             FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
-            if (player.GetModPlayer<MyPlayer>().StandOut)
+            if (player.GetModPlayer<MyPlayer>().standOut)
             {
                 player.statDefense -= fPlayer.banksDefenseReduction;
                 player.buffTime[buffIndex] = 2;

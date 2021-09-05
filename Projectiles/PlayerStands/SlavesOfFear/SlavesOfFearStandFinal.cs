@@ -27,7 +27,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
 
             Player player = Main.player[projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-            if (mPlayer.StandOut)
+            if (mPlayer.standOut)
                 projectile.timeLeft = 2;
 
             if (Main.mouseLeft)

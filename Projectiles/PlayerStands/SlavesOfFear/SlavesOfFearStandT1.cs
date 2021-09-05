@@ -17,15 +17,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
             SelectAnimation();
             UpdateStandInfo();
             if (shootCount > 0)
-            {
                 shootCount--;
-            }
+
             Player player = Main.player[projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-            if (mPlayer.StandOut)
-            {
+            if (mPlayer.standOut)
                 projectile.timeLeft = 2;
-            }
 
             if (Main.mouseLeft)
             {

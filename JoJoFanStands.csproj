@@ -3,7 +3,7 @@
   <Import Project="..\..\references\tModLoader.targets" />
   <PropertyGroup>
     <AssemblyName>JoJoFanStands</AssemblyName>
-    <TargetFramework>net45</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
@@ -14,8 +14,6 @@
     <PackageReference Include="tModLoader.CodeAssist" Version="0.1.*" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="JoJoStands">
-      <HintPath>..\..\Mod Reader\JoJoStands\JoJoStands.XNA.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\JoJoStands\JoJoStands.csproj" />
   </ItemGroup>
 </Project>

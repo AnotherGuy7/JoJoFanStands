@@ -25,21 +25,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
             Player player = Main.player[projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             secondaryAbilityFrames = player.ownedProjectileCounts[mod.ProjectileType("BlackHole")] != 0;
-            //Lighting.AddLight((int)(projectile.Center.X / 16f), (int)(projectile.Center.Y / 16f), 0.6f, 0.9f, 0.3f);
-            //Dust.NewDust(projectile.position + projectile.velocity, projectile.width, projectile.height, 35, projectile.velocity.X * -0.5f, projectile.velocity.Y * -0.5f);
 
             if (shootCount > 0)
-            {
                 shootCount--;
-            }
-            if (mPlayer.StandOut)
-            {
+            if (mPlayer.standOut)
                 projectile.timeLeft = 2;
-            }
             if (player.ownedProjectileCounts[mod.ProjectileType("BlackHole")] == 0)
-            {
                 blackHoleWhoAmI = -1;
-            }
+
             if (!secondaryAbilityFrames)
             {
                 StayBehind();

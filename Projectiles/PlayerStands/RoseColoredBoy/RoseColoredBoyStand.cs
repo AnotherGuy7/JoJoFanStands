@@ -1,9 +1,9 @@
-using Terraria;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
-using static Terraria.ModLoader.ModContent;
 using Microsoft.Xna.Framework;
+using Terraria;
 using Terraria.ID;
+using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
 {
@@ -24,10 +24,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
 
             Player player = Main.player[projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-            if (mPlayer.StandOut)
+            if (mPlayer.standOut)
                 projectile.timeLeft = 2;
 
-            if (!mPlayer.StandAutoMode)
+            if (!mPlayer.standAutoMode)
             {
                 if (Main.mouseLeft && player.whoAmI == projectile.owner)
                 {
@@ -74,7 +74,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
                     player.AddBuff(BuffType<JoJoStands.Buffs.Debuffs.AbilityCooldown>(), 240 * 60);
                 }
             }
-            if (mPlayer.StandAutoMode)
+            if (mPlayer.standAutoMode)
             {
                 BasicPunchAI();
             }

@@ -23,16 +23,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MortalReminder
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             SelectAnimation();
             UpdateStandInfo();
-            if (mPlayer.StandOut)
-            {
+            if (mPlayer.standOut)
                 projectile.timeLeft = 2;
-            }
+
             if (projectile.ai[0] == 0f)
             {
                 if (shootCount > 0)
-                {
                     shootCount--;
-                }
 
                 if (Main.mouseLeft)
                 {

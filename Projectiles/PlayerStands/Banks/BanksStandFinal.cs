@@ -40,7 +40,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
                 shootCount--;
             if (specialPressTimer > 0)
                 specialPressTimer--;
-            if (mPlayer.StandOut)
+            if (mPlayer.standOut)
                 projectile.timeLeft = 2;
 
 

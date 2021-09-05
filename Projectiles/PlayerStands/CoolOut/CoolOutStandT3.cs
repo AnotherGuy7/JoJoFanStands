@@ -1,12 +1,11 @@
+using JoJoStands;
+using JoJoStands.Projectiles.PlayerStands;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
-using JoJoStands;
-using JoJoStands.Projectiles.PlayerStands;
-using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.CoolOut
-{  
+{
     public class CoolOutStandT3 : StandClass
     {
         public override int projectileDamage => 39;
@@ -31,13 +30,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.CoolOut
             UpdateStandInfo();
             Lighting.AddLight(projectile.position, 1.78f, 2.21f, 2.54f);
             if (shootCount > 0)
-            {
                 shootCount--;
-            }
-            if (mPlayer.StandOut)
-            {
+            if (mPlayer.standOut)
                 projectile.timeLeft = 2;
-            }
+
             if (spearWhoAmI != -1)
             {
                 Projectile spear = Main.projectile[spearWhoAmI];

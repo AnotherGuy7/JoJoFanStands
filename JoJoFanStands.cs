@@ -1,34 +1,34 @@
-using Terraria.ModLoader;
-using JoJoStands;
-using Terraria.UI;
-using JoJoFanStands.UI;
-using Terraria;
-using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+using JoJoFanStands.Items.Armor;
 using JoJoFanStands.Items.Stands;
+using JoJoFanStands.UI;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
+using Terraria;
 using Terraria.Graphics.Effects;
 using Terraria.Graphics.Shaders;
+using Terraria.ModLoader;
+using Terraria.UI;
 
 namespace JoJoFanStands
 {
-	public class JoJoFanStands : Mod
-	{
+    public class JoJoFanStands : Mod
+    {
         static internal JoJoFanStands Instance;
 
         static internal Mod JoJoStandsMod;
 
-		private UserInterface _abilityui;
+        private UserInterface _abilityui;
 
-		internal AbilityChooserUI AbilityUI;
+        internal AbilityChooserUI AbilityUI;
 
         public JoJoFanStands()
-		{
+        {
             Instance = this;
-		}
+        }
 
-		public override void Load()
-		{
+        public override void Load()
+        {
             JoJoStandsMod = ModLoader.GetMod("JoJoStands");
 
             if (!Main.dedServ)
@@ -43,19 +43,19 @@ namespace JoJoFanStands
                 Filters.Scene["MonotoneRealityEffect"] = new Filter(new ScreenShaderData(distortedReality, "MonotoneRealityEffect"), EffectPriority.VeryHigh);
                 Filters.Scene["MonotoneRealityEffect"].Load();
             }
-            MyPlayer.standTier1List.Add(ModContent.ItemType<CoolOutT1>());
-            MyPlayer.standTier1List.Add(ModContent.ItemType<FollowMeT1>());
-            MyPlayer.standTier1List.Add(ModContent.ItemType<MortalReminderT1>());
-            MyPlayer.standTier1List.Add(ModContent.ItemType<SlavesOfFearT1>());
-            MyPlayer.standTier1List.Add(ModContent.ItemType<TheFatesT1>());
+            JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<CoolOutT1>());
+            JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<FollowMeT1>());
+            JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<MortalReminderT1>());
+            JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<SlavesOfFearT1>());
+            JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<TheFatesT1>());
+            JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<BanksT1>());
+            JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<BrianEnoAct1>());
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
             if (AbilityChooserUI.Visible)
-            {
                 _abilityui.Update(gameTime);
-            }
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)     //from ExampleMod's ExampleUI
@@ -66,9 +66,8 @@ namespace JoJoFanStands
         private bool DrawUI()       //also from Terraria Interface for Dummies
         {
             if (AbilityChooserUI.Visible)
-            {
                 _abilityui.Draw(Main.spriteBatch, new GameTime());
-            }
+
             return true;
         }
     }

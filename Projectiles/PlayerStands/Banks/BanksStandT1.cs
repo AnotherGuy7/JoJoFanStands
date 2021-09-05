@@ -30,7 +30,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
 
             if (shootCount > 0)
                 shootCount--;
-            if (mPlayer.StandOut)
+            if (mPlayer.standOut)
                 projectile.timeLeft = 2;
 
             if (Main.mouseLeft && player.whoAmI == projectile.owner)

@@ -41,12 +41,12 @@ namespace JoJoFanStands
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             HamonPlayer hPlayer = player.GetModPlayer<HamonPlayer>();
 
-            if (JoJoStands.JoJoStands.StandOut.JustPressed && !mPlayer.StandOut && standKeyPressTimer <= 0)
+            if (JoJoStands.JoJoStands.StandOutHotKey.JustPressed && !mPlayer.standOut && standKeyPressTimer <= 0)
             {
                 SpawnFanStand();
                 standKeyPressTimer += 30;
             }
-            if (JoJoStands.JoJoStands.StandOut.JustPressed && mPlayer.StandOut && standKeyPressTimer <= 0)
+            if (JoJoStands.JoJoStands.StandOutHotKey.JustPressed && mPlayer.standOut && standKeyPressTimer <= 0)
             {
                 standKeyPressTimer += 30;
                 if (anyBrianEno)
@@ -141,7 +141,7 @@ namespace JoJoFanStands
             if (inputItem.IsAir)
             {
                 Main.NewText("There is no stand in the Stand Slot!", Color.Red);
-                mPlayer.StandOut = false;
+                mPlayer.standOut = false;
                 if (Main.netMode == NetmodeID.MultiplayerClient)
                 {
                     JoJoStands.Networking.ModNetHandler.playerSync.SendStandOut(256, player.whoAmI, false, player.whoAmI);
@@ -151,7 +151,7 @@ namespace JoJoFanStands
 
             if (!(inputItem.modItem is FanStandItemClass))
             {
-                mPlayer.StandOut = false;
+                mPlayer.standOut = false;
                 if (Main.netMode == NetmodeID.MultiplayerClient)
                 {
                     JoJoStands.Networking.ModNetHandler.playerSync.SendStandOut(256, player.whoAmI, false, player.whoAmI);
@@ -161,7 +161,7 @@ namespace JoJoFanStands
 
             FanStandItemClass standItem = inputItem.modItem as FanStandItemClass;
 
-            mPlayer.StandOut = true;
+            mPlayer.standOut = true;
             mPlayer.standDefenseToAdd = 4 + (2 * standItem.standTier);
             if (standItem.standType == 2)
                 mPlayer.standDefenseToAdd /= 2;
@@ -172,7 +172,7 @@ namespace JoJoFanStands
 
             if (player.ownedProjectileCounts[mod.ProjectileType(standClassName)] > 0)
             {
-                mPlayer.StandOut = false;
+                mPlayer.standOut = false;
                 if (Main.netMode == NetmodeID.MultiplayerClient)
                 {
                     JoJoStands.Networking.ModNetHandler.playerSync.SendStandOut(256, player.whoAmI, false, player.whoAmI);

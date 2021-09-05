@@ -30,7 +30,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             if (shootCount > 0)
                 shootCount--;
-            if (mPlayer.StandOut)
+            if (mPlayer.standOut)
                 projectile.timeLeft = 2;
             drawOriginOffsetY = -halfStandHeight;
             StayBehind();
@@ -61,10 +61,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             }
             if (player.whoAmI == Main.myPlayer)
             {
-                if (Main.mouseX >= projectile.position.X)
-                {
-                    projectile.direction = 1;
-                }
+                projectile.direction = 1;
                 if (Main.mouseX < projectile.position.X)
                 {
                     projectile.direction = -1;

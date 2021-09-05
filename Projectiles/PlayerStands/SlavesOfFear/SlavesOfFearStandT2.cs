@@ -29,10 +29,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
             shootCount--;
             Player player = Main.player[projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-            if (mPlayer.StandOut)
-            {
+            if (mPlayer.standOut)
                 projectile.timeLeft = 2;
-            }
 
             if (Main.mouseLeft)
             {
@@ -58,9 +56,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
                 attackFrames = false;
                 projectile.velocity.X = 10f * projectile.direction;
                 projectile.position.Y = player.position.Y;
-                for (int i = 0; i < Main.maxNPCs; i++)
+                for (int n = 0; n < Main.maxNPCs; n++)
                 {
-                    NPC npc = Main.npc[i];
+                    NPC npc = Main.npc[n];
                     if (npc.active && projectile.Distance(npc.Center) <= 15f)
                     {
                         npc.StrikeNPC(altDamage, 8f, projectile.direction);

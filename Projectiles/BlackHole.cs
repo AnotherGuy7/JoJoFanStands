@@ -27,46 +27,30 @@ namespace JoJoFanStands.Projectiles
         public override void PostDraw(SpriteBatch spriteBatch, Color lightColor)
         {
             Texture2D texture = mod.GetTexture("Projectiles/BlackHole");
-            spriteBatch.Draw(texture, projectile.Center - Main.screenPosition, new Rectangle(0, 0, texture.Width, texture.Height), Color.White, 0f, new Vector2(texture.Width / 2f, texture.Height / 2f), projectile.scale, SpriteEffects.None, 0);
+            Vector2 drawPosition = projectile.Center - Main.screenPosition;
+            Rectangle sourceRect = new Rectangle(0, 0, texture.Width, texture.Height);
+            Vector2 drawOrigin = new Vector2(texture.Width / 2f, texture.Height / 2f);
+            spriteBatch.Draw(texture, drawPosition, sourceRect, Color.White, 0f, drawOrigin, projectile.scale, SpriteEffects.None, 0);
         }
 
 
         public override void AI()
         {
             if (projectile.scale <= 0.01f)
-            {
                 projectile.Kill();
-            }
+
             vacuumStrength = projectile.scale * 17f;
             if (projectile.scale >= 0.8f)
-            {
                 projectile.scale = 0.8f;
-            }
 
             Player player = Main.player[projectile.owner];
-            if (!player.GetModPlayer<MyPlayer>().TheWorldEffect)
+            if (!player.GetModPlayer<MyPlayer>().timestopActive)
             {
-                for (int k = 0; k < Main.maxNPCs; k++)
+                for (int n = 0; n < Main.maxNPCs; n++)
                 {
-                    NPC npc = Main.npc[k];
+                    NPC npc = Main.npc[n];
                     if (npc.active && !npc.dontTakeDamage && !npc.immortal && npc.velocity != Vector2.Zero)
                     {
-                        /*if (npc.position.X < projectile.position.X)
-                        {
-                            npc.velocity.X += vacuumStrength;
-                        }
-                        if (npc.position.X > projectile.position.X)
-                        {
-                            npc.velocity.X -= vacuumStrength;
-                        }
-                        if (npc.position.Y < projectile.position.Y)
-                        {
-                            npc.velocity.Y += vacuumStrength;
-                        }
-                        if (npc.position.Y > projectile.position.Y)
-                        {
-                            npc.velocity.Y -= vacuumStrength;
-                        }*/
                         Vector2 positionDifference = projectile.Center - npc.Center;
                         positionDifference.Normalize();
                         npc.velocity = positionDifference * vacuumStrength;
@@ -76,36 +60,6 @@ namespace JoJoFanStands.Projectiles
                         npc.StrikeNPC(npc.lifeMax + 50, 90f, 1);
                     }
                 }
-                if (Main.netMode != NetmodeID.SinglePlayer)
-                {
-                    for (int l = 0; l < Main.maxPlayers; l++)
-                    {
-                        Player otherPlayer = Main.player[l];
-                        if (otherPlayer.active && !otherPlayer.dead && otherPlayer.team != player.team && otherPlayer.whoAmI != player.whoAmI)
-                        {
-                            if (otherPlayer.position.X < projectile.position.X)
-                            {
-                                otherPlayer.velocity.X += vacuumStrength;
-                            }
-                            if (otherPlayer.position.X > projectile.position.X)
-                            {
-                                otherPlayer.velocity.X -= vacuumStrength;
-                            }
-                            if (otherPlayer.position.Y < projectile.position.Y)
-                            {
-                                otherPlayer.velocity.Y += vacuumStrength;
-                            }
-                            if (otherPlayer.position.Y > projectile.position.Y)
-                            {
-                                otherPlayer.velocity.Y -= vacuumStrength;
-                            }
-                        }
-                        if (Collision.CheckAABBvAABBCollision(otherPlayer.position, new Vector2(otherPlayer.width, otherPlayer.height), projectile.position, new Vector2(projectile.width, projectile.height)))
-                        {
-                            otherPlayer.KillMe(PlayerDeathReason.ByCustomReason(otherPlayer.name + " has been consumed by " + player.name + "'s black hole."), 9999999999, otherPlayer.direction);
-                        }
-                    }
-                }
                 for (int p = 0; p < Main.maxProjectiles; p++)
                 {
                     Projectile otherProj = Main.projectile[p];
@@ -113,22 +67,6 @@ namespace JoJoFanStands.Projectiles
                     {
                         if (otherProj.active && otherProj.velocity != Vector2.Zero)
                         {
-                            /*if (otherProj.position.X < projectile.position.X)
-                            {
-                                otherProj.velocity.X += vacuumStrength;
-                            }
-                            if (otherProj.position.X > projectile.position.X)
-                            {
-                                otherProj.velocity.X -= vacuumStrength;
-                            }
-                            if (otherProj.position.Y < projectile.position.Y)
-                            {
-                                otherProj.velocity.Y += vacuumStrength;
-                            }
-                            if (otherProj.position.Y > projectile.position.Y)
-                            {
-                                otherProj.velocity.Y -= vacuumStrength;
-                            }*/
                             Vector2 positionDifference = projectile.Center - projectile.Center;
                             positionDifference.Normalize();
                             projectile.velocity = positionDifference * vacuumStrength;
@@ -146,9 +84,27 @@ namespace JoJoFanStands.Projectiles
                         }
                     }
                 }
-                for (int v = 0; v < Main.maxItems; v++)
+                if (Main.netMode != NetmodeID.SinglePlayer)
                 {
-                    Item droppedItem = Main.item[v];
+                    for (int p = 0; p < Main.maxPlayers; p++)
+                    {
+                        Player otherPlayer = Main.player[p];
+                        if (otherPlayer.active && !otherPlayer.dead && otherPlayer.team != player.team && otherPlayer.whoAmI != player.whoAmI)
+                        {
+                            Vector2 vacuumVelocity = projectile.Center - otherPlayer.Center;
+                            vacuumVelocity.Normalize();
+                            vacuumVelocity *= vacuumStrength;
+                            otherPlayer.velocity += vacuumVelocity;
+                        }
+                        if (Collision.CheckAABBvAABBCollision(otherPlayer.position, new Vector2(otherPlayer.width, otherPlayer.height), projectile.position, new Vector2(projectile.width, projectile.height)))
+                        {
+                            otherPlayer.KillMe(PlayerDeathReason.ByCustomReason(otherPlayer.name + " has been consumed by " + player.name + "'s black hole."), 9999999999, otherPlayer.direction);
+                        }
+                    }
+                }
+                for (int i = 0; i < Main.maxItems; i++)
+                {
+                    Item droppedItem = Main.item[i];
                     if (droppedItem.active && droppedItem.velocity != Vector2.Zero)
                     {
                         Vector2 positionDifference = projectile.Center - droppedItem.Center;

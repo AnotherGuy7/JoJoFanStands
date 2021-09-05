@@ -42,19 +42,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.TheFates
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             FanPlayer FPlayer = player.GetModPlayer<FanPlayer>();
             projectile.frameCounter++;
-            if (mPlayer.StandOut)
-            {
+            if (mPlayer.standOut)
                 projectile.timeLeft = 2;
-            }
-            if (projectile.spriteDirection == 1)
-            {
-                drawOffsetX = -10;
-            }
-            if (projectile.spriteDirection == -1)
-            {
-                drawOffsetX = -60;
-            }
+
             drawOriginOffsetY = -80;
+            if (projectile.spriteDirection == 1)
+                drawOffsetX = -10;
+            if (projectile.spriteDirection == -1)
+                drawOffsetX = -60;
+
             if (Main.mouseLeft)
             {
                 attackFrames = true;
