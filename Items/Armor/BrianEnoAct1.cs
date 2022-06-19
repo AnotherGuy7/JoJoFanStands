@@ -1,6 +1,7 @@
 using JoJoFanStands.Buffs;
 using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
+using JoJoStands.Tiles;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -21,9 +22,9 @@ namespace JoJoFanStands.Items.Armor
 
         public override void SetDefaults()
         {
-            item.width = 42;
-            item.height = 48;
-            item.rare = ItemRarityID.LightPurple;
+            Item.width = 42;
+            Item.height = 48;
+            Item.rare = ItemRarityID.LightPurple;
         }
 
         public override bool ManualStandSpawning(Player player)
@@ -37,19 +38,19 @@ namespace JoJoFanStands.Items.Armor
 
         public override void AddRecipes()
         {
-            ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(ItemType<StandArrow>());
-            recipe.AddIngredient(ItemType<SunDroplet>(), 10);
-            recipe.AddIngredient(ItemID.CopperBar, 15);
-            //recipe.AddIngredient(ItemType<WillToEscape>());
-            recipe.SetResult(this);
-            recipe.AddRecipe();
-            recipe = new ModRecipe(mod);
-            recipe.AddIngredient(ItemType<StandArrow>());
-            recipe.AddIngredient(ItemType<SunDroplet>(), 10);
-            recipe.AddIngredient(ItemID.TinBar, 15);
-            recipe.SetResult(this);
-            recipe.AddRecipe();
+            CreateRecipe()
+                .AddIngredient(ItemType<StandArrow>())
+                .AddIngredient(ItemType<SunDroplet>(), 10)
+                .AddIngredient(ItemID.CopperBar, 15)
+                .AddTile(ModContent.TileType<RemixTableTile>())
+                .Register();
+
+            CreateRecipe()
+                .AddIngredient(ItemType<StandArrow>())
+                .AddIngredient(ItemType<SunDroplet>(), 10)
+                .AddIngredient(ItemID.TinBar, 15)
+                .AddTile(ModContent.TileType<RemixTableTile>())
+                .Register();
         }
     }
 }

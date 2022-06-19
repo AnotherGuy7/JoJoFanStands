@@ -1,6 +1,7 @@
 using JoJoFanStands.Buffs;
 using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
+using JoJoStands.Tiles;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -21,10 +22,10 @@ namespace JoJoFanStands.Items.Armor
 
         public override void SetDefaults()
         {
-            item.width = 44;
-            item.height = 56;
-            item.accessory = true;
-            item.rare = ItemRarityID.LightPurple;
+            Item.width = 44;
+            Item.height = 56;
+            Item.accessory = true;
+            Item.rare = ItemRarityID.LightPurple;
         }
 
         public override bool ManualStandSpawning(Player player)
@@ -38,14 +39,14 @@ namespace JoJoFanStands.Items.Armor
 
         public override void AddRecipes()
         {
-            ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(ItemType<BrianEnoAct1>());
-            recipe.AddIngredient(ItemID.HellstoneBar, 8);
-            recipe.AddIngredient(ItemID.Coral, 5);
-            recipe.AddIngredient(ItemType<SunDroplet>(), 5);
-            recipe.AddIngredient(ItemID.Bone, 30);
-            recipe.SetResult(this);
-            recipe.AddRecipe();
+            CreateRecipe()
+                .AddIngredient(ItemType<BrianEnoAct1>())
+                .AddIngredient(ItemID.HellstoneBar, 8)
+                .AddIngredient(ItemID.Coral, 5)
+                .AddIngredient(ItemType<SunDroplet>(), 5)
+                .AddIngredient(ItemID.Bone, 30)
+                .AddTile(ModContent.TileType<RemixTableTile>())
+                .Register();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace JoJoFanStands.Buffs
 {
     public class Forewarned : ModBuff
     {
-        public override void SetDefaults()
+        public override void SetStaticDefaults()
         {
 			DisplayName.SetDefault("Forwarned");
             Description.SetDefault("You've already seen everything in the next 3 seconds...");
@@ -17,13 +17,13 @@ namespace JoJoFanStands.Buffs
  
         public override void Update(Player player, ref int buffIndex)
         {
-            if (player.HasBuff(mod.BuffType(Name)))
+            if (player.HasBuff(Mod.Find<ModBuff>(Name).Type))
             {
                 //forseeing stuff here
             }
             else
             {
-                player.AddBuff(mod.BuffType("SoreEye"), 1800);
+                player.AddBuff(Mod.Find<ModBuff>("SoreEye").Type, 1800);
             }
         }
     }

@@ -1,5 +1,6 @@
 using JoJoFanStands.Projectiles.PlayerStands.BackInBlack;
 using JoJoStands.Items;
+using JoJoStands.Tiles;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -12,7 +13,7 @@ namespace JoJoFanStands.Items.Stands
         public override int standSpeed => 40;
         public override int standType => 2;
         public override int standTier => 1;
-        public override bool fanStandItem => true;
+        public override bool FanStandItem => true;
 
         public override void SetStaticDefaults()
         {
@@ -22,41 +23,38 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetDefaults()
         {
-            item.damage = 16;
-            item.width = 32;
-            item.height = 32;
-            item.useTime = 12;
-            item.useAnimation = 12;
-            item.maxStack = 1;
-            item.knockBack = 2f;
-            item.value = 0;
-            item.noUseGraphic = true;
-            item.rare = ItemRarityID.LightPurple;
+            Item.damage = 16;
+            Item.width = 38;
+            Item.height = 48;
+            Item.maxStack = 1;
+            Item.value = 0;
+            Item.noUseGraphic = true;
+            Item.rare = ItemRarityID.LightPurple;
         }
 
         public override bool ManualStandSpawning(Player player)
         {
-            Projectile.NewProjectile(player.position, player.velocity, ProjectileType<BackInBlackStand>(), 0, 0f, Main.myPlayer);
+            Projectile.NewProjectile(Item.GetSource_FromThis(), player.position, player.velocity, ProjectileType<BackInBlackStand>(), 0, 0f, Main.myPlayer);
             return true;
         }
 
         public override void AddRecipes()
         {
-            Mod JoJoStands = ModLoader.GetMod("JoJoStands");
-            ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(JoJoStands.ItemType("StandArrow"));
-            recipe.AddIngredient(ItemID.HallowedBar, 9);
-            recipe.AddIngredient(ItemID.CursedFlame, 12);
-            recipe.AddIngredient(ItemID.DemoniteBar, 15);
-            recipe.SetResult(this);
-            recipe.AddRecipe();
-            recipe = new ModRecipe(mod);
-            recipe.AddIngredient(JoJoStands.ItemType("StandArrow"));
-            recipe.AddIngredient(ItemID.HallowedBar, 9);
-            recipe.AddIngredient(ItemID.Ichor, 12);
-            recipe.AddIngredient(ItemID.CrimtaneBar, 15);
-            recipe.SetResult(this);
-            recipe.AddRecipe();
+            CreateRecipe()
+                .AddIngredient(ItemType<StandArrow>())
+                .AddIngredient(ItemID.HallowedBar, 9)
+                .AddIngredient(ItemID.CursedFlame, 12)
+                .AddIngredient(ItemID.DemoniteBar, 15)
+                .AddTile(ModContent.TileType<RemixTableTile>())
+                .Register();
+
+            CreateRecipe()
+                .AddIngredient(ItemType<StandArrow>())
+                .AddIngredient(ItemID.HallowedBar, 9)
+                .AddIngredient(ItemID.Ichor, 12)
+                .AddIngredient(ItemID.CrimtaneBar, 15)
+                .AddTile(ModContent.TileType<RemixTableTile>())
+                .Register();
         }
     }
 }

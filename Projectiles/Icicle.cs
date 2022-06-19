@@ -9,25 +9,25 @@ namespace JoJoFanStands.Projectiles
     {
         public override string Texture
         {
-            get { return mod.Name + "/Projectiles/IceSpike"; }
+            get { return Mod.Name + "/Projectiles/IceSpike"; }
         }
 
         public override void SetDefaults()
         {
-            projectile.width = 14;
-            projectile.height = 20;
-            projectile.aiStyle = 0;
-            projectile.timeLeft = 100;
-            projectile.penetrate = 1;
-            projectile.friendly = true;
-            projectile.tileCollide = false;
-            projectile.ignoreWater = false;
+            Projectile.width = 14;
+            Projectile.height = 20;
+            Projectile.aiStyle = 0;
+            Projectile.timeLeft = 100;
+            Projectile.penetrate = 1;
+            Projectile.friendly = true;
+            Projectile.tileCollide = false;
+            Projectile.ignoreWater = false;
         }
 
         public override void AI()
         {
-            projectile.rotation = projectile.velocity.ToRotation() + MathHelper.ToRadians(90f);
-            projectile.velocity.Y++;
+            Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.ToRadians(90f);
+            Projectile.velocity.Y++;
         }
 
         public override bool OnTileCollide(Vector2 oldVelocity)

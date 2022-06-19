@@ -1,8 +1,10 @@
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
+using Terraria.ModLoader;
 using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
@@ -13,7 +15,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
         public override int punchTime => 10;
         public override int altDamage => 74;
         public override int halfStandHeight => 32;
-        public override int standType => 1;
+        public override StandType standType => StandType.Melee;
 
         public override void AI()
         {
@@ -22,14 +24,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
             if (shootCount > 0)
                 shootCount--;
 
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             if (mPlayer.standOut)
-                projectile.timeLeft = 2;
+                Projectile.timeLeft = 2;
 
             if (!mPlayer.standAutoMode)
             {
-                if (Main.mouseLeft && player.whoAmI == projectile.owner)
+                if (Main.mouseLeft && player.whoAmI == Projectile.owner)
                 {
                     Punch();
                 }
@@ -38,18 +40,18 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
                     if (player.whoAmI == Main.myPlayer)
                         attackFrames = false;
                 }
-                if (Main.mouseRight && player.whoAmI == projectile.owner)
+                if (Main.mouseRight && player.whoAmI == Projectile.owner)
                 {
-                    projectile.direction = player.direction;
+                    Projectile.direction = player.direction;
                     if (shootCount <= 0)
                     {
                         shootCount = 70;
-                        Vector2 shootVel = Main.MouseWorld - projectile.position;
+                        Vector2 shootVel = Main.MouseWorld - Projectile.position;
                         shootVel.Normalize();
                         shootVel *= 12f;
-                        Projectile.NewProjectile(projectile.Center + new Vector2(28f * projectile.direction, -8f), shootVel, ProjectileType<RosePetal>(), altDamage, 6f, player.whoAmI);
+                        Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + new Vector2(28f * Projectile.direction, -8f), shootVel, ProjectileType<RosePetal>(), altDamage, 6f, player.whoAmI);
                     }
-                    Dust.NewDust(projectile.Center + new Vector2(28f * projectile.direction, -8f), 2, 2, DustID.Fire);
+                    Dust.NewDust(Projectile.Center + new Vector2(28f * Projectile.direction, -8f), 2, 2, DustID.Torch);
                     secondaryAbilityFrames = true;
                 }
                 else
@@ -61,7 +63,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
                     if (!secondaryAbilityFrames)
                     {
                         StayBehind();
-                        normalFrames = true;
+                        idleFrames = true;
                     }
                     else
                     {
@@ -85,10 +87,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
         {
             if (attackFrames)
             {
-                normalFrames = false;
+                idleFrames = false;
                 PlayAnimation("Attack");
             }
-            if (normalFrames)
+            if (idleFrames)
             {
                 attackFrames = false;
                 PlayAnimation("Idle");
@@ -96,13 +98,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
             if (secondaryAbilityFrames)
             {
                 attackFrames = false;
-                normalFrames = false;
+                idleFrames = false;
                 PlayAnimation("Secondary");
             }
-            if (Main.player[projectile.owner].GetModPlayer<MyPlayer>().poseMode)
+            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().poseMode)
             {
                 attackFrames = false;
-                normalFrames = false;
+                idleFrames = false;
                 secondaryAbilityFrames = false;
                 PlayAnimation("Pose");
             }
@@ -110,7 +112,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
 
         public override void PlayAnimation(string animationName)
         {
-            standTexture = mod.GetTexture("Projectiles/PlayerStands/RoseColoredBoy/RoseColoredBoy_" + animationName);
+            standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/RoseColoredBoy/RoseColoredBoy_" + animationName).Value;
             if (animationName == "Idle")
             {
                 AnimateStand(animationName, 4, 12, true);

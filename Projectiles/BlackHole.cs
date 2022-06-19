@@ -5,6 +5,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework.Graphics;
 using JoJoStands;
+using JoJoFanStands.Projectiles.PlayerStands.BackInBlack;
 
 namespace JoJoFanStands.Projectiles
 {
@@ -14,36 +15,44 @@ namespace JoJoFanStands.Projectiles
 
         public override void SetDefaults()
         {
-            projectile.width = 250;
-            projectile.height = 250;
-            projectile.aiStyle = 0;
-            projectile.timeLeft = 1500;
-            projectile.friendly = true;
-            projectile.ignoreWater = true;
-            projectile.penetrate = -1;
-            projectile.alpha = 255;
+            Projectile.width = 250;
+            Projectile.height = 250;
+            Projectile.aiStyle = 0;
+            Projectile.timeLeft = 1500;
+            Projectile.friendly = true;
+            Projectile.ignoreWater = true;
+            Projectile.penetrate = -1;
+            Projectile.alpha = 255;
         }
 
-        public override void PostDraw(SpriteBatch spriteBatch, Color lightColor)
+        private Texture2D blackHoleTexture;
+        private Rectangle blackHoleSourceRect;
+        private Vector2 blackHoleOrigin;
+
+        public override void PostDraw(Color lightColor)
         {
-            Texture2D texture = mod.GetTexture("Projectiles/BlackHole");
-            Vector2 drawPosition = projectile.Center - Main.screenPosition;
-            Rectangle sourceRect = new Rectangle(0, 0, texture.Width, texture.Height);
-            Vector2 drawOrigin = new Vector2(texture.Width / 2f, texture.Height / 2f);
-            spriteBatch.Draw(texture, drawPosition, sourceRect, Color.White, 0f, drawOrigin, projectile.scale, SpriteEffects.None, 0);
+            if (blackHoleTexture == null)
+            {
+                blackHoleTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/BlackHole", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+                blackHoleSourceRect = new Rectangle(0, 0, blackHoleTexture.Width, blackHoleTexture.Height);
+                blackHoleOrigin = new Vector2(blackHoleSourceRect.Width / 2f, blackHoleSourceRect.Height / 2f);
+            }
+
+            Vector2 drawPosition = Projectile.Center - Main.screenPosition;
+            Main.EntitySpriteDraw(blackHoleTexture, drawPosition, blackHoleSourceRect, Color.White, 0f, blackHoleOrigin, Projectile.scale, SpriteEffects.None, 0);
         }
 
 
         public override void AI()
         {
-            if (projectile.scale <= 0.01f)
-                projectile.Kill();
+            if (Projectile.scale <= 0.01f)
+                Projectile.Kill();
 
-            vacuumStrength = projectile.scale * 17f;
-            if (projectile.scale >= 0.8f)
-                projectile.scale = 0.8f;
+            vacuumStrength = Projectile.scale * 17f;
+            if (Projectile.scale >= 0.8f)
+                Projectile.scale = 0.8f;
 
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
             if (!player.GetModPlayer<MyPlayer>().timestopActive)
             {
                 for (int n = 0; n < Main.maxNPCs; n++)
@@ -51,36 +60,33 @@ namespace JoJoFanStands.Projectiles
                     NPC npc = Main.npc[n];
                     if (npc.active && !npc.dontTakeDamage && !npc.immortal && npc.velocity != Vector2.Zero)
                     {
-                        Vector2 positionDifference = projectile.Center - npc.Center;
+                        Vector2 positionDifference = Projectile.Center - npc.Center;
                         positionDifference.Normalize();
                         npc.velocity = positionDifference * vacuumStrength;
-                    }
-                    if (Collision.CheckAABBvAABBCollision(npc.position, new Vector2(npc.width, npc.height), projectile.position, new Vector2(projectile.width, projectile.height)))
-                    {
-                        npc.StrikeNPC(npc.lifeMax + 50, 90f, 1);
+
+                        if (Collision.CheckAABBvAABBCollision(npc.position, npc.Size, Projectile.position, new Vector2(Projectile.width, Projectile.height)))
+                            npc.StrikeNPC(npc.lifeMax + 50, 90f, 1);
                     }
                 }
                 for (int p = 0; p < Main.maxProjectiles; p++)
                 {
                     Projectile otherProj = Main.projectile[p];
-                    if (otherProj.type != mod.ProjectileType("BackInBlackStand") && otherProj.whoAmI != projectile.whoAmI)
+                    if (otherProj.active && otherProj.whoAmI != Projectile.whoAmI && otherProj.type != ModContent.ProjectileType<BackInBlackStand>())
                     {
                         if (otherProj.active && otherProj.velocity != Vector2.Zero)
                         {
-                            Vector2 positionDifference = projectile.Center - projectile.Center;
+                            Vector2 positionDifference = Projectile.Center - Projectile.Center;
                             positionDifference.Normalize();
-                            projectile.velocity = positionDifference * vacuumStrength;
+                            Projectile.velocity = positionDifference * vacuumStrength;
                         }
-                        if (Collision.CheckAABBvAABBCollision(otherProj.position, new Vector2(otherProj.width, otherProj.height), projectile.position, new Vector2(projectile.width, projectile.height)))
+                        if (Collision.CheckAABBvAABBCollision(otherProj.position, otherProj.Size, Projectile.position, Projectile.Size))
                         {
                             otherProj.Kill();
                         }
-                        if (otherProj.type == projectile.type && MyPlayer.SecretReferences)      //now this is where things get fun
+                        if (otherProj.type == Projectile.type && MyPlayer.SecretReferences)      //now this is where things get fun
                         {
-                            if (otherProj.whoAmI > projectile.whoAmI)       //so that just 1 black hole spawns the boss
-                            {
-                                NPC.NewNPC((int)projectile.position.X, (int)projectile.position.Y, NPCID.MoonLordCore);
-                            }
+                            if (otherProj.whoAmI > Projectile.whoAmI)       //so that just 1 black hole spawns the boss
+                                NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.position.X, (int)Projectile.position.Y, NPCID.MoonLordCore);
                         }
                     }
                 }
@@ -91,14 +97,13 @@ namespace JoJoFanStands.Projectiles
                         Player otherPlayer = Main.player[p];
                         if (otherPlayer.active && !otherPlayer.dead && otherPlayer.team != player.team && otherPlayer.whoAmI != player.whoAmI)
                         {
-                            Vector2 vacuumVelocity = projectile.Center - otherPlayer.Center;
+                            Vector2 vacuumVelocity = Projectile.Center - otherPlayer.Center;
                             vacuumVelocity.Normalize();
                             vacuumVelocity *= vacuumStrength;
                             otherPlayer.velocity += vacuumVelocity;
-                        }
-                        if (Collision.CheckAABBvAABBCollision(otherPlayer.position, new Vector2(otherPlayer.width, otherPlayer.height), projectile.position, new Vector2(projectile.width, projectile.height)))
-                        {
-                            otherPlayer.KillMe(PlayerDeathReason.ByCustomReason(otherPlayer.name + " has been consumed by " + player.name + "'s black hole."), 9999999999, otherPlayer.direction);
+
+                            if (Collision.CheckAABBvAABBCollision(otherPlayer.position, otherPlayer.Size, Projectile.position, new Vector2(Projectile.width, Projectile.height)))
+                                otherPlayer.KillMe(PlayerDeathReason.ByCustomReason(otherPlayer.name + " has been consumed by " + player.name + "'s black hole."), 9999999999, otherPlayer.direction);
                         }
                     }
                 }
@@ -107,14 +112,14 @@ namespace JoJoFanStands.Projectiles
                     Item droppedItem = Main.item[i];
                     if (droppedItem.active && droppedItem.velocity != Vector2.Zero)
                     {
-                        Vector2 positionDifference = projectile.Center - droppedItem.Center;
+                        Vector2 positionDifference = Projectile.Center - droppedItem.Center;
                         positionDifference.Normalize();
                         droppedItem.velocity = positionDifference * vacuumStrength;
+
+                        if (Collision.CheckAABBvAABBCollision(droppedItem.position, droppedItem.Size, Projectile.position, new Vector2(Projectile.width, Projectile.height)))
+                            droppedItem.TurnToAir();
                     }
-                    if (Collision.CheckAABBvAABBCollision(droppedItem.position, new Vector2(droppedItem.width, droppedItem.height), projectile.position, new Vector2(projectile.width, projectile.height)))
-                    {
-                        droppedItem.TurnToAir();
-                    }
+
                 }
             }
         }

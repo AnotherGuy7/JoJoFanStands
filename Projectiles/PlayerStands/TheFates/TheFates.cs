@@ -9,28 +9,28 @@ namespace JoJoFanStands.Projectiles.PlayerStands.TheFates
     {
         public override void SetStaticDefaults()
         {
-            Main.projPet[projectile.type] = true;
-            Main.projFrames[projectile.type] = 20;
+            Main.projPet[Projectile.type] = true;
+            Main.projFrames[Projectile.type] = 20;
         }
 
         public override void SetDefaults()
         {
-            projectile.netImportant = true;
-            projectile.width = 38;
-            projectile.height = 1;
-            projectile.friendly = true;
-            projectile.minion = true;
-            projectile.netImportant = true;
-            projectile.minionSlots = 1;
-            projectile.penetrate = 1;
-            projectile.tileCollide = true;
-            projectile.ignoreWater = true;
+            Projectile.netImportant = true;
+            Projectile.width = 38;
+            Projectile.height = 1;
+            Projectile.friendly = true;
+            Projectile.minion = true;
+            Projectile.netImportant = true;
+            Projectile.minionSlots = 1;
+            Projectile.penetrate = 1;
+            Projectile.tileCollide = true;
+            Projectile.ignoreWater = true;
         }
 
         public Vector2 velocityAddition = Vector2.Zero;
         public float mouseDistance = 0f;
-        protected float shootSpeed = 16f;       //how fast the projectile the minion shoots goes
-        public bool normalFrames = false;
+        protected float shootSpeed = 16f;       //how fast the Projectile the minion shoots goes
+        public bool idleFrames = false;
         public bool attackFrames = false;
         int shootCount = 0;
 
@@ -38,82 +38,82 @@ namespace JoJoFanStands.Projectiles.PlayerStands.TheFates
         {
             SelectFrame();
             shootCount--;
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             FanPlayer FPlayer = player.GetModPlayer<FanPlayer>();
-            projectile.frameCounter++;
+            Projectile.frameCounter++;
             if (mPlayer.standOut)
-                projectile.timeLeft = 2;
+                Projectile.timeLeft = 2;
 
-            drawOriginOffsetY = -80;
-            if (projectile.spriteDirection == 1)
-                drawOffsetX = -10;
-            if (projectile.spriteDirection == -1)
-                drawOffsetX = -60;
+            DrawOriginOffsetY = -80;
+            if (Projectile.spriteDirection == 1)
+                DrawOffsetX = -10;
+            if (Projectile.spriteDirection == -1)
+                DrawOffsetX = -60;
 
             if (Main.mouseLeft)
             {
                 attackFrames = true;
-                normalFrames = false;
+                idleFrames = false;
                 Main.mouseRight = false;        //so that the player can't just stop time while punching
-                float rotaY = Main.MouseWorld.Y - projectile.Center.Y;
-                projectile.rotation = MathHelper.ToRadians((rotaY * projectile.spriteDirection) / 6f);
-                if (Main.MouseWorld.X > projectile.position.X)
+                float rotaY = Main.MouseWorld.Y - Projectile.Center.Y;
+                Projectile.rotation = MathHelper.ToRadians((rotaY * Projectile.spriteDirection) / 6f);
+                if (Main.MouseWorld.X > Projectile.position.X)
                 {
-                    projectile.spriteDirection = 1;
-                    projectile.direction = 1;
+                    Projectile.spriteDirection = 1;
+                    Projectile.direction = 1;
                 }
-                if (Main.MouseWorld.X < projectile.position.X)
+                if (Main.MouseWorld.X < Projectile.position.X)
                 {
-                    projectile.spriteDirection = -1;
-                    projectile.direction = -1;
+                    Projectile.spriteDirection = -1;
+                    Projectile.direction = -1;
                 }
-                if (projectile.position.X < Main.MouseWorld.X - 5f)
+                if (Projectile.position.X < Main.MouseWorld.X - 5f)
                 {
                     velocityAddition.X = 5f;
                 }
-                if (projectile.position.X > Main.MouseWorld.X + 5f)
+                if (Projectile.position.X > Main.MouseWorld.X + 5f)
                 {
                     velocityAddition.X = -5f;
                 }
-                if (projectile.position.X > Main.MouseWorld.X - 5f && projectile.position.X < Main.MouseWorld.X + 5f)
+                if (Projectile.position.X > Main.MouseWorld.X - 5f && Projectile.position.X < Main.MouseWorld.X + 5f)
                 {
                     velocityAddition.X = 0f;
                 }
-                if (projectile.position.Y > Main.MouseWorld.Y + 5f)
+                if (Projectile.position.Y > Main.MouseWorld.Y + 5f)
                 {
                     velocityAddition.Y = -5f;
                 }
-                if (projectile.position.Y < Main.MouseWorld.Y - 5f)
+                if (Projectile.position.Y < Main.MouseWorld.Y - 5f)
                 {
                     velocityAddition.Y = 5f;
                 }
-                if (projectile.position.Y < Main.MouseWorld.Y + 5f && projectile.position.Y > Main.MouseWorld.Y - 5f)
+                if (Projectile.position.Y < Main.MouseWorld.Y + 5f && Projectile.position.Y > Main.MouseWorld.Y - 5f)
                 {
                     velocityAddition.Y = 0f;
                 }
-                mouseDistance = Vector2.Distance(Main.MouseWorld, projectile.Center);
+                mouseDistance = Vector2.Distance(Main.MouseWorld, Projectile.Center);
                 if (mouseDistance > 20f)
                 {
-                    projectile.velocity = player.velocity + velocityAddition;
+                    Projectile.velocity = player.velocity + velocityAddition;
                 }
                 if (mouseDistance <= 20f)
                 {
-                    projectile.velocity = Vector2.Zero;
+                    Projectile.velocity = Vector2.Zero;
                 }
                 if (shootCount <= 0)
                 {
                     shootCount += 12;
-                    Vector2 shootVel = Main.MouseWorld - projectile.Center;
+                    Vector2 shootVel = Main.MouseWorld - Projectile.Center;
                     if (shootVel == Vector2.Zero)
                     {
                         shootVel = new Vector2(0f, 1f);
                     }
                     shootVel.Normalize();
                     shootVel *= shootSpeed;
-                    int proj = Projectile.NewProjectile(projectile.Center.X, projectile.Center.Y - 20f, shootVel.X, shootVel.Y, mod.ProjectileType("Fists"), 7, 2f, Main.myPlayer, 0f, 0f);
+                    int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y - 20f, shootVel.X, shootVel.Y, ModContent.ProjectileType<Fists>(), 7, 2f, Main.myPlayer, 0f, 0f);
                     Main.projectile[proj].netUpdate = true;
-                    projectile.netUpdate = true;
+                    Projectile.netUpdate = true;
                 }
                 if (shootCount <= 0)
                 {
@@ -125,81 +125,81 @@ namespace JoJoFanStands.Projectiles.PlayerStands.TheFates
                 Vector2 vector131 = player.Center;
                 vector131.X -= (float)((12 + player.width / 2) * player.direction);
                 vector131.Y -= -15f;
-                projectile.Center = Vector2.Lerp(projectile.Center, vector131, 0.2f);
-                projectile.velocity *= 0.8f;
-                projectile.direction = (projectile.spriteDirection = player.direction);
-                projectile.rotation = 0;
-                normalFrames = true;
+                Projectile.Center = Vector2.Lerp(Projectile.Center, vector131, 0.2f);
+                Projectile.velocity *= 0.8f;
+                Projectile.direction = (Projectile.spriteDirection = player.direction);
+                Projectile.rotation = 0;
+                idleFrames = true;
                 attackFrames = false;
             }
-            if (Main.mouseRight && !player.HasBuff(mod.BuffType("SoreEye")))
+            if (Main.mouseRight && !player.HasBuff(Mod.Find<ModBuff>("SoreEye").Type))
             {
                 Main.mouseLeft = false;
-                player.AddBuff(mod.BuffType("Forewarned"), 180);
+                player.AddBuff(Mod.Find<ModBuff>("Forewarned").Type, 180);
             }
-            Vector2 direction = player.Center - projectile.Center;
+            Vector2 direction = player.Center - Projectile.Center;
             float distanceTo = direction.Length();
             if (distanceTo > 98f)
             {
-                if (projectile.position.X <= player.position.X - 15f)
+                if (Projectile.position.X <= player.position.X - 15f)
                 {
-                    projectile.position = new Vector2(projectile.position.X + 0.2f, projectile.position.Y);
-                    projectile.velocity = Vector2.Zero;
+                    Projectile.position = new Vector2(Projectile.position.X + 0.2f, Projectile.position.Y);
+                    Projectile.velocity = Vector2.Zero;
                 }
-                if (projectile.position.X >= player.position.X + 15f)
+                if (Projectile.position.X >= player.position.X + 15f)
                 {
-                    projectile.position = new Vector2(projectile.position.X - 0.2f, projectile.position.Y);
-                    projectile.velocity = Vector2.Zero;
+                    Projectile.position = new Vector2(Projectile.position.X - 0.2f, Projectile.position.Y);
+                    Projectile.velocity = Vector2.Zero;
                 }
-                if (projectile.position.Y >= player.position.Y + 15f)
+                if (Projectile.position.Y >= player.position.Y + 15f)
                 {
-                    projectile.position = new Vector2(projectile.position.X, projectile.position.Y - 0.2f);
-                    projectile.velocity = Vector2.Zero;
+                    Projectile.position = new Vector2(Projectile.position.X, Projectile.position.Y - 0.2f);
+                    Projectile.velocity = Vector2.Zero;
                 }
-                if (projectile.position.Y <= player.position.Y - 15f)
+                if (Projectile.position.Y <= player.position.Y - 15f)
                 {
-                    projectile.position = new Vector2(projectile.position.X, projectile.position.Y + 0.2f);
-                    projectile.velocity = Vector2.Zero;
+                    Projectile.position = new Vector2(Projectile.position.X, Projectile.position.Y + 0.2f);
+                    Projectile.velocity = Vector2.Zero;
                 }
             }
             if (distanceTo >= 120)
             {
                 Main.mouseLeft = false;
                 Main.mouseRight = false;
-                projectile.Center = player.Center;
+                Projectile.Center = player.Center;
             }
         }
 
         public virtual void SelectFrame()
         {
-            projectile.frameCounter++;
+            Projectile.frameCounter++;
             if (attackFrames)
             {
-                normalFrames = false;
-                if (projectile.frameCounter >= 12)
+                idleFrames = false;
+                if (Projectile.frameCounter >= 12)
                 {
-                    projectile.frame += 1;
-                    projectile.frameCounter = 0;
+                    Projectile.frame += 1;
+                    Projectile.frameCounter = 0;
                 }
-                if (projectile.frame <= 15)
+                if (Projectile.frame <= 15)
                 {
-                    projectile.frame = 16;
+                    Projectile.frame = 16;
                 }
-                if (projectile.frame >= 20)
+                if (Projectile.frame >= 20)
                 {
-                    projectile.frame = 16;
+                    Projectile.frame = 16;
                 }
             }
-            if (normalFrames)
+            if (idleFrames)
             {
-                if (projectile.frameCounter >= 15)
+                if (Projectile.frameCounter >= 15)
                 {
-                    projectile.frame += 1;
-                    projectile.frameCounter = 0;
+                    Projectile.frame += 1;
+                    Projectile.frameCounter = 0;
                 }
-                if (projectile.frame >= 16)
+                if (Projectile.frame >= 16)
                 {
-                    projectile.frame = 0;
+                    Projectile.frame = 0;
                 }
             }
         }

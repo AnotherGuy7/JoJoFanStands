@@ -6,7 +6,7 @@ namespace JoJoFanStands.Buffs
 {
     public class BrianEnoActiveBuff : ModBuff
     {
-        public override void SetDefaults()
+        public override void SetStaticDefaults()
         {
 			DisplayName.SetDefault("Brian Eno Active");
             Description.SetDefault("Brian Eno is active!");

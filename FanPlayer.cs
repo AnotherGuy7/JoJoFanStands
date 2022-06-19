@@ -4,9 +4,11 @@ using JoJoFanStands.Mounts;
 using JoJoStands;
 using JoJoStands.Items;
 using JoJoStands.Items.Hamon;
+using JoJoStands.Networking;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -16,7 +18,7 @@ namespace JoJoFanStands
 {
     public class FanPlayer : ModPlayer
     {
-        public static bool spawnPao = false;
+        public static bool SpawnPao = false;
 
         private int standKeyPressTimer = 0;
 
@@ -60,7 +62,7 @@ namespace JoJoFanStands
             }
             if (JoJoStands.JoJoStands.SpecialHotKey.JustPressed)
             {
-                if (player.mount.Type != Mount.None)
+                if (player.mount.Type != MountID.None)
                 {
                     SpinBoost = true;
                 }
@@ -97,10 +99,10 @@ namespace JoJoFanStands
 
             if (BrianEnoAct1)
             {
-                if (player.mount.Type != Mount.None && !player.wet)
+                if (player.mount.Type != MountID.None && !player.wet)
                 {
                     player.moveSpeed += 0.1f;
-                    player.meleeCrit += 10;
+                    player.GetCritChance(DamageClass.Melee) += 10;
                 }
                 if (SpinBoost)
                 {
@@ -109,10 +111,10 @@ namespace JoJoFanStands
             }
             if (BrianEnoAct2)
             {
-                if (player.mount.Type != Mount.None)
+                if (player.mount.Type != MountID.None)
                 {
                     player.moveSpeed += 0.1f;
-                    player.meleeCrit += 10;
+                    player.GetCritChance(DamageClass.Melee) += 10;
                 }
                 if (SpinBoost)
                 {
@@ -121,10 +123,10 @@ namespace JoJoFanStands
             }
             if (BrianEnoAct3)
             {
-                if (player.mount.Type != Mount.None)
+                if (player.mount.Type != MountID.None)
                 {
                     player.moveSpeed += 0.1f;
-                    player.meleeCrit += 10;
+                    player.GetCritChance(DamageClass.Melee) += 10;
                 }
                 if (SpinBoost)
                 {
@@ -135,31 +137,28 @@ namespace JoJoFanStands
 
         public void SpawnFanStand()
         {
-            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-            Item inputItem = mPlayer.StandSlot.Item;
+            MyPlayer mPlayer = Player.GetModPlayer<MyPlayer>();
+            Item inputItem = mPlayer.StandSlot.SlotItem;
 
             if (inputItem.IsAir)
             {
                 Main.NewText("There is no stand in the Stand Slot!", Color.Red);
                 mPlayer.standOut = false;
                 if (Main.netMode == NetmodeID.MultiplayerClient)
-                {
-                    JoJoStands.Networking.ModNetHandler.playerSync.SendStandOut(256, player.whoAmI, false, player.whoAmI);
-                }
+                    ModNetHandler.playerSync.SendStandOut(256, Player.whoAmI, false, Player.whoAmI);
                 return;
             }
 
-            if (!(inputItem.modItem is FanStandItemClass))
+            if (!(inputItem.ModItem is FanStandItemClass))
             {
                 mPlayer.standOut = false;
                 if (Main.netMode == NetmodeID.MultiplayerClient)
-                {
-                    JoJoStands.Networking.ModNetHandler.playerSync.SendStandOut(256, player.whoAmI, false, player.whoAmI);
-                }
+                    ModNetHandler.playerSync.SendStandOut(256, Player.whoAmI, false, Player.whoAmI);
+
                 return;
             }
 
-            FanStandItemClass standItem = inputItem.modItem as FanStandItemClass;
+            FanStandItemClass standItem = inputItem.ModItem as FanStandItemClass;
 
             mPlayer.standOut = true;
             mPlayer.standDefenseToAdd = 4 + (2 * standItem.standTier);
@@ -170,61 +169,52 @@ namespace JoJoFanStands
             if (standClassName.Contains("T4"))
                 standClassName = standItem.standProjectileName + "StandFinal";
 
-            if (player.ownedProjectileCounts[mod.ProjectileType(standClassName)] > 0)
+            if (Player.ownedProjectileCounts[Mod.Find<ModProjectile>(standClassName).Type] > 0)
             {
                 mPlayer.standOut = false;
                 if (Main.netMode == NetmodeID.MultiplayerClient)
-                {
-                    JoJoStands.Networking.ModNetHandler.playerSync.SendStandOut(256, player.whoAmI, false, player.whoAmI);
-                }
+                    ModNetHandler.playerSync.SendStandOut(256, Player.whoAmI, false, Player.whoAmI);
+
                 return;
             }
 
-            if (!standItem.ManualStandSpawning(player))
+            if (!standItem.ManualStandSpawning(Player))
             {
-                int standProjectileType = mod.ProjectileType(standClassName);
-
-                Projectile.NewProjectile(player.position, player.velocity, standProjectileType, 0, 0f, Main.myPlayer);
+                int standProjectileType = Mod.Find<ModProjectile>(standClassName).Type;
+                Projectile.NewProjectile(inputItem.GetSource_FromThis(), Player.position, Player.velocity, standProjectileType, 0, 0f, Player.whoAmI);
             }
         }
 
         public override void ModifyHitByNPC(NPC npc, ref int damage, ref bool crit)
         {
-            if (anyBrianEno && player.mount.Type != Mount.None && !player.wet)
+            if (anyBrianEno && Player.mount.Type != MountID.None && !Player.wet)
             {
                 if (BrianEnoAct1 && (Main.rand.NextFloat(0, 101) <= 5f || SpinBoost))
                 {
                     damage = 0;
-                    player.velocity.X -= 5f * player.direction;
+                    Player.velocity.X -= 5f * Player.direction;
                 }
             }
         }
 
-        public override void ModifyDrawLayers(List<PlayerLayer> layers)
+        public override void HideDrawLayers(PlayerDrawSet drawInfo)
         {
-            if (player.mount.Type == MountType<BrianEnoMount>())
+            if (Player.mount.Type == MountType<BrianEnoMount>() || Player.mount.Type == MountType<SkySawMount>())
             {
-                PlayerLayer.Legs.visible = false;
-                PlayerLayer.Skin.visible = false;
-                PlayerLayer.ShoeAcc.visible = false;
+                PlayerDrawLayers.Skin.Hide();
+                PlayerDrawLayers.Leggings.Hide();
+                PlayerDrawLayers.Shoes.Hide();
             }
-            if (player.mount.Type == MountType<BathysphereMount>())
+            if (Player.mount.Type == MountType<BathysphereMount>())
             {
-                PlayerLayer.Legs.visible = false;
-                PlayerLayer.Body.visible = false;
-                PlayerLayer.Skin.visible = false;
-                PlayerLayer.Arms.visible = false;
-                PlayerLayer.HeldItem.visible = false;
-                PlayerLayer.ShieldAcc.visible = false;
-                PlayerLayer.ShoeAcc.visible = false;
-                PlayerLayer.BalloonAcc.visible = false;
-                PlayerLayer.Wings.visible = false;
-            }
-            if (player.mount.Type == MountType<SkySawMount>())
-            {
-                PlayerLayer.Legs.visible = false;
-                PlayerLayer.Skin.visible = false;
-                PlayerLayer.ShoeAcc.visible = false;
+                PlayerDrawLayers.HeldItem.Hide();
+                PlayerDrawLayers.Shield.Hide();
+                PlayerDrawLayers.Skin.Hide();
+                PlayerDrawLayers.Torso.Hide();
+                PlayerDrawLayers.Wings.Hide();
+                PlayerDrawLayers.BalloonAcc.Hide();
+                PlayerDrawLayers.Leggings.Hide();
+                PlayerDrawLayers.Shoes.Hide();
             }
         }
     }

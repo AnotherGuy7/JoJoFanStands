@@ -9,7 +9,7 @@ namespace JoJoFanStands.Buffs
 {
     public class SoreEye : ModBuff
     {
-        public override void SetDefaults()
+        public override void SetStaticDefaults()
         {
 			DisplayName.SetDefault("Sore Eye");
             Description.SetDefault("Your eyes are in pain.");

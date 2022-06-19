@@ -1,8 +1,10 @@
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Graphics.Effects;
+using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
 {
@@ -26,13 +28,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
         {
             SelectAnimation();
             UpdateStandInfo();
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             if (shootCount > 0)
                 shootCount--;
             if (mPlayer.standOut)
-                projectile.timeLeft = 2;
-            drawOriginOffsetY = -halfStandHeight;
+                Projectile.timeLeft = 2;
+            DrawOriginOffsetY = -halfStandHeight;
             StayBehind();
 
             if (JoJoStands.JoJoStands.SpecialHotKey.JustPressed && !UI.AbilityChooserUI.Visible)
@@ -53,7 +55,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                             if (npcDist <= 25f)
                             {
                                 shootCount += newShootTime;
-                                npc.StrikeNPC(97, 0f, projectile.direction * -1);
+                                npc.StrikeNPC(97, 0f, Projectile.direction * -1);
                             }
                         }
                     }
@@ -61,10 +63,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             }
             if (player.whoAmI == Main.myPlayer)
             {
-                projectile.direction = 1;
-                if (Main.mouseX < projectile.position.X)
+                Projectile.direction = 1;
+                if (Main.mouseX < Projectile.position.X)
                 {
-                    projectile.direction = -1;
+                    Projectile.direction = -1;
                 }
                 if (abilityNumber == 0)
                 {
@@ -96,7 +98,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                     NPC npc = Main.npc[n];
                     if (npc.active)
                     {
-                        Vector2 pushBackVelocity = npc.position - projectile.position;
+                        Vector2 pushBackVelocity = npc.position - Projectile.position;
                         pushBackVelocity.Normalize();
                         pushBackVelocity *= 25f;
                         npc.velocity += pushBackVelocity;
@@ -111,9 +113,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                 for (int n = 0; n < Main.maxNPCs; n++)
                 {
                     NPC npc = Main.npc[n];
-                    if (npc.active && projectile.Distance(npc.Center) <= 60f)
+                    if (npc.active && Projectile.Distance(npc.Center) <= 60f)
                     {
-                        Vector2 pushBackVelocity = npc.position - projectile.position;
+                        Vector2 pushBackVelocity = npc.position - Projectile.position;
                         pushBackVelocity.Normalize();
                         pushBackVelocity *= 10f;
                         npc.velocity += pushBackVelocity;
@@ -122,9 +124,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                 for (int p = 0; p < Main.maxProjectiles; p++)
                 {
                     Projectile otherProj = Main.projectile[p];
-                    if (otherProj.active && otherProj.hostile && projectile.Distance(otherProj.Center) <= 60f)
+                    if (otherProj.active && otherProj.hostile && Projectile.Distance(otherProj.Center) <= 60f)
                     {
-                        Vector2 pushBackVelocity = otherProj.position - projectile.position;
+                        Vector2 pushBackVelocity = otherProj.position - Projectile.position;
                         pushBackVelocity.Normalize();
                         pushBackVelocity *= 25f;
                         otherProj.velocity += pushBackVelocity;
@@ -156,7 +158,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                 }
             }
 
-            if (abilityNumber == 5)     //non-existant: Whatever this projectile touches will no longer ever spawn in the game for the time you are in the world
+            if (abilityNumber == 5)     //non-existant: Whatever this Projectile touches will no longer ever spawn in the game for the time you are in the world
             {
                 abilityName = "Genocide";
                 //AnimateStand(1, 0.16f, false, true);
@@ -168,7 +170,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                         if (npc.active && Vector2.Distance(Main.MouseWorld, npc.position) < 25f)
                         {
                             shootCount += 60;
-                            //Main.npc[i].StrikeNPC(10, 0f, projectile.direction * -1);
+                            //Main.npc[i].StrikeNPC(10, 0f, Projectile.direction * -1);
                             npc.GetGlobalNPC<NPCs.FanGlobalNPC>().nonExistant = true;
                             if (NPCs.FanGlobalNPC.nonExistantTypes.Count != NPCs.FanGlobalNPC.nonExistantTypes.Capacity)
                             {
@@ -214,24 +216,24 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
 
         /*public virtual void AnimateStand(int frameAmount, float fps, bool loop, bool ability)        //remember that 'fps' refers to how many frames is supposed to play every second, not how fast it plays
         {
-            Main.projFrames[projectile.whoAmI] = frameAmount;
-            projectile.frameCounter++;
-            standTexture = mod.GetTexture("Projectiles/PlayerStands/Megalovania/M" + direction);
+            Main.projFrames[Projectile.whoAmI] = frameAmount;
+            Projectile.frameCounter++;
+            standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Megalovania/M" + direction);
             float framesPerSecond = 60f / fps;
-            if (projectile.frameCounter >= framesPerSecond)
+            if (Projectile.frameCounter >= framesPerSecond)
             {
-                projectile.frameCounter = 0;
-                projectile.frame += 1;
+                Projectile.frameCounter = 0;
+                Projectile.frame += 1;
             }
-            if (projectile.frame >= frameAmount && loop)
+            if (Projectile.frame >= frameAmount && loop)
             {
-                projectile.frame = 0;
+                Projectile.frame = 0;
             }
-            if (projectile.frame >= frameAmount && !loop)
+            if (Projectile.frame >= frameAmount && !loop)
             {
                 direction = "Idle";
             }
-            if (projectile.frame >= frameAmount && ability)
+            if (Projectile.frame >= frameAmount && ability)
             {
                 direction = "Idle";
                 abilityNumber = 0;
@@ -247,33 +249,33 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
             }
             else
             {
-                projectile.frame = 0;
+                Projectile.frame = 0;
                 PlayAnimation(abilityName);
                 maxFrames = 1;
-                if (projectile.frame >= maxFrames)
+                if (Projectile.frame >= maxFrames)
                 {
                     abilityNumber = 0;
                 }
             }
             /*if (attackFrames)
             {
-                normalFrames = false;
+                idleFrames = false;
                 PlayAnimation("Attack");
             }
-            if (normalFrames)
+            if (idleFrames)
             {
                 attackFrames = false;
                 PlayAnimation("Idle");
             }
             if (secondaryAbilityFrames)
             {
-                normalFrames = false;
+                idleFrames = false;
                 attackFrames = false;
                 PlayAnimation("Pose");
             }
-            if (Main.player[projectile.owner].GetModPlayer<MyPlayer>().poseMode)
+            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().poseMode)
             {
-                normalFrames = false;
+                idleFrames = false;
                 attackFrames = false;
                 PlayAnimation("Pose");
             }*/
@@ -281,7 +283,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
 
         public override void PlayAnimation(string animationName)
         {
-            standTexture = mod.GetTexture("Projectiles/PlayerStands/Megalovania/M" + animationName);
+            standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Megalovania/M" + animationName).Value;
             if (animationName == "Up")
             {
                 AnimateStand(animationName, 2, 30, true);

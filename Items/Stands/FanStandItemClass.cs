@@ -4,6 +4,6 @@ namespace JoJoFanStands.Items.Stands
 {
     public class FanStandItemClass : StandItemClass
     {
-        public virtual bool fanStandItem { get; }
+        public virtual bool FanStandItem { get; }
     }
 }

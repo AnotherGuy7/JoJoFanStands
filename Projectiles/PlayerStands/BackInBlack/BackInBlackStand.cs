@@ -1,8 +1,11 @@
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
+using Terraria.ModLoader;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
 {
@@ -11,7 +14,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
         public override float shootSpeed => 16f;
         public override int shootTime => 40;
         public override int projectileDamage => 62;
-        public override int standType => 2;
+        public override StandType standType => StandType.Ranged;
         public override int halfStandHeight => 33;
         public override int standOffset => 20;
 
@@ -22,15 +25,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
         {
             SelectAnimation();
             UpdateStandInfo();
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-            secondaryAbilityFrames = player.ownedProjectileCounts[mod.ProjectileType("BlackHole")] != 0;
+            secondaryAbilityFrames = player.ownedProjectileCounts[ModContent.ProjectileType<BlackHole>()] != 0;
 
             if (shootCount > 0)
                 shootCount--;
             if (mPlayer.standOut)
-                projectile.timeLeft = 2;
-            if (player.ownedProjectileCounts[mod.ProjectileType("BlackHole")] == 0)
+                Projectile.timeLeft = 2;
+            if (player.ownedProjectileCounts[ModContent.ProjectileType<BlackHole>()] == 0)
                 blackHoleWhoAmI = -1;
 
             if (!secondaryAbilityFrames)
@@ -39,10 +42,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
             }
             else
             {
-                projectile.velocity = Vector2.Zero;
-                projectile.position = Main.projectile[blackHoleWhoAmI].Center - new Vector2(0f, -300f);
+                Projectile.velocity = Vector2.Zero;
+                Projectile.position = Main.projectile[blackHoleWhoAmI].Center - new Vector2(0f, -300f);
             }
-            /*if (blackHoleWhoAmI == 0 && player.ownedProjectileCounts[mod.ProjectileType("BlackHole")] != 0)
+            /*if (blackHoleWhoAmI == 0 && player.ownedProjectileCounts[ModContent.ProjectileType<BlackHole")] != 0)
             {
                 blackHoleWhoAmI = BlackHole.whoAmI;
             }*/
@@ -52,31 +55,30 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
                 attackFrames = true;
                 if (shootCount <= 0)
                 {
-                    Main.PlaySound(SoundID.Item78, projectile.position);
+                    SoundEngine.PlaySound(SoundID.Item78, Projectile.position);
                     shootCount += newShootTime;
-                    Vector2 shootVel = Main.MouseWorld - projectile.Center;
+                    Vector2 shootVel = Main.MouseWorld - Projectile.Center;
                     if (shootVel == Vector2.Zero)
-                    {
                         shootVel = new Vector2(0f, 1f);
-                    }
+
                     shootVel.Normalize();
                     shootVel *= 1.5f;
                     Vector2 perturbedSpeed = new Vector2(shootVel.X, shootVel.Y);
-                    int proj = Projectile.NewProjectile(projectile.Center.X, projectile.Center.Y, perturbedSpeed.X, perturbedSpeed.Y, mod.ProjectileType("BackInBlackOrb"), newProjectileDamage, 2f, player.whoAmI);
+                    int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, perturbedSpeed, ModContent.ProjectileType<BackInBlackOrb>(), newProjectileDamage, 2f, player.whoAmI);
                     Main.projectile[proj].netUpdate = true;
-                    projectile.netUpdate = true;
+                    Projectile.netUpdate = true;
                 }
             }
             if (!Main.mouseLeft && !secondaryAbilityFrames)
             {
-                normalFrames = true;
+                idleFrames = true;
                 attackFrames = false;
             }
             if (Main.mouseRight && shootCount <= 0 && player.whoAmI == Main.myPlayer && !secondaryAbilityFrames)
             {
-                if (player.ownedProjectileCounts[mod.ProjectileType("TeleportationWormhole")] == 0)
+                if (player.ownedProjectileCounts[ModContent.ProjectileType<TeleportationWormhole>()] == 0)
                 {
-                    wormholeWhoAmI = Projectile.NewProjectile(Main.MouseWorld, Vector2.Zero, mod.ProjectileType("TeleportationWormhole"), 0, 0f, player.whoAmI);
+                    wormholeWhoAmI = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Main.MouseWorld, Vector2.Zero, ModContent.ProjectileType<TeleportationWormhole>(), 0, 0f, player.whoAmI);
                     shootCount += 60;
                 }
                 else
@@ -90,9 +92,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
             }
             if (SpecialKeyCurrent())
             {
-                if (player.ownedProjectileCounts[mod.ProjectileType("BlackHole")] == 0 && blackHoleWhoAmI == -1)
+                if (player.ownedProjectileCounts[ModContent.ProjectileType<BlackHole>()] == 0 && blackHoleWhoAmI == -1)
                 {
-                    blackHoleWhoAmI = Projectile.NewProjectile(projectile.Center.X, projectile.Center.Y - 300f, 0f, 0f, mod.ProjectileType("BlackHole"), 0, 0f, player.whoAmI);
+                    blackHoleWhoAmI = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y - 300f, 0f, 0f, ModContent.ProjectileType<BlackHole>(), 0, 0f, player.whoAmI);
                     Main.projectile[blackHoleWhoAmI].scale = 0.05f;
                     Main.projectile[blackHoleWhoAmI].netUpdate = true;
                 }
@@ -112,23 +114,23 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
         {
             if (attackFrames)
             {
-                normalFrames = false;
+                idleFrames = false;
                 PlayAnimation("Attack");
             }
-            if (normalFrames)
+            if (idleFrames)
             {
                 attackFrames = false;
                 PlayAnimation("Idle");
             }
             if (secondaryAbilityFrames)
             {
-                normalFrames = false;
+                idleFrames = false;
                 attackFrames = false;
                 PlayAnimation("Pose");
             }
-            if (Main.player[projectile.owner].GetModPlayer<MyPlayer>().poseMode)
+            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().poseMode)
             {
-                normalFrames = false;
+                idleFrames = false;
                 attackFrames = false;
                 PlayAnimation("Pose");
             }
@@ -136,7 +138,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
 
         public override void PlayAnimation(string animationName)
         {
-            standTexture = mod.GetTexture("Projectiles/PlayerStands/BackInBlack/BackInBlack_" + animationName);
+            standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/BackInBlack/BackInBlack_" + animationName).Value;
             if (animationName == "Idle")
             {
                 AnimateStand(animationName, 2, 14, true);

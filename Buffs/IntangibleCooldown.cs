@@ -9,7 +9,7 @@ namespace JoJoFanStands.Buffs
 {
     public class IntangibleCooldown : ModBuff
     {
-        public override void SetDefaults()
+        public override void SetStaticDefaults()
         {
 			DisplayName.SetDefault("Intangible Cooldown");
             Description.SetDefault("You got sick of going through everything.");

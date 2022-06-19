@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
@@ -26,7 +27,7 @@ namespace JoJoFanStands.UI
             AbilityUI.Width.Set(600f, 0f);
             AbilityUI.Height.Set(400f, 0f);
 
-            UIImageButton pushBack = new UIImageButton(ModContent.GetTexture("JoJoFanStands/UI/PushBack"));
+            UIImageButton pushBack = new UIImageButton(ModContent.Request<Texture2D>("JoJoFanStands/UI/PushBack", AssetRequestMode.ImmediateLoad));
             pushBack.HAlign = 0.1f;
             pushBack.VAlign = 0.2f;
             pushBack.Width.Set(48f, 0f);
@@ -34,7 +35,7 @@ namespace JoJoFanStands.UI
             pushBack.OnClick += new MouseEvent(PushBackClicked);
             AbilityUI.Append(pushBack);
 
-            UIImageButton forceField = new UIImageButton(ModContent.GetTexture("JoJoFanStands/UI/ForceField"));
+            UIImageButton forceField = new UIImageButton(ModContent.Request<Texture2D>("JoJoFanStands/UI/ForceField", AssetRequestMode.ImmediateLoad));
             forceField.HAlign = 0.2f;
             forceField.VAlign = 0.2f;
             forceField.Width.Set(48f, 0f);
@@ -42,7 +43,7 @@ namespace JoJoFanStands.UI
             forceField.OnClick += new MouseEvent(ForceFieldClicked);
             AbilityUI.Append(forceField);
 
-            UIImageButton crystal = new UIImageButton(ModContent.GetTexture("JoJoFanStands/UI/Crystal"));
+            UIImageButton crystal = new UIImageButton(ModContent.Request<Texture2D>("JoJoFanStands/UI/Crystal", AssetRequestMode.ImmediateLoad));
             crystal.HAlign = 0.3f;
             crystal.VAlign = 0.2f;
             crystal.Width.Set(48f, 0f);
@@ -50,7 +51,7 @@ namespace JoJoFanStands.UI
             crystal.OnClick += new MouseEvent(CrystalClicked);
             AbilityUI.Append(crystal);
 
-            UIImageButton gravity = new UIImageButton(ModContent.GetTexture("JoJoFanStands/UI/Gravity"));
+            UIImageButton gravity = new UIImageButton(ModContent.Request<Texture2D>("JoJoFanStands/UI/Gravity", AssetRequestMode.ImmediateLoad));
             gravity.HAlign = 0.4f;
             gravity.VAlign = 0.2f;
             gravity.Width.Set(48f, 0f);
@@ -58,7 +59,7 @@ namespace JoJoFanStands.UI
             gravity.OnClick += new MouseEvent(GravityClicked);
             AbilityUI.Append(gravity);
 
-            UIImageButton genocide = new UIImageButton(ModContent.GetTexture("JoJoFanStands/UI/Genocide"));
+            UIImageButton genocide = new UIImageButton(ModContent.Request<Texture2D>("JoJoFanStands/UI/Genocide", AssetRequestMode.ImmediateLoad));
             genocide.HAlign = 0.5f;
             genocide.VAlign = 0.2f;
             genocide.Width.Set(48f, 0f);
@@ -66,7 +67,7 @@ namespace JoJoFanStands.UI
             genocide.OnClick += new MouseEvent(GenocideClicked);
             AbilityUI.Append(genocide);
 
-            UIImageButton distortedReality = new UIImageButton(ModContent.GetTexture("JoJoFanStands/UI/MonotoneReality"));
+            UIImageButton distortedReality = new UIImageButton(ModContent.Request<Texture2D>("JoJoFanStands/UI/MonotoneReality", AssetRequestMode.ImmediateLoad));
             distortedReality.HAlign = 0.6f;
             distortedReality.VAlign = 0.2f;
             distortedReality.Width.Set(48f, 0f);

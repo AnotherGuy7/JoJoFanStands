@@ -14,37 +14,37 @@ namespace JoJoFanStands.Projectiles
 
         public override void SetDefaults()
         {
-            projectile.width = 14;
-            projectile.height = 20;
-            projectile.aiStyle = 0;
-            projectile.timeLeft = 60;
-            projectile.penetrate = -1;
-            projectile.friendly = true;
-            projectile.tileCollide = true;
-            projectile.ignoreWater = true;
-            projectile.scale = 1.5f;
-            drawOriginOffsetY = 8;
+            Projectile.width = 14;
+            Projectile.height = 20;
+            Projectile.aiStyle = 0;
+            Projectile.timeLeft = 60;
+            Projectile.penetrate = -1;
+            Projectile.friendly = true;
+            Projectile.tileCollide = true;
+            Projectile.ignoreWater = true;
+            Projectile.scale = 1.5f;
+            DrawOriginOffsetY = 8;
         }
 
         public override void AI()
         {
-            Projectile ownerProj = Main.projectile[(int)projectile.ai[0]];
+            Projectile ownerProj = Main.projectile[(int)Projectile.ai[0]];
 
-            projectile.direction = (int)projectile.ai[1];
-            projectile.velocity.Y += 5f;
-            projectile.scale -= 0.025f;     //0.025f obtained by doing (max scale - max time left)
-            drawOriginOffsetY = 8 + (int)((1.5f - projectile.scale) * 20f);
-            if (!ownerProj.active || projectile.scale <= 0f)
+            Projectile.direction = (int)Projectile.ai[1];
+            Projectile.velocity.Y += 5f;
+            Projectile.scale -= 0.025f;     //0.025f obtained by doing (max scale - max time left)
+            DrawOriginOffsetY = 8 + (int)((1.5f - Projectile.scale) * 20f);
+            if (!ownerProj.active || Projectile.scale <= 0f)
             {
-                projectile.Kill();
+                Projectile.Kill();
             }
 
-            /*if (Collision.SolidTiles((int)projectile.position.X / 16, (int)(projectile.position.X + moveDistanceX) / 16, (int)projectile.position.Y / 16, (int)(projectile.position.Y - Yaddition) / 16))
+            /*if (Collision.SolidTiles((int)Projectile.position.X / 16, (int)(Projectile.position.X + moveDistanceX) / 16, (int)Projectile.position.Y / 16, (int)(Projectile.position.Y - Yaddition) / 16))
             {
                 spawnedAnother = true;
                 Yaddition += 1;
             }*/
-            if (Main.tile[(int)(projectile.position.X + (moveDistanceX * projectile.direction)) / 16, (int)(projectile.position.Y - Yaddition) / 16].type == 0 && Main.tile[(int)(projectile.position.X + (moveDistanceX * projectile.direction)) / 16, (int)(projectile.position.Y - Yaddition) / 16].type != TileID.Trees)
+            if (Main.tile[(int)(Projectile.position.X + (moveDistanceX * Projectile.direction)) / 16, (int)(Projectile.position.Y - Yaddition) / 16].TileType == 0 && Main.tile[(int)(Projectile.position.X + (moveDistanceX * Projectile.direction)) / 16, (int)(Projectile.position.Y - Yaddition) / 16].TileType != TileID.Trees)
             {
                 canSpawn = true;
             }
@@ -52,7 +52,7 @@ namespace JoJoFanStands.Projectiles
             {
                 Yaddition += 5;
             }
-            if (canSpawn && !spawnedAnother && projectile.timeLeft <= 55)        //&& projectile.timeLeft <= 5
+            if (canSpawn && !spawnedAnother && Projectile.timeLeft <= 55)        //&& Projectile.timeLeft <= 5
             {
                 /*if (FPlayer.additionMode)
                 {
@@ -64,8 +64,8 @@ namespace JoJoFanStands.Projectiles
                 }*/
                 spawnedAnother = true;
                 canSpawn = false;
-                int proj = Projectile.NewProjectile(projectile.Center.X + (5f * projectile.direction), projectile.Center.Y - Yaddition, 0f, 0f, mod.ProjectileType("IceSpike"), projectile.damage, 2f, Main.myPlayer, ownerProj.whoAmI, projectile.direction);
-                Main.projectile[proj].direction = projectile.direction;
+                int proj = Projectile.NewProjectile(Projectile.GetSource_FromAI(), Projectile.Center.X + (5f * Projectile.direction), Projectile.Center.Y - Yaddition, 0f, 0f, Mod.Find<ModProjectile>("IceSpike").Type, Projectile.damage, 2f, Main.myPlayer, ownerProj.whoAmI, Projectile.direction);
+                Main.projectile[proj].direction = Projectile.direction;
                 Main.projectile[proj].netUpdate = true;
             }
         }

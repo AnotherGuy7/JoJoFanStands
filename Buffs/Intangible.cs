@@ -9,7 +9,7 @@ namespace JoJoFanStands.Buffs
 {
     public class Intangible : ModBuff
     {
-        public override void SetDefaults()
+        public override void SetStaticDefaults()
         {
 			DisplayName.SetDefault("Intangible!");
             Description.SetDefault("Everything goes through you and you go through everything");
@@ -17,7 +17,7 @@ namespace JoJoFanStands.Buffs
  
         public override void Update(Player player, ref int buffIndex)
         {
-            if (player.HasBuff(mod.BuffType(Name)))
+            if (player.HasBuff(Mod.Find<ModBuff>(Name).Type))
             {
                 if (player.controlDown)
                 {
@@ -42,7 +42,7 @@ namespace JoJoFanStands.Buffs
             }
             else
             {
-                player.AddBuff(JoJoFanStands.JoJoStandsMod.BuffType("AbilityCooldown"), 1800);
+                player.AddBuff(JoJoFanStands.JoJoStandsMod.Find<ModBuff>("AbilityCooldown").Type, 1800);
             }
         }
     }

@@ -49,15 +49,15 @@ namespace JoJoFanStands.NPCs
                 npc.color = Color.LightBlue;
                 if (icicleTimer == 170)
                 {
-                    Projectile.NewProjectile(npc.position.X, npc.position.Y - Main.screenHeight, 0f, 5f, mod.ProjectileType("Icicle"), 23, 1f, Main.myPlayer);
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), npc.position.X, npc.position.Y - Main.screenHeight, 0f, 5f, ModContent.ProjectileType<Icicle"), 23, 1f, Main.myPlayer);
                 }
                 if (icicleTimer == 175)
                 {
-                    Projectile.NewProjectile(npc.position.X, npc.position.Y - Main.screenHeight, 0f, 5f, mod.ProjectileType("Icicle"), 23, 1f, Main.myPlayer);
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), npc.position.X, npc.position.Y - Main.screenHeight, 0f, 5f, ModContent.ProjectileType<Icicle"), 23, 1f, Main.myPlayer);
                 }
                 if (icicleTimer == 180)
                 {
-                    Projectile.NewProjectile(npc.position.X, npc.position.Y - Main.screenHeight, 0f, 5f, mod.ProjectileType("Icicle"), 23, 1f, Main.myPlayer);
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), npc.position.X, npc.position.Y - Main.screenHeight, 0f, 5f, ModContent.ProjectileType<Icicle"), 23, 1f, Main.myPlayer);
                     FPlayer.avalanche = false;
                 }
                 if (icicleTimer >= 200)
@@ -69,10 +69,10 @@ namespace JoJoFanStands.NPCs
             return true;
         }
 
-        public override void NPCLoot(NPC npc)
+        public override void OnKill(NPC npc)
         {
             if (banksCoinMultiplier > 1f)
-                Item.NewItem(npc.getRect(), ItemID.CopperCoin, (int)(npc.value * (banksCoinMultiplier - 1f)));
+                Item.NewItem(npc.GetSource_Loot(), npc.getRect(), ItemID.CopperCoin, (int)(npc.value * (banksCoinMultiplier - 1f)));
         }
 
         public override bool CheckActive(NPC npc)

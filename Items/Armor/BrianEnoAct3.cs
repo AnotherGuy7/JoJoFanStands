@@ -1,6 +1,7 @@
 using JoJoFanStands.Buffs;
 using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
+using JoJoStands.Tiles;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -21,10 +22,10 @@ namespace JoJoFanStands.Items.Armor
 
         public override void SetDefaults()
         {
-            item.width = 42;
-            item.height = 64;
-            item.accessory = true;
-            item.rare = ItemRarityID.LightPurple;
+            Item.width = 42;
+            Item.height = 64;
+            Item.accessory = true;
+            Item.rare = ItemRarityID.LightPurple;
         }
 
         public override bool ManualStandSpawning(Player player)
@@ -38,22 +39,23 @@ namespace JoJoFanStands.Items.Armor
 
         public override void AddRecipes()
         {
-            ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(ItemType<BrianEnoAct2>());
-            recipe.AddIngredient(ItemID.PalladiumBar, 12);
-            recipe.AddIngredient(ItemType<SunDroplet>(), 5);
-            recipe.AddIngredient(ItemID.SoulofFlight, 20);
-            recipe.AddIngredient(ItemType<WillToEscape>(), 2);
-            recipe.SetResult(this);
-            recipe.AddRecipe();
-            recipe = new ModRecipe(mod);
-            recipe.AddIngredient(ItemType<BrianEnoAct2>());
-            recipe.AddIngredient(ItemID.CobaltBar, 12);
-            recipe.AddIngredient(ItemType<SunDroplet>(), 5);
-            recipe.AddIngredient(ItemID.SoulofFlight, 20);
-            recipe.AddIngredient(ItemType<WillToEscape>(), 2);
-            recipe.SetResult(this);
-            recipe.AddRecipe();
+            CreateRecipe()
+                .AddIngredient(ItemType<BrianEnoAct2>())
+                .AddIngredient(ItemID.PalladiumBar, 12)
+                .AddIngredient(ItemID.SoulofFlight, 20)
+                .AddIngredient(ItemType<SunDroplet>(), 5)
+                .AddIngredient(ItemType<WillToEscape>(), 2)
+                .AddTile(ModContent.TileType<RemixTableTile>())
+                .Register();
+
+            CreateRecipe()
+                .AddIngredient(ItemType<BrianEnoAct2>())
+                .AddIngredient(ItemID.CobaltBar, 12)
+                .AddIngredient(ItemID.SoulofFlight, 20)
+                .AddIngredient(ItemType<SunDroplet>(), 5)
+                .AddIngredient(ItemType<WillToEscape>(), 2)
+                .AddTile(ModContent.TileType<RemixTableTile>())
+                .Register();
         }
     }
 }

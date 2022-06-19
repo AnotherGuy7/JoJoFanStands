@@ -7,17 +7,17 @@ namespace JoJoFanStands.Projectiles
     {
         public override void SetDefaults()
         {
-            projectile.width = 25;
-            projectile.height = 25;
-            projectile.aiStyle = 0;
-            projectile.timeLeft = 300;
-            projectile.friendly = true;
+            Projectile.width = 25;
+            Projectile.height = 25;
+            Projectile.aiStyle = 0;
+            Projectile.timeLeft = 300;
+            Projectile.friendly = true;
         }
 
         public override void AI()
         {
-            projectile.rotation += MathHelper.ToRadians(3f);       //90 degrees every 2s
-            projectile.timeLeft++;
+            Projectile.rotation += MathHelper.ToRadians(3f);       //90 degrees every 2s
+            Projectile.timeLeft++;
         }
     }
 }

@@ -1,11 +1,14 @@
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
 using JoJoFanStands.Buffs;
 using static Terraria.ModLoader.ModContent;
 using JoJoFanStands.NPCs;
+using Terraria.ModLoader;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.Banks
 {
@@ -14,7 +17,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
         public override float shootSpeed => 16f;
         public override int shootTime => 8;
         public override int projectileDamage => 10;
-        public override int standType => 2;
+        public override StandType standType => StandType.Ranged;
         public override int halfStandHeight => 32;
         public override int standOffset => 0;
 
@@ -30,21 +33,21 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
         {
             SelectAnimation();
             UpdateStandInfo();
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
             riskyRewardsActive = player.HasBuff(BuffType<RiskyRewards>());
-            //Lighting.AddLight((int)(projectile.Center.X / 16f), (int)(projectile.Center.Y / 16f), 0.6f, 0.9f, 0.3f);
-            //Dust.NewDust(projectile.position + projectile.velocity, projectile.width, projectile.height, 35, projectile.velocity.X * -0.5f, projectile.velocity.Y * -0.5f);
+            //Lighting.AddLight((int)(Projectile.Center.X / 16f), (int)(Projectile.Center.Y / 16f), 0.6f, 0.9f, 0.3f);
+            //Dust.NewDust(Projectile.position + Projectile.velocity, Projectile.width, Projectile.height, 35, Projectile.velocity.X * -0.5f, Projectile.velocity.Y * -0.5f);
 
             if (shootCount > 0)
                 shootCount--;
             if (specialPressTimer > 0)
                 specialPressTimer--;
             if (mPlayer.standOut)
-                projectile.timeLeft = 2;
+                Projectile.timeLeft = 2;
 
-            if (Main.mouseLeft && player.whoAmI == projectile.owner)
+            if (Main.mouseLeft && player.whoAmI == Projectile.owner)
             {
                 if (target == null)
                 {
@@ -53,23 +56,25 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
                 else
                 {
                     attackFrames = true;
-                    projectile.position = target.Center + new Vector2(((target.width / 2f) + projectile.width) * -target.direction, 0f);
-                    projectile.direction = target.direction;
-                    if (projectile.Distance(target.Center) >= TargetDetectionRange)
+                    Projectile.position = target.Center + new Vector2(((target.width / 2f) + Projectile.width) * -target.direction, 0f);
+                    Projectile.direction = target.direction;
+                    if (Projectile.Distance(target.Center) >= TargetDetectionRange)
                     {
                         target = null;
                     }
 
-                    if (shootCount <= 0 && projectile.frame == 2)
+                    if (shootCount <= 0 && Projectile.frame == 2)
                     {
                         shootCount += shootTime;
-                        target.StrikeNPC(newProjectileDamage, 0.2f, projectile.direction);
-                        Main.PlaySound(2, (int)projectile.Center.X, (int)projectile.Center.Y, 41, 1f, 3f);
+                        target.StrikeNPC(newProjectileDamage, 0.2f, Projectile.direction);
+                        SoundStyle item41 = SoundID.Item41;
+                        item41.Pitch = 3f;
+                        SoundEngine.PlaySound(item41, Projectile.Center);
                     }
                     target.GetGlobalNPC<FanGlobalNPC>().banksCoinMultiplier = coinMultiplier;
                 }
             }
-            if (Main.mouseRight && player.whoAmI == projectile.owner && !attackFrames)
+            if (Main.mouseRight && player.whoAmI == Projectile.owner && !attackFrames)
             {
                 if (target == null)
                 {
@@ -79,9 +84,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
                 else
                 {
                     secondaryAbilityFrames = true;
-                    projectile.Center = target.Center + new Vector2(((target.width / 2f) + projectile.width) * -target.direction, 0f);
-                    projectile.direction = target.direction;
-                    if (projectile.Distance(target.Center) >= TargetDetectionRange)
+                    Projectile.Center = target.Center + new Vector2(((target.width / 2f) + Projectile.width) * -target.direction, 0f);
+                    Projectile.direction = target.direction;
+                    if (Projectile.Distance(target.Center) >= TargetDetectionRange)
                     {
                         target = null;
                     }
@@ -90,7 +95,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
                     if (shotgunChargeTimer >= 75)
                     {
                         shootCount += newShootTime;
-                        Vector2 shootVel = target.Center - projectile.Center;
+                        Vector2 shootVel = target.Center - Projectile.Center;
                         shootVel.Normalize();
                         shootVel *= shootSpeed;
 
@@ -100,18 +105,18 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
                         for (int i = 0; i < numberProjectiles; i++)
                         {
                             Vector2 perturbedSpeed = new Vector2(shootVel.X + random, shootVel.Y).RotatedBy(MathHelper.Lerp(-rotation, rotation, i / (numberProjectiles - 1))) * .2f;
-                            int proj = Projectile.NewProjectile(projectile.Center, perturbedSpeed, ProjectileID.Bullet, newProjectileDamage * 2, 1f, player.whoAmI);
+                            int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, perturbedSpeed, ProjectileID.Bullet, newProjectileDamage * 2, 1f, player.whoAmI);
                             Main.projectile[proj].netUpdate = true;
                         }
                         shotgunChargeTimer = 0;
-                        Main.PlaySound(2, projectile.position, 36);
+                        SoundEngine.PlaySound(SoundID.Item36, Projectile.position);
                     }
                     target.GetGlobalNPC<FanGlobalNPC>().banksCoinMultiplier = coinMultiplier;
                 }
             }
             if (!Main.mouseLeft && !Main.mouseRight)
             {
-                normalFrames = true;
+                idleFrames = true;
                 attackFrames = false;
                 secondaryAbilityFrames = false;
                 target = null;
@@ -137,30 +142,30 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
             {
                 StayBehind();
             }
-            projectile.spriteDirection = projectile.direction;
+            Projectile.spriteDirection = Projectile.direction;
         }
 
         public override void SelectAnimation()
         {
             if (attackFrames)
             {
-                normalFrames = false;
+                idleFrames = false;
                 PlayAnimation("Attack");
             }
-            if (normalFrames)
+            if (idleFrames)
             {
                 attackFrames = false;
                 PlayAnimation("Idle");
             }
             if (secondaryAbilityFrames)
             {
-                normalFrames = false;
+                idleFrames = false;
                 attackFrames = false;
                 PlayAnimation("Secondary");
             }
-            if (Main.player[projectile.owner].GetModPlayer<MyPlayer>().poseMode)
+            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().poseMode)
             {
-                normalFrames = false;
+                idleFrames = false;
                 attackFrames = false;
                 PlayAnimation("Pose");
             }
@@ -168,7 +173,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
 
         public override void PlayAnimation(string animationName)
         {
-            standTexture = mod.GetTexture("Projectiles/PlayerStands/Banks/BanksStand_" + animationName);
+            standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Banks/BanksStand_" + animationName).Value;
             if (animationName == "Idle")
             {
                 AnimateStand(animationName, 4, 15, true);

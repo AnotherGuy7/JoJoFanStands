@@ -1,6 +1,7 @@
 using JoJoFanStands.Projectiles.PlayerStands.TheFates;
 using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
+using JoJoStands.Tiles;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -13,7 +14,7 @@ namespace JoJoFanStands.Items.Stands
         public override int standSpeed => 12;
         public override int standType => 1;
         public override int standTier => 1;
-        public override bool fanStandItem => true;
+        public override bool FanStandItem => true;
 
         public override void SetStaticDefaults()
         {
@@ -23,31 +24,28 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetDefaults()
         {
-            item.damage = 19;
-            item.width = 32;
-            item.height = 32;
-            item.useTime = 12;
-            item.useAnimation = 12;
-            item.maxStack = 1;
-            item.knockBack = 2f;
-            item.value = 0;
-            item.noUseGraphic = true;
-            item.rare = ItemRarityID.LightPurple;
+            Item.damage = 19;
+            Item.width = 22;
+            Item.height = 24;
+            Item.maxStack = 1;
+            Item.value = 0;
+            Item.noUseGraphic = true;
+            Item.rare = ItemRarityID.LightPurple;
         }
 
         public override bool ManualStandSpawning(Player player)
         {
-            Projectile.NewProjectile(player.position, player.velocity, ProjectileType<TheFates>(), 0, 0f, Main.myPlayer);
+            Projectile.NewProjectile(Item.GetSource_FromThis(), player.position, player.velocity, ProjectileType<TheFates>(), 0, 0f, Main.myPlayer);
             return true;
         }
 
         public override void AddRecipes()
         {
-            ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(ItemType<StandArrow>());
-            recipe.AddIngredient(ItemType<WillToControl>());
-            recipe.SetResult(this);
-            recipe.AddRecipe();
+            CreateRecipe()
+                .AddIngredient(ItemType<StandArrow>())
+                .AddIngredient(ItemType<WillToControl>())
+                .AddTile(ModContent.TileType<RemixTableTile>())
+                .Register();
         }
     }
 }

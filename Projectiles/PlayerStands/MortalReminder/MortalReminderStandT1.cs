@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
+using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.MortalReminder
 {
@@ -12,21 +13,21 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MortalReminder
         public override int altDamage => 96;
         public override int halfStandHeight => 28;
         public override int punchTime => 17;
-        public override int standType => 1;
+        public override StandType standType => StandType.Melee;
         public override int standOffset => -25;
 
         private int afterImageTimer = 60;
 
         public override void AI()
         {
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             SelectAnimation();
             UpdateStandInfo();
             if (mPlayer.standOut)
-                projectile.timeLeft = 2;
+                Projectile.timeLeft = 2;
 
-            if (projectile.ai[0] == 0f)
+            if (Projectile.ai[0] == 0f)
             {
                 if (shootCount > 0)
                     shootCount--;
@@ -35,51 +36,51 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MortalReminder
                 {
                     attackFrames = true;
                     Punch();
-                    projectile.ai[1] = 3f;
+                    Projectile.ai[1] = 3f;
                 }
                 else
                 {
-                    normalFrames = true;
+                    idleFrames = true;
                     StayBehind();
-                    projectile.ai[1] = 1f;
+                    Projectile.ai[1] = 1f;
                 }
 
                 afterImageTimer--;
                 if (afterImageTimer <= 0)
                 {
-                    int afterImage = Projectile.NewProjectile(projectile.position, Vector2.Zero, mod.ProjectileType(Name), 0, 0f, Main.myPlayer, 1f, projectile.ai[1]);
+                    int afterImage = Projectile.NewProjectile(Projectile.GetSource_FromAI(), Projectile.position, Vector2.Zero, ModContent.ProjectileType<MortalReminderStandT1>(), 0, 0f, Main.myPlayer, 1f, Projectile.ai[1]);
                     Main.projectile[afterImage].timeLeft = 300;
-                    Main.projectile[afterImage].frame = projectile.frame;
-                    Main.projectile[afterImage].spriteDirection = projectile.spriteDirection;
-                    Main.projFrames[afterImage] = Main.projFrames[projectile.whoAmI];
+                    Main.projectile[afterImage].frame = Projectile.frame;
+                    Main.projectile[afterImage].spriteDirection = Projectile.spriteDirection;
+                    Main.projFrames[afterImage] = Main.projFrames[Projectile.whoAmI];
                     afterImageTimer = 60;
                 }
                 LimitDistance();
             }
             else
             {
-                projectile.alpha = 125 + (int)((float)projectile.timeLeft / 2.4f);
-                if (projectile.ai[1] == 1f)
+                Projectile.alpha = 125 + (int)((float)Projectile.timeLeft / 2.4f);
+                if (Projectile.ai[1] == 1f)
                 {
-                    normalFrames = true;
+                    idleFrames = true;
                 }
-                if (projectile.ai[1] == 2f)
+                if (Projectile.ai[1] == 2f)
                 {
                     secondaryAbilityFrames = true;
                 }
-                if (projectile.ai[1] == 3f)
+                if (Projectile.ai[1] == 3f)
                 {
                     attackFrames = true;
                 }
             }
         }
-
-        public override bool PreDrawExtras(SpriteBatch spriteBatch)
+        public override bool PreDrawExtras()
         {
-            if (projectile.ai[0] == 1f)
+            if (Projectile.ai[0] == 1f)
             {
-                int frameHeight = standTexture.Height / Main.projFrames[projectile.whoAmI];
-                spriteBatch.Draw(standTexture, projectile.Center - Main.screenPosition + new Vector2(19f, 1f), new Rectangle(0, frameHeight * projectile.frame, standTexture.Width, frameHeight), Color.White * projectile.alpha, 0f, new Vector2(standTexture.Width / 2f, frameHeight / 2f), 1f, effects, 0);
+                int frameHeight = standTexture.Height / Main.projFrames[Projectile.whoAmI];
+                Rectangle sourceRect = new Rectangle(0, frameHeight * Projectile.frame, standTexture.Width, frameHeight);
+                Main.EntitySpriteDraw(standTexture, Projectile.Center - Main.screenPosition + new Vector2(19f, 1f), sourceRect, Color.White * Projectile.alpha, 0f, new Vector2(standTexture.Width / 2f, frameHeight / 2f), 1f, effects, 0);
             }
             return true;
         }
@@ -88,28 +89,28 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MortalReminder
         {
             if (attackFrames)
             {
-                normalFrames = false;
+                idleFrames = false;
                 PlayAnimation("Attack");
-                projectile.ai[1] = 3f;
+                Projectile.ai[1] = 3f;
             }
-            if (normalFrames)
+            if (idleFrames)
             {
                 attackFrames = false;
                 PlayAnimation("Idle");
-                projectile.ai[1] = 1f;
+                Projectile.ai[1] = 1f;
             }
             if (secondaryAbilityFrames)     //Dash
             {
-                normalFrames = false;
+                idleFrames = false;
                 attackFrames = false;
                 PlayAnimation("Dash");
-                projectile.ai[1] = 2f;
+                Projectile.ai[1] = 2f;
             }
         }
 
         public override void PlayAnimation(string animationName)
         {
-            standTexture = mod.GetTexture("Projectiles/PlayerStands/MortalReminder/MortalReminder_" + animationName);
+            standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/MortalReminder/MortalReminder_" + animationName).Value;
             if (animationName == "Idle")
             {
                 AnimateStand(animationName, 4, 12, true);

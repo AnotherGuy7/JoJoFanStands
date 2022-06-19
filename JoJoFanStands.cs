@@ -3,6 +3,7 @@ using JoJoFanStands.Items.Stands;
 using JoJoFanStands.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Graphics.Effects;
@@ -14,35 +15,22 @@ namespace JoJoFanStands
 {
     public class JoJoFanStands : Mod
     {
-        static internal JoJoFanStands Instance;
-
-        static internal Mod JoJoStandsMod;
-
-        private UserInterface _abilityui;
-
-        internal AbilityChooserUI AbilityUI;
-
-        public JoJoFanStands()
-        {
-            Instance = this;
-        }
+        public static Mod JoJoStandsMod;
+        public static JoJoFanStands Instance;
 
         public override void Load()
         {
+            Instance = ModContent.GetInstance<JoJoFanStands>();
             JoJoStandsMod = ModLoader.GetMod("JoJoStands");
 
             if (!Main.dedServ)
             {
-                AbilityUI = new AbilityChooserUI();
-                AbilityUI.Activate();
-                _abilityui = new UserInterface();
-                _abilityui.SetState(AbilityUI);
-
                 //Shader stuff
-                Ref<Effect> distortedReality = new Ref<Effect>(GetEffect("Effects/MonotoneRealityShader"));
+                Ref<Effect> distortedReality = new Ref<Effect>(ModContent.Request<Effect>("JoJoFanStands/Effects/MonotoneRealityShader", AssetRequestMode.ImmediateLoad).Value);
                 Filters.Scene["MonotoneRealityEffect"] = new Filter(new ScreenShaderData(distortedReality, "MonotoneRealityEffect"), EffectPriority.VeryHigh);
                 Filters.Scene["MonotoneRealityEffect"].Load();
             }
+
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<CoolOutT1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<FollowMeT1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<MortalReminderT1>());
@@ -52,23 +40,10 @@ namespace JoJoFanStands
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<BrianEnoAct1>());
         }
 
-        public override void UpdateUI(GameTime gameTime)
+        public override void Unload()
         {
-            if (AbilityChooserUI.Visible)
-                _abilityui.Update(gameTime);
-        }
-
-        public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)     //from ExampleMod's ExampleUI
-        {
-            layers.Insert(5, new LegacyGameInterfaceLayer("JoJoFanStands: UI", DrawUI, InterfaceScaleType.UI));     //from Terraria Interface for Dummies, and Insert so it doesn't draw over everything
-        }
-
-        private bool DrawUI()       //also from Terraria Interface for Dummies
-        {
-            if (AbilityChooserUI.Visible)
-                _abilityui.Draw(Main.spriteBatch, new GameTime());
-
-            return true;
+            JoJoStandsMod = null;
+            Instance = null;
         }
     }
 }

@@ -1,6 +1,8 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -10,38 +12,41 @@ namespace JoJoFanStands.Projectiles
     {
         public override void SetDefaults()
         {
-            //projectile.CloneDefaults(ProjectileID.JavelinFriendly);
-            projectile.height = 25;
-            projectile.width = 25;
-            projectile.timeLeft = 1800;
-            projectile.friendly = true;
-            projectile.scale = 0.5f;
-            projectile.tileCollide = true;
-            //drawOffsetX = -21;
-            //drawOriginOffsetX = -21;
-            //drawOriginOffsetY = -42;
-            //projectile.alpha = 255;
+            Projectile.height = 25;
+            Projectile.width = 25;
+            Projectile.timeLeft = 1800;
+            Projectile.friendly = true;
+            Projectile.scale = 0.5f;
+            Projectile.tileCollide = true;
         }
 
-        public override bool PreDraw(SpriteBatch spriteBatch, Color lightColor)     //draw offsets move too much
+        private Texture2D iceSpearTexture;
+        private Vector2 iceSpearOrigin;
+
+        public override bool PreDraw(ref Color lightColor)     //draw offsets move too much
         {
-            Texture2D texture = mod.GetTexture("Projectiles/IceSpear");
-            spriteBatch.Draw(texture, projectile.Center - Main.screenPosition, new Rectangle(0, 0, texture.Width, texture.Height), lightColor, projectile.rotation, new Vector2(texture.Width / 2f, texture.Height / 2f), projectile.scale, SpriteEffects.None, 0f);
+            if (iceSpearTexture == null)
+            {
+                iceSpearTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/IceSpear", AssetRequestMode.ImmediateLoad).Value;
+                iceSpearOrigin = new Vector2(iceSpearTexture.Width / 2f, iceSpearTexture.Height / 2f);
+            }
+
+            Main.EntitySpriteDraw(iceSpearTexture, Projectile.Center - Main.screenPosition, null, lightColor, Projectile.rotation, iceSpearOrigin, Projectile.scale, SpriteEffects.None, 0);
             return false;
         }
 
         public override void AI()
         {
-            if (projectile.ai[0] == 1f)
+            if (Projectile.ai[0] == 1f)
             {
-                projectile.velocity.Y += 0.15f;
-                projectile.rotation = projectile.velocity.ToRotation() + 1f;
+                Projectile.velocity.Y += 0.15f;
+                Projectile.rotation = Projectile.velocity.ToRotation() + 1f;
             }
         }
 
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
-            Main.PlaySound(SoundID.Item28, projectile.position);
+            SoundEngine.PlaySound(SoundID.Item28, Projectile.position);
             target.AddBuff(BuffID.Frostburn, 180);
         }
     }

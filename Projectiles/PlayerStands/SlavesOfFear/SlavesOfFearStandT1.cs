@@ -1,6 +1,8 @@
 using Terraria;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
+using Terraria.ModLoader;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
 {
@@ -10,7 +12,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
         public override int punchTime => 13;
         public override int altDamage => 96;
         public override int halfStandHeight => 37;
-        public override int standType => 1;
+        public override StandType standType => StandType.Melee;
 
         public override void AI()
         {
@@ -19,10 +21,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
             if (shootCount > 0)
                 shootCount--;
 
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             if (mPlayer.standOut)
-                projectile.timeLeft = 2;
+                Projectile.timeLeft = 2;
 
             if (Main.mouseLeft)
             {
@@ -39,10 +41,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
         {
             if (attackFrames)
             {
-                normalFrames = false;
+                idleFrames = false;
                 PlayAnimation("Attack");
             }
-            if (normalFrames)
+            if (idleFrames)
             {
                 attackFrames = false;
                 PlayAnimation("Idle");
@@ -51,7 +53,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
 
         public override void PlayAnimation(string animationName)
         {
-            standTexture = mod.GetTexture("Projectiles/PlayerStands/SlavesOfFear/SlavesOfFear_" + animationName);
+            standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/SlavesOfFear/SlavesOfFear_" + animationName).Value;
             if (animationName == "Idle")
             {
                 AnimateStand(animationName, 2, 14, true);

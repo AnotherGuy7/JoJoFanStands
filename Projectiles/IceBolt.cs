@@ -9,18 +9,18 @@ namespace JoJoFanStands.Projectiles
     {
         public override void SetDefaults()
         {
-            projectile.width = 8;
-            projectile.height = 8;
-            projectile.aiStyle = 0;
-            projectile.timeLeft = 180;
-            projectile.friendly = true;
-            projectile.tileCollide = true;
-            projectile.ignoreWater = true;
+            Projectile.width = 10;
+            Projectile.height = 20;
+            Projectile.aiStyle = 0;
+            Projectile.timeLeft = 180;
+            Projectile.friendly = true;
+            Projectile.tileCollide = true;
+            Projectile.ignoreWater = true;
         }
 
         public override void AI()
         {
-            projectile.rotation = projectile.velocity.ToRotation() + MathHelper.ToRadians(90f);
+            Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.ToRadians(90f);
         }
 
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)

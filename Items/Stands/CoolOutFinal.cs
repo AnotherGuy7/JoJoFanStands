@@ -1,5 +1,6 @@
 using JoJoStands;
-using JoJoStands.Items;
+using JoJoStands.Items.CraftingMaterials;
+using JoJoStands.Tiles;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -13,11 +14,11 @@ namespace JoJoFanStands.Items.Stands
         public override int standType => 2;
         public override string standProjectileName => "CoolOut";
         public override int standTier => 4;
-        public override bool fanStandItem => true;
+        public override bool FanStandItem => true;
 
         public override string Texture
         {
-            get { return mod.Name + "/Items/Stands/CoolOutT1"; }
+            get { return Mod.Name + "/Items/Stands/CoolOutT1"; }
         }
 
         public override void SetStaticDefaults()
@@ -28,16 +29,13 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetDefaults()
         {
-            item.damage = 51;
-            item.width = 32;
-            item.height = 32;
-            item.useTime = 12;
-            item.useAnimation = 12;
-            item.maxStack = 1;
-            item.knockBack = 2f;
-            item.value = 0;
-            item.noUseGraphic = true;
-            item.rare = ItemRarityID.LightPurple;
+            Item.damage = 51;
+            Item.width = 36;
+            Item.height = 42;
+            Item.maxStack = 1;
+            Item.value = 0;
+            Item.noUseGraphic = true;
+            Item.rare = ItemRarityID.LightPurple;
         }
 
         public override bool ManualStandSpawning(Player player)
@@ -48,16 +46,15 @@ namespace JoJoFanStands.Items.Stands
 
         public override void AddRecipes()
         {
-            Mod JoJoStands = ModLoader.GetMod("JoJoStands");
-            ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(ItemType<CoolOutT3>());
-            recipe.AddIngredient(ItemID.PearlstoneBlock, 20);
-            recipe.AddIngredient(ItemID.FrostCore);
-            recipe.AddIngredient(ItemID.CrystalShard, 8);
-            recipe.AddIngredient(JoJoStands.ItemType("WillToProtect"), 2);
-            recipe.AddIngredient(JoJoStands.ItemType("WillToControl"), 2);
-            recipe.SetResult(this);
-            recipe.AddRecipe();
+            CreateRecipe()
+                .AddIngredient(ItemType<CoolOutT3>())
+                .AddIngredient(ItemID.PearlstoneBlock, 20)
+                .AddIngredient(ItemID.FrostCore)
+                .AddIngredient(ItemID.CrystalShard, 8)
+                .AddIngredient(ItemType<WillToProtect>(), 2)
+                .AddIngredient(ItemType<WillToControl>(), 2)
+                .AddTile(ModContent.TileType<RemixTableTile>())
+                .Register();
         }
     }
 }

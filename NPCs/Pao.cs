@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria.ID;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace JoJoFanStands.NPCs
@@ -15,31 +12,31 @@ namespace JoJoFanStands.NPCs
 
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[npc.type] = 2;
+            Main.npcFrameCount[NPC.type] = 2;
         }
 
         public override void SetDefaults()
         {
-            npc.width = 32;
-            npc.height = 32;
-            npc.defense = 999999999;
-            npc.lifeMax = 999999999;
-            npc.HitSound = SoundID.NPCHit1;
-            npc.DeathSound = SoundID.NPCDeath1;
-            npc.knockBackResist = 2f;
-            npc.chaseable = false;
-            npc.aiStyle = 0;
-            npc.immortal = true;
+            NPC.width = 32;
+            NPC.height = 32;
+            NPC.defense = 999999999;
+            NPC.lifeMax = 999999999;
+            NPC.HitSound = SoundID.NPCHit1;
+            NPC.DeathSound = SoundID.NPCDeath1;
+            NPC.knockBackResist = 2f;
+            NPC.chaseable = false;
+            NPC.aiStyle = 0;
+            NPC.immortal = true;
         }
 
         public override bool CheckDead()
         {
             if (!timeToDie)
             {
-                int npc2 = NPC.NewNPC((int)npc.position.X, (int)npc.position.Y, npc.type);
-                int npc3 = NPC.NewNPC((int)npc.position.X, (int)npc.position.Y, npc.type);
-                Main.npc[npc2].GivenName = "Pao Alt #" + npc.whoAmI;
-                Main.npc[npc3].GivenName = "Pao Alt #" + npc.whoAmI;
+                int npc2 = NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.position.X, (int)NPC.position.Y, NPC.type);
+                int npc3 = NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.position.X, (int)NPC.position.Y, NPC.type);
+                Main.npc[npc2].GivenName = "Pao Alt #" + NPC.whoAmI;
+                Main.npc[npc3].GivenName = "Pao Alt #" + NPC.whoAmI;
                 Main.NewText("You can't get rid of me that easily.", Color.DarkRed);
                 return false;
             }
@@ -51,26 +48,26 @@ namespace JoJoFanStands.NPCs
 
         public override void AI()
         {
-            Player player = Main.player[npc.target];
+            Player player = Main.player[NPC.target];
             Vector2 vector131 = player.Center;
             vector131.X -= (float)((12 + player.width / 2) * player.direction);
-            npc.Center = Vector2.Lerp(npc.Center, vector131, 0.2f);
-            npc.velocity *= 0.8f;
-            npc.direction = (npc.spriteDirection = player.direction);
-            npc.ai[0]++;
-            npc.ai[2]++;
-            if (npc.ai[2] >= 72000)
+            NPC.Center = Vector2.Lerp(NPC.Center, vector131, 0.2f);
+            NPC.velocity *= 0.8f;
+            NPC.direction = (NPC.spriteDirection = player.direction);
+            NPC.ai[0]++;
+            NPC.ai[2]++;
+            if (NPC.ai[2] >= 72000)
             {
                 timeToDie = true;
-                int proj = Projectile.NewProjectile(npc.position, Vector2.Zero, ProjectileID.Bomb, 250, 10f);
+                int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.position, Vector2.Zero, ProjectileID.Bomb, 250, 10f);
                 Main.projectile[proj].timeLeft = 2;
                 Main.NewText("Bye dad.");
-                npc.StrikeNPC(npc.life + 1, 999f, 1, true);
+                NPC.StrikeNPC(NPC.life + 1, 999f, 1, true);
             }
-            if (npc.ai[0] >= npc.ai[1])
+            if (NPC.ai[0] >= NPC.ai[1])
             {
-                npc.ai[0] = 0;
-                npc.ai[1] = Main.rand.NextFloat(120f, 450f);
+                NPC.ai[0] = 0;
+                NPC.ai[1] = Main.rand.NextFloat(120f, 450f);
                 int randText = Main.rand.Next(1, 12);
                 if (randText == 1)
                 {
@@ -121,30 +118,26 @@ namespace JoJoFanStands.NPCs
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
-            if (FanPlayer.spawnPao)
-            {
+            if (FanPlayer.SpawnPao)
                 return 0.02f;
-            }
-            else
-            {
-                return 0f;
-            }
+
+            return 0f;
         }
 
         public override void FindFrame(int frameHeight)
         {
             frameHeight = 20;
-            npc.frameCounter++;
-            if (npc.frameCounter >= 20)
+            NPC.frameCounter++;
+            if (NPC.frameCounter >= 20)
             {
                 frame += 1;
-                npc.frameCounter = 0;
+                NPC.frameCounter = 0;
             }
             if (frame >= 2)
             {
                 frame = 0;
             }
-            npc.frame.Y = frame * frameHeight;
+            NPC.frame.Y = frame * frameHeight;
         }
     }
 }

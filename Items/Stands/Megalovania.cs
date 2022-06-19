@@ -1,5 +1,7 @@
 using JoJoFanStands.Projectiles.PlayerStands.Megalovania;
 using JoJoStands.Items;
+using JoJoStands.Items.CraftingMaterials;
+using JoJoStands.Tiles;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -12,7 +14,7 @@ namespace JoJoFanStands.Items.Stands
         public override int standSpeed => 60;
         public override int standType => 2;
         public override int standTier => 1;
-        public override bool fanStandItem => true;
+        public override bool FanStandItem => true;
 
         public override void SetStaticDefaults()
         {
@@ -22,40 +24,35 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetDefaults()
         {
-            item.damage = 97;
-            item.width = 32;
-            item.height = 32;
-            item.useTime = 12;
-            item.useAnimation = 12;
-            item.maxStack = 1;
-            item.knockBack = 2f;
-            item.value = 0;
-            item.noUseGraphic = true;
-            item.rare = ItemRarityID.LightPurple;
+            Item.damage = 97;
+            Item.width = 32;
+            Item.height = 28;
+            Item.maxStack = 1;
+            Item.value = 0;
+            Item.noUseGraphic = true;
+            Item.rare = ItemRarityID.LightPurple;
         }
 
         public override bool ManualStandSpawning(Player player)
         {
-            Projectile.NewProjectile(player.position, player.velocity, ProjectileType<MegalovaniaStand>(), 0, 0f, Main.myPlayer);
+            Projectile.NewProjectile(Item.GetSource_FromThis(), player.position, player.velocity, ProjectileType<MegalovaniaStand>(), 0, 0f, Main.myPlayer);
             return true;
         }
 
         public override void AddRecipes()
         {
-            Mod JoJoStands = ModLoader.GetMod("JoJoStands");
-            ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(JoJoStands.ItemType("StandArrow"));
-            recipe.AddIngredient(ItemID.Hellstone, 50);
-            recipe.AddIngredient(ItemID.HallowedBar, 25);
-            recipe.AddIngredient(ItemID.ChlorophyteOre, 50);
-            recipe.AddIngredient(ItemID.GlowingMushroom, 5);
-            recipe.AddIngredient(ItemID.LifeCrystal, 6);
-            recipe.AddIngredient(JoJoStands.ItemType("WillToFight"), 20);
-            recipe.AddIngredient(JoJoStands.ItemType("WillToControl"), 20);
-            recipe.AddIngredient(JoJoStands.ItemType("WillToDestroy"), 20);
-            recipe.AddTile(JoJoStands.TileType("RemixTableTile"));
-            recipe.SetResult(this);
-            recipe.AddRecipe();
+            CreateRecipe()
+                .AddIngredient(ItemType<StandArrow>())
+                .AddIngredient(ItemID.Hellstone, 50)
+                .AddIngredient(ItemID.HallowedBar, 25)
+                .AddIngredient(ItemID.ChlorophyteOre, 50)
+                .AddIngredient(ItemID.GlowingMushroom, 5)
+                .AddIngredient(ItemID.LifeCrystal, 6)
+                .AddIngredient(ItemType<WillToFight>(), 20)
+                .AddIngredient(ItemType<WillToControl>(), 20)
+                .AddIngredient(ItemType<WillToDestroy>(), 20)
+                .AddTile(ModContent.TileType<RemixTableTile>())
+                .Register();
         }
     }
 }

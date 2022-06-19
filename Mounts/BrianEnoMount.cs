@@ -1,45 +1,40 @@
-using JoJoStands;
-using Microsoft.Xna.Framework;
-using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace JoJoFanStands.Mounts
 {
-    public class BrianEnoMount : ModMountData       //ExampleMod'
+    public class BrianEnoMount : ModMount       //ExampleMod'
     {
-        public override void SetDefaults()
+        public override void SetStaticDefaults()
         {
-            mountData.heightBoost = -12;
-            mountData.fallDamage = 0.5f;
-            mountData.runSpeed = 11f;
-            mountData.dashSpeed = 8f;
-            mountData.flightTimeMax = 0;
-            mountData.fatigueMax = 0;
-            mountData.jumpHeight = 5;
-            mountData.acceleration = 0.19f;
-            mountData.jumpSpeed = 4f;
-            mountData.blockExtraJumps = false;
-            mountData.totalFrames = 1;
-            mountData.constantJump = true;
-            int[] array = new int[mountData.totalFrames];
+            MountData.heightBoost = -12;
+            MountData.fallDamage = 0.5f;
+            MountData.runSpeed = 11f;
+            MountData.dashSpeed = 8f;
+            MountData.flightTimeMax = 0;
+            MountData.fatigueMax = 0;
+            MountData.jumpHeight = 5;
+            MountData.acceleration = 0.19f;
+            MountData.jumpSpeed = 4f;
+            MountData.blockExtraJumps = false;
+            MountData.totalFrames = 1;
+            MountData.constantJump = true;
+            int[] array = new int[MountData.totalFrames];
             for (int l = 0; l < array.Length; l++)
             {
                 array[l] = 20;
             }
-            mountData.playerYOffsets = array;
-            mountData.xOffset = -13;
-            mountData.bodyFrame = 3;
-            mountData.yOffset = -12;
-            mountData.playerHeadOffset = 22;
+            MountData.playerYOffsets = array;
+            MountData.xOffset = -13;
+            MountData.bodyFrame = 3;
+            MountData.yOffset = -12;
+            MountData.playerHeadOffset = 22;
             if (Main.netMode == NetmodeID.Server)
-            {
                 return;
-            }
 
-            mountData.textureWidth = mountData.backTexture.Width;
-            mountData.textureHeight = mountData.backTexture.Height / mountData.totalFrames;
+            MountData.textureWidth = 38;
+            MountData.textureHeight = 54;
         }
     }
 }

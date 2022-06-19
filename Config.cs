@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using Terraria;
 using Terraria.ModLoader.Config;
 
 namespace JoJoFanStands
@@ -14,7 +13,7 @@ namespace JoJoFanStands
 
         public override void OnChanged()        //couldn't use Player player = Main.LocalPlayer cause it wasn't set to an instance of an object
         {
-            FanPlayer.spawnPao = PaoSpawning;
+            FanPlayer.SpawnPao = PaoSpawning;
         }
     }
 }
