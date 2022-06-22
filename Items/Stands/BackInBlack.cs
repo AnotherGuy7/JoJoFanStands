@@ -35,7 +35,7 @@ namespace JoJoFanStands.Items.Stands
         public override bool ManualStandSpawning(Player player)
         {
             Projectile.NewProjectile(Item.GetSource_FromThis(), player.position, player.velocity, ProjectileType<BackInBlackStand>(), 0, 0f, Main.myPlayer);
-            return true;
+            return false;
         }
 
         public override void AddRecipes()

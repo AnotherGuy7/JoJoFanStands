@@ -1,15 +1,11 @@
 using JoJoFanStands.Items.Armor;
 using JoJoFanStands.Items.Stands;
-using JoJoFanStands.UI;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using System.Collections.Generic;
 using Terraria;
 using Terraria.Graphics.Effects;
 using Terraria.Graphics.Shaders;
 using Terraria.ModLoader;
-using Terraria.UI;
 
 namespace JoJoFanStands
 {

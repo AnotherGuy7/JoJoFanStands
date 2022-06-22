@@ -30,6 +30,7 @@ namespace JoJoFanStands
         public bool RoseColoredSunActive = false;
 
         public int banksDefenseReduction = 0;
+        public int lucySelectedMarkerWhoAmI;
 
         public override void ResetEffects()
         {
@@ -146,6 +147,7 @@ namespace JoJoFanStands
                 mPlayer.standOut = false;
                 if (Main.netMode == NetmodeID.MultiplayerClient)
                     ModNetHandler.playerSync.SendStandOut(256, Player.whoAmI, false, Player.whoAmI);
+
                 return;
             }
 

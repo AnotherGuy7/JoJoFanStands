@@ -7,7 +7,7 @@ namespace JoJoFanStands
     {
         public override ConfigScope Mode => ConfigScope.ClientSide;
 
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         [Tooltip("Determines whether or not you want an NPC called 'Pao' to spawn.")]
         public bool PaoSpawning;
 
