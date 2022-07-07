@@ -3,6 +3,7 @@ using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
 using JoJoStands.Tiles;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -15,6 +16,7 @@ namespace JoJoFanStands.Items.Stands
         public override string standProjectileName => "LucyInTheSky";
         public override int standTier => 1;
         public override bool FanStandItem => true;
+        public static readonly SoundStyle lucyInTheSkySpawnSound = new SoundStyle("JoJoFanStands/Sounds/SummonCries/LucyInTheSky").WithVolumeScale(MyPlayer.ModSoundsVolume);
 
         public override void SetStaticDefaults()
         {
@@ -31,6 +33,12 @@ namespace JoJoFanStands.Items.Stands
             Item.value = 0;
             Item.noUseGraphic = true;
             Item.rare = ItemRarityID.LightPurple;
+        }
+
+        public override bool ManualStandSpawning(Player player)
+        {
+            SoundEngine.PlaySound(lucyInTheSkySpawnSound);
+            return false;
         }
 
         public override void AddRecipes()

@@ -1,11 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using JoJoStands.UI;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.UI;
-using Terraria.UI.Chat;
 
 namespace JoJoFanStands.UI
 {

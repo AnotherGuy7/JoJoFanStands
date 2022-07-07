@@ -10,8 +10,10 @@ namespace JoJoFanStands
     public class JoJoFanStandsSystem : ModSystem
     {
         private UserInterface _abilityui;
+        private UserInterface _lightBridgeUI;
 
         internal AbilityChooserUI AbilityUI;
+        public static LightBridgeUI LightBridgeUI;
 
         public override void Load()
         {
@@ -21,6 +23,11 @@ namespace JoJoFanStands
                 AbilityUI.Activate();
                 _abilityui = new UserInterface();
                 _abilityui.SetState(AbilityUI);
+
+                LightBridgeUI = new LightBridgeUI();
+                LightBridgeUI.Activate();
+                _lightBridgeUI = new UserInterface();
+                _lightBridgeUI.SetState(LightBridgeUI);
             }
         }
 
@@ -28,6 +35,9 @@ namespace JoJoFanStands
         {
             if (AbilityChooserUI.Visible)
                 _abilityui.Update(gameTime);
+
+            if (LightBridgeUI.Visible)
+                _lightBridgeUI.Update(gameTime);
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)     //from ExampleMod's ExampleUI
@@ -40,6 +50,8 @@ namespace JoJoFanStands
             if (AbilityChooserUI.Visible)
                 _abilityui.Draw(Main.spriteBatch, new GameTime());
 
+            if (LightBridgeUI.Visible)
+                _lightBridgeUI.Draw(Main.spriteBatch, new GameTime());
             return true;
         }
     }
