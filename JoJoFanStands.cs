@@ -34,6 +34,7 @@ namespace JoJoFanStands
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<TheFatesT1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<BanksT1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<BrianEnoAct1>());
+            JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<ExpansesT1>());
         }
 
         public override void Unload()
