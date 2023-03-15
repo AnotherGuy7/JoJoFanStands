@@ -10,12 +10,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
 {
     public class MegalovaniaStand : StandClass
     {
-        public override int projectileDamage => 18;
-        public override int shootTime => 40;
-        public override int altDamage => 96;
-        public override int halfStandHeight => 34;      //28
-        public override int standOffset => -25;
-        public override float maxDistance => 0f;
+        public override int ProjectileDamage => 18;
+        public override int ShootTime => 40;
+        public override int AltDamage => 96;
+        public override int HalfStandHeight => 34;      //28
+        public override Vector2 StandOffset => new Vector2(-25, 0);
+        public override float MaxDistance => 0f;
 
         public static int abilityNumber = 0;
 
@@ -34,7 +34,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                 shootCount--;
             if (mPlayer.standOut)
                 Projectile.timeLeft = 2;
-            DrawOriginOffsetY = -halfStandHeight;
+            DrawOriginOffsetY = -HalfStandHeight;
             StayBehind();
 
             if (JoJoStands.JoJoStands.SpecialHotKey.JustPressed && !UI.AbilityChooserUI.Visible)
@@ -273,7 +273,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                 attackFrames = false;
                 PlayAnimation("Pose");
             }
-            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().poseMode)
+            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().posing)
             {
                 idleFrames = false;
                 attackFrames = false;

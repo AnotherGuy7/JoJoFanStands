@@ -9,10 +9,10 @@ namespace JoJoFanStands.Items.Stands
 {
     public class BanksT2 : FanStandItemClass
     {
-        public override int standSpeed => 10;           //6 shots/s
-        public override int standType => 2;
-        public override string standProjectileName => "Banks";
-        public override int standTier => 2;
+        public override int StandSpeed => 10;           //6 shots/s
+        public override int StandType => 2;
+        public override string StandProjectileName => "Banks";
+        public override int StandTier => 2;
         public override bool FanStandItem => true;
 
         public override string Texture
@@ -35,6 +35,12 @@ namespace JoJoFanStands.Items.Stands
             Item.value = 0;
             Item.noUseGraphic = true;
             Item.rare = ItemRarityID.LightPurple;
+        }
+
+        public override bool ManualStandSpawning(Player player)
+        {
+            player.GetModPlayer<FanPlayer>().SpawnFanStand();
+            return true;
         }
 
         public override void AddRecipes()

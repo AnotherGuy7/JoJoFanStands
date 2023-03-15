@@ -9,12 +9,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MortalReminder
 {
     public class MortalReminderStandT1 : StandClass
     {
-        public override int punchDamage => 18;
-        public override int altDamage => 96;
-        public override int halfStandHeight => 28;
-        public override int punchTime => 17;
-        public override StandType standType => StandType.Melee;
-        public override int standOffset => -25;
+        public override int PunchDamage => 18;
+        public override int AltDamage => 96;
+        public override int HalfStandHeight => 28;
+        public override int PunchTime => 17;
+        public override StandAttackType StandType => StandAttackType.Melee;
+        public override Vector2 StandOffset => new Vector2(-25, 0);
 
         private int afterImageTimer = 60;
 

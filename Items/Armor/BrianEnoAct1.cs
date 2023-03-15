@@ -11,8 +11,8 @@ namespace JoJoFanStands.Items.Armor
 {
     public class BrianEnoAct1 : StandItemClass
     {
-        public override int standType => 2;
-        public override int standTier => 1;
+        public override int StandType => 2;
+        public override int StandTier => 1;
 
         public override void SetStaticDefaults()
         {
@@ -31,7 +31,7 @@ namespace JoJoFanStands.Items.Armor
         {
             FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
 
-            fPlayer.BrianEnoAct1 = true;
+            fPlayer.brianEnoAct1 = true;
             player.AddBuff(BuffType<BrianEnoActiveBuff>(), 2);
             return true;
         }

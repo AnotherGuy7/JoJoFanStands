@@ -15,19 +15,20 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
 
         /*public Vector2 velocityAddition = Vector2.Zero;
         public float mouseDistance = 0f;
-        protected float shootSpeed = 16f;
+        protected float ProjectileSpeed = 16f;
         public bool idleFrames = false;
         public bool attackFrames = false;
         public bool secondaryAbilityFrames = false;
-        public float maxDistance = 0f;
-        public int punchDamage = 47;
-        public int altDamage = 54;*/
+        public float MaxDistance = 0f;
+        public int PunchDamage = 47;
+        public int AltDamage = 54;*/
 
-        public override int halfStandHeight => 37;
-        public override int punchDamage => 68;
-        public override int altDamage => 76;
-        public override int punchTime => 11;
-        public override StandType standType => StandType.Melee;
+        public override int HalfStandHeight => 37;
+        public override int PunchDamage => 68;
+        public override int AltDamage => 76;
+        public override int PunchTime => 11;
+        public override int TierNumber => 3;
+        public override StandAttackType StandType => StandAttackType.Melee;
 
         public override void AI()
         {
@@ -95,7 +96,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
                     NPC npc = Main.npc[n];
                     if (npc.active && Projectile.Distance(npc.Center) <= 15f)
                     {
-                        npc.StrikeNPC(altDamage, 8f, Projectile.direction);
+                        npc.StrikeNPC(AltDamage, 8f, Projectile.direction);
                     }
                 }
                 if (distanceTo > newMaxDistance * 2)

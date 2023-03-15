@@ -21,7 +21,7 @@ namespace JoJoFanStands.Projectiles.Minions
         {
             Player player = Main.player[Projectile.owner];
             FanPlayer modPlayer = player.GetModPlayer<FanPlayer>();
-            if (modPlayer.RoseColoredSunActive)
+            if (modPlayer.roseColoredSunActive)
                 Projectile.timeLeft = 2;
 
             Projectile.position.Y = player.position.Y - 240f;

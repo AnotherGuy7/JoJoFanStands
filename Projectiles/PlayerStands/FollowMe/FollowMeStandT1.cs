@@ -10,10 +10,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
 {
     public class FollowMeStandT1 : StandClass
     {
-        public override int punchDamage => 16;
-        public override int altDamage => 31;
-        public override int halfStandHeight => 39;
-        public override StandType standType => StandType.Melee;
+        public override int PunchDamage => 16;
+        public override int AltDamage => 31;
+        public override int HalfStandHeight => 39;
+        public override int TierNumber => 1;
+        public override StandAttackType StandType => StandAttackType.Melee;
 
         private Vector2 velocityAddition;
         private float mouseDistance;
@@ -92,7 +93,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
                 {
                     Vector2 vector131 = player.Center;
                     vector131.X -= (float)((9 + player.width / 2) * player.direction);
-                    vector131.Y -= -35f + halfStandHeight;
+                    vector131.Y -= -35f + HalfStandHeight;
                     Projectile.Center = Vector2.Lerp(Projectile.Center, vector131, 0.2f);
                     Projectile.velocity *= 0.8f;
                     Projectile.direction = (Projectile.spriteDirection = player.direction);
@@ -109,7 +110,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
                     shootVel = new Vector2(0f, 1f);
                 }
                 shootVel.Normalize();
-                shootVel *= shootSpeed;
+                shootVel *= ProjectileSpeed;
                 int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y, shootVel.X, shootVel.Y, ModContent.ProjectileType<Fists>(), (int)(newPunchDamage * windUpForce), 4f * windUpForce, Main.myPlayer);
                 Main.projectile[proj].timeLeft = 6;
                 Main.projectile[proj].netUpdate = true;

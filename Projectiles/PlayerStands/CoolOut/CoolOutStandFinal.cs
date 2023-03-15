@@ -11,13 +11,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.CoolOut
 {  
     public class CoolOutStandFinal : StandClass
     {
-        public override int projectileDamage => 51;
-        public override int shootTime => 20;
-        public override int altDamage => 63;
-        public override StandType standType => StandType.Ranged;
-        public override int standOffset => 20;
-        public override int halfStandHeight => 32;
-        public override float maxDistance => 0f;
+        public override int ProjectileDamage => 51;
+        public override int ShootTime => 20;
+        public override int AltDamage => 63;
+        public override StandAttackType StandType => StandAttackType.Ranged;
+        public override Vector2 StandOffset => new Vector2(20, 0);
+        public override int HalfStandHeight => 32;
+        public override float MaxDistance => 0f;
 
         private int abilityNumber = 0;
         private int specialDamage = 71;
@@ -72,7 +72,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.CoolOut
                         shootVel = new Vector2(0f, 1f);
                     }
                     shootVel.Normalize();
-                    shootVel *= shootSpeed;
+                    shootVel *= ProjectileSpeed;
                     int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<IceBolt>(), newProjectileDamage, 8f, Main.myPlayer);
                     Main.projectile[proj].netUpdate = true;
                     Projectile.netUpdate = true;
@@ -102,7 +102,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.CoolOut
                     if (Main.mouseRight && shootCount <= 0f && player.ownedProjectileCounts[ModContent.ProjectileType<IceSpear>()] == 0 && spearWhoAmI == -1)
                     {
                         Projectile.ai[0] = 0.5f;
-                        spearWhoAmI = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y - 10f, 0f, 0f, ModContent.ProjectileType<IceSpear>(), (int)(altDamage * mPlayer.standDamageBoosts), 10f, Main.myPlayer, Projectile.whoAmI);
+                        spearWhoAmI = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y - 10f, 0f, 0f, ModContent.ProjectileType<IceSpear>(), (int)(AltDamage * mPlayer.standDamageBoosts), 10f, Main.myPlayer, Projectile.whoAmI);
                         Main.projectile[spearWhoAmI].netUpdate = true;
                         Projectile.netUpdate = true;
                     }
@@ -128,7 +128,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.CoolOut
                     {
                         Projectile spear = Main.projectile[spearWhoAmI];
                         spear.ai[0] = 1f;
-                        spear.damage = (int)(altDamage * (Projectile.ai[0] + 1));
+                        spear.damage = (int)(AltDamage * (Projectile.ai[0] + 1));
                         Vector2 direction = Main.MouseWorld - Projectile.Center;
                         direction.Normalize();
                         spear.velocity = (direction * 12f) * Projectile.ai[0];
@@ -196,7 +196,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.CoolOut
                 attackFrames = false;
                 PlayAnimation("Idle");
             }
-            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().poseMode)
+            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().posing)
             {
                 idleFrames = false;
                 attackFrames = false;

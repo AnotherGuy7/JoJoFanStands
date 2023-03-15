@@ -15,10 +15,25 @@ namespace JoJoFanStands.NPCs
             Main.npcFrameCount[NPC.type] = 2;
         }
 
+        private readonly string[] PaoMessages = new string[11]
+        {
+            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGGGGGGGGGHHHHHHHHHHHHHHHHH",
+            "You're a NICE CAR",
+            "Give me admin... OR DIE!",
+            "SOPA DE MACACO!",
+            "Uma delicia.",
+            "Give me ULF Ratt",
+            "Got any traps???",
+            "Hi dad.",
+            "ghlaghaoigh eioh ngia ophgoa hg haoiegh auoguh augn hgioagh oiahn goea",
+            "Dead.",
+            "How die???"
+        };
+
         public override void SetDefaults()
         {
-            NPC.width = 32;
-            NPC.height = 32;
+            NPC.width = 20;
+            NPC.height = 20;
             NPC.defense = 999999999;
             NPC.lifeMax = 999999999;
             NPC.HitSound = SoundID.NPCHit1;
@@ -35,8 +50,8 @@ namespace JoJoFanStands.NPCs
             {
                 int npc2 = NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.position.X, (int)NPC.position.Y, NPC.type);
                 int npc3 = NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.position.X, (int)NPC.position.Y, NPC.type);
-                Main.npc[npc2].GivenName = "Pao Alt #" + NPC.whoAmI;
-                Main.npc[npc3].GivenName = "Pao Alt #" + NPC.whoAmI;
+                Main.npc[npc2].GivenName = "Pao Alt #" + Main.npc[npc2].whoAmI;
+                Main.npc[npc3].GivenName = "Pao Alt #" + Main.npc[npc3].whoAmI;
                 Main.NewText("You can't get rid of me that easily.", Color.DarkRed);
                 return false;
             }
@@ -56,7 +71,7 @@ namespace JoJoFanStands.NPCs
             NPC.direction = (NPC.spriteDirection = player.direction);
             NPC.ai[0]++;
             NPC.ai[2]++;
-            if (NPC.ai[2] >= 72000)
+            if (NPC.ai[2] >= 120 * 60)
             {
                 timeToDie = true;
                 int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.position, Vector2.Zero, ProjectileID.Bomb, 250, 10f);
@@ -68,57 +83,13 @@ namespace JoJoFanStands.NPCs
             {
                 NPC.ai[0] = 0;
                 NPC.ai[1] = Main.rand.NextFloat(120f, 450f);
-                int randText = Main.rand.Next(1, 12);
-                if (randText == 1)
-                {
-                    Main.NewText("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGGGGGGGGGHHHHHHHHHHHHHHHHH");
-                }
-                if (randText == 2)
-                {
-                    Main.NewText("You're a NICE CAR");
-                }
-                if (randText == 3)
-                {
-                    Main.NewText("Give me admin... OR DIE!");
-                }
-                if (randText == 4)
-                {
-                    Main.NewText("SOPA DE MACACO!");
-                }
-                if (randText == 5)
-                {
-                    Main.NewText("Uma delicia.");
-                }
-                if (randText == 6)
-                {
-                    Main.NewText("Give me ULF Ratt");
-                }
-                if (randText == 7)
-                {
-                    Main.NewText("Got any traps???");
-                }
-                if (randText == 8)
-                {
-                    Main.NewText("Hi dad.");
-                }
-                if (randText == 9)
-                {
-                    Main.NewText("ghlaghaoigh eioh ngia ophgoa hg haoiegh auoguh augn hgioagh oiahn goea");
-                }
-                if (randText == 10)
-                {
-                    Main.NewText("Dead.");
-                }
-                if (randText == 11)
-                {
-                    Main.NewText("How die???");
-                }
+                Main.NewText(PaoMessages[Main.rand.Next(0, PaoMessages.Length)]);
             }
         }
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
-            if (FanPlayer.SpawnPao)
+            if (FanPlayer.NaturalPaoSpawns)
                 return 0.02f;
 
             return 0f;
@@ -132,10 +103,8 @@ namespace JoJoFanStands.NPCs
             {
                 frame += 1;
                 NPC.frameCounter = 0;
-            }
-            if (frame >= 2)
-            {
-                frame = 0;
+                if (frame >= 2)
+                    frame = 0;
             }
             NPC.frame.Y = frame * frameHeight;
         }

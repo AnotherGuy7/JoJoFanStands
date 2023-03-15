@@ -83,7 +83,7 @@ namespace JoJoFanStands.Projectiles
                         {
                             otherProj.Kill();
                         }
-                        if (otherProj.type == Projectile.type && MyPlayer.SecretReferences)      //now this is where things get fun
+                        if (otherProj.type == Projectile.type && JoJoStands.JoJoStands.SecretReferences)      //now this is where things get fun
                         {
                             if (otherProj.whoAmI > Projectile.whoAmI)       //so that just 1 black hole spawns the boss
                                 NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.position.X, (int)Projectile.position.Y, NPCID.MoonLordCore);

@@ -4,21 +4,23 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.LucyInTheSky
 {
-    public class LucyInTheSkyStandT1 : StandClass
+    public class LucyInTheSkyStandT2 : StandClass
     {
-        public override int PunchDamage => 19;
-        public override int PunchTime => 12;
+        public override int PunchDamage => 43;
+        public override int PunchTime => 11;
         public override int HalfStandHeight => 37;
-        public override int TierNumber => 1;
+        public override int TierNumber => 2;
         //public override Vector2 StandOffset => Vector2.Zero;
         public override StandAttackType StandType => StandAttackType.Melee;
+        public override bool UseProjectileAlpha => true;
 
-        private const int MaxAmountOfMarkers = 3;
+        private const int MaxAmountOfMarkers = 5;
 
         private int amountOfBridges = 0;
         private int lightBridgeShootTimer = 0;
@@ -26,9 +28,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.LucyInTheSky
         private bool showAllBridgeSources = false;
         private int lightMarkerFrame = 0;
         private int lightMarkerFrameCounter = 0;
+        private int hiddenTeleportCooldownTimer = 0;
 
         public override void ExtraSpawnEffects()
         {
+            Projectile.alpha = 255;
             for (int p = 0; p < Main.maxProjectiles; p++)
             {
                 Projectile marker = Main.projectile[p];
@@ -51,16 +55,22 @@ namespace JoJoFanStands.Projectiles.PlayerStands.LucyInTheSky
             UpdateStandInfo();
             if (shootCount > 0)
                 shootCount--;
+            if (hiddenTeleportCooldownTimer > 0)
+                hiddenTeleportCooldownTimer--;
 
             Player player = Main.player[Projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
             if (mPlayer.standOut)
                 Projectile.timeLeft = 2;
+            if (fPlayer.hidingInLucyMarker)
+                Projectile.alpha = 0;
+            else
+                Projectile.alpha = 255;
 
             if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
             {
-                if (Main.mouseLeft)
+                if (Main.mouseLeft && !fPlayer.hidingInLucyMarker)
                 {
                     Punch();
                 }
@@ -72,16 +82,29 @@ namespace JoJoFanStands.Projectiles.PlayerStands.LucyInTheSky
                         idleFrames = false;
                 }
 
-                if (Main.mouseRight && shootCount <= 0 && player.whoAmI == Main.myPlayer)
+                if (Main.mouseRight && !fPlayer.hidingInLucyMarker && shootCount <= 0 && !playerHasAbilityCooldown && player.whoAmI == Main.myPlayer)
                 {
-                    Vector3 lightLevel = Lighting.GetColor((int)Main.MouseWorld.X / 16, (int)Main.MouseWorld.Y / 16).ToVector3();       //1.703 is max light
-                    if (lightLevel.Length() > 1.3f && Main.tile[(int)Main.MouseWorld.X / 16, (int)Main.MouseWorld.Y / 16].TileType == TileID.Torches)
+                    bool attemptingTeleport = false;
+                    for (int p = 0; p < Main.maxProjectiles; p++)
                     {
-                        secondaryAbilityFrames = true;
-                        lightBridgeShootPosition = Main.MouseWorld - new Vector2(8f);
-                        Projectile.frame = 0;
+                        Projectile marker = Main.projectile[p];
+                        if (marker.active && marker.type == ModContent.ProjectileType<LightMarker>() && marker.owner == player.whoAmI && marker.Hitbox.Contains(Main.MouseWorld.ToPoint()))
+                        {
+                            shootCount = 60;
+                            attemptingTeleport = true;
+                            break;
+                        }
                     }
-                    shootCount += 30;
+                    if (!attemptingTeleport)
+                    {
+                        Vector3 lightLevel = Lighting.GetColor((int)Main.MouseWorld.X / 16, (int)Main.MouseWorld.Y / 16).ToVector3();       //1.703 is max light
+                        if (lightLevel.Length() > 1.3f && Main.tile[(int)Main.MouseWorld.X / 16, (int)Main.MouseWorld.Y / 16].TileType == TileID.Torches)
+                        {
+                            secondaryAbilityFrames = true;
+                            lightBridgeShootPosition = Main.MouseWorld - new Vector2(8f);
+                        }
+                        shootCount += 30;
+                    }
                 }
 
                 if (secondaryAbilityFrames)
@@ -151,7 +174,18 @@ namespace JoJoFanStands.Projectiles.PlayerStands.LucyInTheSky
                             Vector2 uiPosition = Main.player[Projectile.owner].Center + (markerDirection * 64f);
 
                             if (Main.mouseLeft && Vector2.Distance(Main.MouseWorld, uiPosition) <= 16f)
+                            {
                                 fPlayer.lucySelectedMarkerWhoAmI = marker.whoAmI;
+                                if (fPlayer.hidingInLucyMarker && hiddenTeleportCooldownTimer <= 0)
+                                {
+                                    hiddenTeleportCooldownTimer = 30;
+                                    SoundStyle coinSound = SoundID.CoinPickup;
+                                    coinSound.Pitch = 2f;
+                                    coinSound.PitchVariance = 0.2f;
+                                    SoundEngine.PlaySound(coinSound, Projectile.Center);
+                                    player.position = marker.position;
+                                }
+                            }
                         }
                     }
                 }

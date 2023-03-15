@@ -1,25 +1,26 @@
+using JoJoFanStands.Buffs;
+using JoJoFanStands.NPCs;
+using JoJoStands;
+using JoJoStands.Projectiles.PlayerStands;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
-using JoJoStands;
-using JoJoStands.Projectiles.PlayerStands;
-using JoJoFanStands.Buffs;
-using static Terraria.ModLoader.ModContent;
-using JoJoFanStands.NPCs;
 using Terraria.ModLoader;
-using Microsoft.Xna.Framework.Graphics;
+using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.Banks
 {
     public class BanksStandT3 : StandClass
     {
-        public override float shootSpeed => 16f;
-        public override int shootTime => 8;
-        public override int projectileDamage => 10;
-        public override StandType standType => StandType.Ranged;
-        public override int halfStandHeight => 32;
-        public override int standOffset => 0;
+        public override float ProjectileSpeed => 16f;
+        public override int ShootTime => 8;
+        public override int ProjectileDamage => 10;
+        public override int TierNumber => 3;
+        public override StandAttackType StandType => StandAttackType.Ranged;
+        public override int HalfStandHeight => 32;
+        public override Vector2 StandOffset => Vector2.Zero;
 
 
         private const float TargetDetectionRange = 32f * 16f;
@@ -65,7 +66,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
 
                     if (shootCount <= 0 && Projectile.frame == 2)
                     {
-                        shootCount += shootTime;
+                        shootCount += ShootTime;
                         target.StrikeNPC(newProjectileDamage, 0.2f, Projectile.direction);
                         SoundStyle item41 = SoundID.Item41;
                         item41.Pitch = 3f;
@@ -97,7 +98,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
                         shootCount += newShootTime;
                         Vector2 shootVel = target.Center - Projectile.Center;
                         shootVel.Normalize();
-                        shootVel *= shootSpeed;
+                        shootVel *= ProjectileSpeed;
 
                         float numberProjectiles = 6;
                         float rotation = MathHelper.ToRadians(30f);
@@ -121,7 +122,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
                 secondaryAbilityFrames = false;
                 target = null;
             }
-            if (SpecialKeyPressedNoCooldown() && specialPressTimer <= 0)
+            if (SpecialKeyPressed(false) && specialPressTimer <= 0)
             {
                 if (riskyRewardsActive)
                 {
@@ -163,7 +164,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
                 attackFrames = false;
                 PlayAnimation("Secondary");
             }
-            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().poseMode)
+            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().posing)
             {
                 idleFrames = false;
                 attackFrames = false;
@@ -180,7 +181,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
             }
             if (animationName == "Attack")
             {
-                AnimateStand(animationName, 5, shootTime / 5, true);
+                AnimateStand(animationName, 5, ShootTime / 5, true);
             }
             if (animationName == "Secondary")
             {

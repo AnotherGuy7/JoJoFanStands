@@ -25,6 +25,9 @@ namespace JoJoFanStands
                 Ref<Effect> distortedReality = new Ref<Effect>(ModContent.Request<Effect>("JoJoFanStands/Effects/MonotoneRealityShader", AssetRequestMode.ImmediateLoad).Value);
                 Filters.Scene["MonotoneRealityEffect"] = new Filter(new ScreenShaderData(distortedReality, "MonotoneRealityEffect"), EffectPriority.VeryHigh);
                 Filters.Scene["MonotoneRealityEffect"].Load();
+
+                Ref<Effect> backInBlackDistortion = new Ref<Effect>((Effect)ModContent.Request<Effect>("JoJoFanStands/Effects/BackInBlackDistortion", AssetRequestMode.ImmediateLoad));
+                GameShaders.Misc["BackInBlackDistortion"] = new MiscShaderData(backInBlackDistortion, "BackInBlackDistortionEffect");
             }
 
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<CoolOutT1>());

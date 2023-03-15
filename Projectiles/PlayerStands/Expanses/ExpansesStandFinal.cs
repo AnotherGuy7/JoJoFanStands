@@ -14,14 +14,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Expanses
 {
     public class ExpansesStandFinal : StandClass
     {
-        public override int projectileDamage => 80;
-        public override int altDamage => 150;
-        public override int shootTime => 4;
-        public override StandType standType => StandType.Ranged;
-        public override int standOffset => 0;
-        public override int halfStandHeight => 37;
-        public override float maxDistance => 0f;
-	private bool IsCrystallized = false;
+        public override int ProjectileDamage => 80;
+        public override int AltDamage => 150;
+        public override int ShootTime => 4;
+        public override StandAttackType StandType => StandAttackType.Ranged;
+        public override Vector2 StandOffset => Vector2.Zero;
+        public override int HalfStandHeight => 37;
+        public override float MaxDistance => 0f;
+	    private bool IsCrystallized = false;
 
         public override void AI()
         {
@@ -57,21 +57,21 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Expanses
                 attackFrames = true;
 				Vector2 shootVel = Main.MouseWorld - Projectile.Center;shootVel.Normalize();shootVel *= 25f;
 				Projectile.ai[0] += 1f;
-                int column = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<ColumnProj>(), (int)(altDamage * mPlayer.standDamageBoosts), 8f, Main.myPlayer);
+                int column = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<ColumnProj>(), (int)(AltDamage * mPlayer.standDamageBoosts), 8f, Main.myPlayer);
                 Main.projectile[column].netUpdate = true;
 			if (Projectile.ai[0]== 180f)
 			{
-                int columnb = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<ColumnProj>(), (int)(altDamage * mPlayer.standDamageBoosts), 4f, Main.myPlayer);
+                int columnb = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<ColumnProj>(), (int)(AltDamage * mPlayer.standDamageBoosts), 4f, Main.myPlayer);
                 Main.projectile[columnb].netUpdate = true;
 			}
 			if (Projectile.ai[0] == 360f)
 			{
-                int columnc = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<ColumnProj>(), (int)(altDamage * mPlayer.standDamageBoosts), 4f, Main.myPlayer);
+                int columnc = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<ColumnProj>(), (int)(AltDamage * mPlayer.standDamageBoosts), 4f, Main.myPlayer);
                 Main.projectile[columnc].netUpdate = true;
 			}
 			if (Projectile.ai[0] == 540f)
 			{
-                int columnd = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<ColumnProj>(), (int)(altDamage * mPlayer.standDamageBoosts), 4f, Main.myPlayer);
+                int columnd = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<ColumnProj>(), (int)(AltDamage * mPlayer.standDamageBoosts), 4f, Main.myPlayer);
                 Main.projectile[columnd].netUpdate = true;
 				Projectile.ai[0] = 0f;
 			}
@@ -96,7 +96,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Expanses
             {attackFrames = false;PlayAnimation("Idle");}
             if (attackFrames)
             {idleFrames = false;PlayAnimation("Attack");}
-            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().poseMode)
+            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().posing)
             {idleFrames = false; PlayAnimation("Pose");}
         }
         public override void PlayAnimation(string animationName)

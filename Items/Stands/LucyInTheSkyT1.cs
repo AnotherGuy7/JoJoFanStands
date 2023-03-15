@@ -1,7 +1,7 @@
-using JoJoStands;
 using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
 using JoJoStands.Tiles;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -11,17 +11,22 @@ namespace JoJoFanStands.Items.Stands
 {
     public class LucyInTheSkyT1 : FanStandItemClass
     {
-        public override int standSpeed => 12;
-        public override int standType => 2;
-        public override string standProjectileName => "LucyInTheSky";
-        public override int standTier => 1;
+        public override int StandSpeed => 12;
+        public override int StandType => 2;
+        public override string StandProjectileName => "LucyInTheSky";
+        public override int StandTier => 1;
+        public override Color StandTierDisplayColor => Color.LightGreen;
         public override bool FanStandItem => true;
-        public static readonly SoundStyle lucyInTheSkySpawnSound = new SoundStyle("JoJoFanStands/Sounds/SummonCries/LucyInTheSky").WithVolumeScale(MyPlayer.ModSoundsVolume);
+        public static readonly SoundStyle lucyInTheSkySpawnSound = new SoundStyle("JoJoFanStands/Sounds/SummonCries/LucyInTheSky").WithVolumeScale(JoJoStands.JoJoStands.ModSoundsVolume);
 
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Lucy in the Sky (Tier 1)");
-            Tooltip.SetDefault("Left-click to barrage the life out of enemies and right-click on a light source to create a marker!\nRight-click anywhere to bring up the Marker Menu\nUser Name: Archerous \nReference: Lucy in the Sky by The Beatles");
+            Tooltip.SetDefault("Left-click to barrage the life out of enemies and right-click on a light source to create a marker!" +
+                "\nSecond Special: Show/Hide the Marker Menu" +
+                "\nNote: Up to 3 Light Markers can be placed." + 
+                "\nUser Name: Archerous" +
+                "\nReference: Lucy in the Sky by The Beatles");
         }
 
         public override void SetDefaults()
@@ -38,7 +43,8 @@ namespace JoJoFanStands.Items.Stands
         public override bool ManualStandSpawning(Player player)
         {
             SoundEngine.PlaySound(lucyInTheSkySpawnSound);
-            return false;
+            player.GetModPlayer<FanPlayer>().SpawnFanStand();
+            return true;
         }
 
         public override void AddRecipes()

@@ -12,13 +12,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Expanses
 {
     public class ExpansesStandT1 : StandClass
     {
-        public override int projectileDamage => 2;
-        public override int altDamage => 9;
-        public override int shootTime => 12;
-        public override StandType standType => StandType.Ranged;
-        public override int standOffset => 0;
-        public override int halfStandHeight => 37;
-        public override float maxDistance => 0f;
+        public override int ProjectileDamage => 2;
+        public override int AltDamage => 9;
+        public override int ShootTime => 12;
+        public override StandAttackType StandType => StandAttackType.Ranged;
+        public override Vector2 StandOffset => Vector2.Zero;
+        public override int HalfStandHeight => 37;
+        public override float MaxDistance => 0f;
 
         public override void AI()
         {
@@ -56,8 +56,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Expanses
                     Vector2 shootVel = Main.MouseWorld - Projectile.Center;
                     if (shootVel == Vector2.Zero){shootVel = new Vector2(0f, 1f);}
                     shootVel.Normalize();
-                    shootVel *= shootSpeed;
-                int column = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<ColumnProj>(), (int)(altDamage * mPlayer.standDamageBoosts), 8f, Main.myPlayer);
+                    shootVel *= ProjectileSpeed;
+                int column = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<ColumnProj>(), (int)(AltDamage * mPlayer.standDamageBoosts), 8f, Main.myPlayer);
                 Main.projectile[column].netUpdate = true;
                 Projectile.netUpdate = true;
 		}
@@ -68,7 +68,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Expanses
             {attackFrames = false;PlayAnimation("Idle");}
             if (attackFrames)
             {idleFrames = false;PlayAnimation("Attack");}
-            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().poseMode)
+            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().posing)
             {idleFrames = false; PlayAnimation("Pose");}
         }
         public override void PlayAnimation(string animationName)

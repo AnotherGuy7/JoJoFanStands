@@ -3,17 +3,17 @@ using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
 using JoJoStands.Tiles;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ID;
 
 namespace JoJoFanStands.Items.Stands
 {
     public class ExpansesT1 : FanStandItemClass
     {
-        public override int standSpeed => 12;
-        public override int standType => 2;
-        public override string standProjectileName => "Expanses";
-        public override int standTier => 1;
+        public override int StandSpeed => 12;
+        public override int StandType => 2;
+        public override string StandProjectileName => "Expanses";
+        public override int StandTier => 1;
         public override bool FanStandItem => true;
 
         public override void SetStaticDefaults()
@@ -30,13 +30,14 @@ namespace JoJoFanStands.Items.Stands
             Item.maxStack = 1;
             Item.value = 0;
             Item.noUseGraphic = true;
-            Item.rare = 3;
+            Item.rare = ItemRarityID.LightPurple;
         }
 
         public override bool ManualStandSpawning(Player player)
         {
             player.GetModPlayer<MyPlayer>().standDefenseToAdd = 3;
-            return false;
+            player.GetModPlayer<FanPlayer>().SpawnFanStand();
+            return true;
         }
 
         public override void AddRecipes()

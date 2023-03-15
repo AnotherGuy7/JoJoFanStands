@@ -21,7 +21,7 @@ namespace JoJoFanStands.Buffs
             if (player.ownedProjectileCounts[ProjectileType<RoseColoredSun>()] == 0)
                 Projectile.NewProjectile(player.GetSource_FromThis(), player.position, Vector2.Zero, ProjectileType<RoseColoredSun>(), 999, 2f, Main.myPlayer);
 
-            player.GetModPlayer<FanPlayer>().RoseColoredSunActive = true;
+            player.GetModPlayer<FanPlayer>().roseColoredSunActive = true;
         }
     }
 }

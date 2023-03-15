@@ -28,20 +28,6 @@ namespace JoJoFanStands.Projectiles
                 crit = true;
             }
 
-            if (mPlayer.destroyAmuletEquipped)
-            {
-                if (Main.rand.NextFloat(0, 101) >= 93)
-                {
-                    target.AddBuff(BuffID.OnFire, 60 * 3);
-                }
-            }
-            if (mPlayer.greaterDestroyEquipped)
-            {
-                if (Main.rand.NextFloat(0, 101) >= 80)
-                {
-                    target.AddBuff(BuffID.CursedInferno, 60 * 10);
-                }
-            }
             if (mPlayer.crackedPearlEquipped)
             {
                 if (Main.rand.NextFloat(0, 101) >= 60)
@@ -60,20 +46,6 @@ namespace JoJoFanStands.Projectiles
                 crit = true;
             }
 
-            if (mPlayer.destroyAmuletEquipped)
-            {
-                if (Main.rand.NextFloat(0, 101) >= 93)
-                {
-                    target.AddBuff(BuffID.OnFire, 3 * 60);
-                }
-            }
-            if (mPlayer.greaterDestroyEquipped)
-            {
-                if (Main.rand.NextFloat(0, 101) >= 80)
-                {
-                    target.AddBuff(BuffID.CursedInferno, 10 * 60);
-                }
-            }
             if (mPlayer.crackedPearlEquipped)
             {
                 if (Main.rand.NextFloat(0, 101) >= 60)

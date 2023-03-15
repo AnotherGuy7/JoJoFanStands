@@ -11,9 +11,9 @@ namespace JoJoFanStands.Items.Stands
 {
     public class Megalovania : FanStandItemClass
     {
-        public override int standSpeed => 60;
-        public override int standType => 2;
-        public override int standTier => 1;
+        public override int StandSpeed => 60;
+        public override int StandType => 2;
+        public override int StandTier => 1;
         public override bool FanStandItem => true;
 
         public override void SetStaticDefaults()

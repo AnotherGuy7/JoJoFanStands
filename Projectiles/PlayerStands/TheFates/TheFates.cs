@@ -29,7 +29,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.TheFates
 
         public Vector2 velocityAddition = Vector2.Zero;
         public float mouseDistance = 0f;
-        protected float shootSpeed = 16f;       //how fast the Projectile the minion shoots goes
+        protected float ProjectileSpeed = 16f;       //how fast the Projectile the minion shoots goes
         public bool idleFrames = false;
         public bool attackFrames = false;
         int shootCount = 0;
@@ -110,7 +110,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.TheFates
                         shootVel = new Vector2(0f, 1f);
                     }
                     shootVel.Normalize();
-                    shootVel *= shootSpeed;
+                    shootVel *= ProjectileSpeed;
                     int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y - 20f, shootVel.X, shootVel.Y, ModContent.ProjectileType<Fists>(), 7, 2f, Main.myPlayer, 0f, 0f);
                     Main.projectile[proj].netUpdate = true;
                     Projectile.netUpdate = true;

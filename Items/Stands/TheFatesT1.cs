@@ -11,9 +11,9 @@ namespace JoJoFanStands.Items.Stands
 {
     public class TheFatesT1 : FanStandItemClass
     {
-        public override int standSpeed => 12;
-        public override int standType => 1;
-        public override int standTier => 1;
+        public override int StandSpeed => 12;
+        public override int StandType => 1;
+        public override int StandTier => 1;
         public override bool FanStandItem => true;
 
         public override void SetStaticDefaults()

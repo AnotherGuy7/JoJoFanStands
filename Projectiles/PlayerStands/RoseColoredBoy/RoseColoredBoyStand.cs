@@ -11,11 +11,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
 {
     public class RoseColoredBoyStand : StandClass
     {
-        public override int punchDamage => 62;
-        public override int punchTime => 10;
-        public override int altDamage => 74;
-        public override int halfStandHeight => 32;
-        public override StandType standType => StandType.Melee;
+        public override int PunchDamage => 62;
+        public override int PunchTime => 10;
+        public override int AltDamage => 74;
+        public override int HalfStandHeight => 32;
+        public override StandAttackType StandType => StandAttackType.Melee;
 
         public override void AI()
         {
@@ -29,7 +29,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
             if (mPlayer.standOut)
                 Projectile.timeLeft = 2;
 
-            if (!mPlayer.standAutoMode)
+            if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
             {
                 if (Main.mouseLeft && player.whoAmI == Projectile.owner)
                 {
@@ -49,7 +49,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
                         Vector2 shootVel = Main.MouseWorld - Projectile.position;
                         shootVel.Normalize();
                         shootVel *= 12f;
-                        Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + new Vector2(28f * Projectile.direction, -8f), shootVel, ProjectileType<RosePetal>(), altDamage, 6f, player.whoAmI);
+                        Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + new Vector2(28f * Projectile.direction, -8f), shootVel, ProjectileType<RosePetal>(), AltDamage, 6f, player.whoAmI);
                     }
                     Dust.NewDust(Projectile.Center + new Vector2(28f * Projectile.direction, -8f), 2, 2, DustID.Torch);
                     secondaryAbilityFrames = true;
@@ -76,7 +76,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
                     player.AddBuff(BuffType<JoJoStands.Buffs.Debuffs.AbilityCooldown>(), 240 * 60);
                 }
             }
-            if (mPlayer.standAutoMode)
+            if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Auto)
             {
                 BasicPunchAI();
             }
@@ -101,7 +101,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
                 idleFrames = false;
                 PlayAnimation("Secondary");
             }
-            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().poseMode)
+            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().posing)
             {
                 attackFrames = false;
                 idleFrames = false;

@@ -11,9 +11,9 @@ namespace JoJoFanStands.Items.Stands
 {
     public class RoseColoredBoy : FanStandItemClass
     {
-        public override int standSpeed => 10;
-        public override int standType => 1;
-        public override int standTier => 1;
+        public override int StandSpeed => 10;
+        public override int StandType => 1;
+        public override int StandTier => 1;
         public override bool FanStandItem => true;
 
         public override void SetStaticDefaults()

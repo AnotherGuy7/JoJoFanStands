@@ -10,10 +10,10 @@ namespace JoJoFanStands.Items.Stands
 {
     public class CoolOutFinal : FanStandItemClass
     {
-        public override int standSpeed => 20;
-        public override int standType => 2;
-        public override string standProjectileName => "CoolOut";
-        public override int standTier => 4;
+        public override int StandSpeed => 20;
+        public override int StandType => 2;
+        public override string StandProjectileName => "CoolOut";
+        public override int StandTier => 4;
         public override bool FanStandItem => true;
 
         public override string Texture
@@ -41,7 +41,8 @@ namespace JoJoFanStands.Items.Stands
         public override bool ManualStandSpawning(Player player)
         {
             player.GetModPlayer<MyPlayer>().standDefenseToAdd = 4;
-            return false;
+            player.GetModPlayer<FanPlayer>().SpawnFanStand();
+            return true;
         }
 
         public override void AddRecipes()

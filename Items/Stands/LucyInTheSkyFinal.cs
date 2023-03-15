@@ -1,5 +1,6 @@
 using JoJoStands.Items.CraftingMaterials;
 using JoJoStands.Tiles;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -9,10 +10,11 @@ namespace JoJoFanStands.Items.Stands
 {
     public class LucyInTheSkyFinal : FanStandItemClass
     {
-        public override int standSpeed => 9;
-        public override int standType => 2;
-        public override string standProjectileName => "LucyInTheSky";
-        public override int standTier => 4;
+        public override int StandSpeed => 9;
+        public override int StandType => 2;
+        public override string StandProjectileName => "LucyInTheSky";
+        public override int StandTier => 4;
+        public override Color StandTierDisplayColor => Color.LightGreen;
         public override bool FanStandItem => true;
         public override string Texture
         {
@@ -21,8 +23,16 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Lucy in the Sky (Final Tier)");
-            Tooltip.SetDefault("Left-click to barrage the life out of enemies and right-click on a light source to create a marker!\nRight-click anywhere to bring up the Marker Menu\nUser Name: Archerous \nReference: Lucy in the Sky by The Beatles");
+            DisplayName.SetDefault("Lucy in the Sky (Tier 3)");
+            Tooltip.SetDefault("Left-click to barrage the life out of enemies and right-click on a light source to create a marker!" +
+                "\nHold right-click on a light source to hide inside of the network!" +
+                "\nSpecial: Electrify all active highways!" +
+                "\nSecond Special: Show/Hide the Marker Menu" +
+                "\nHeld Second Special: Shoot bullets out of the selected marker toward the nearest enemy!" +
+                "\nNote: Up to 12 Light Markers can be placed." +
+                "\nThe held Second Special only works when the player has ammo in their ammo slots!" +
+                "\nUser Name: Archerous" +
+                "\nReference: Lucy in the Sky by The Beatles");
         }
 
         public override void SetDefaults()
@@ -39,7 +49,8 @@ namespace JoJoFanStands.Items.Stands
         public override bool ManualStandSpawning(Player player)
         {
             SoundEngine.PlaySound(LucyInTheSkyT1.lucyInTheSkySpawnSound);
-            return false;
+            player.GetModPlayer<FanPlayer>().SpawnFanStand();
+            return true;
         }
 
         public override void AddRecipes()

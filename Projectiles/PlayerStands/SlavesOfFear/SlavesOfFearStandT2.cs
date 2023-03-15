@@ -1,27 +1,26 @@
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using Terraria;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
 {
     public class SlavesOfFearStandT2 : StandClass
     {
-        public override float maxDistance       
+        public override float MaxDistance
         {
             get { return 98f; }
         }
 
-        public override int halfStandHeight => 37;          //a simpler version of doing the above
+        public override int HalfStandHeight => 37;          //a simpler version of doing the above
 
-        public override int punchDamage => 47;
-        public override int altDamage => 54;
-
-        public override int punchTime => 12;
-        public override StandType standType => StandType.Melee;
+        public override int PunchDamage => 47;
+        public override int AltDamage => 54;
+        public override int PunchTime => 12;
+        public override int TierNumber => 2;
+        public override StandAttackType StandType => StandAttackType.Melee;
 
         public override void AI()
         {
@@ -62,7 +61,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
                     NPC npc = Main.npc[n];
                     if (npc.active && Projectile.Distance(npc.Center) <= 15f)
                     {
-                        npc.StrikeNPC(altDamage, 8f, Projectile.direction);
+                        npc.StrikeNPC(AltDamage, 8f, Projectile.direction);
                     }
                 }
                 if (distanceTo > newMaxDistance * 2)

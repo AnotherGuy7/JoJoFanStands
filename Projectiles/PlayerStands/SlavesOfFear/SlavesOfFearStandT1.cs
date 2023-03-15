@@ -1,18 +1,19 @@
-using Terraria;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
-using Terraria.ModLoader;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
+using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
 {
     public class SlavesOfFearStandT1 : StandClass
     {
-        public override int punchDamage => 23;
-        public override int punchTime => 13;
-        public override int altDamage => 96;
-        public override int halfStandHeight => 37;
-        public override StandType standType => StandType.Melee;
+        public override int PunchDamage => 23;
+        public override int PunchTime => 13;
+        public override int AltDamage => 96;
+        public override int HalfStandHeight => 37;
+        public override int TierNumber => 1;
+        public override StandAttackType StandType => StandAttackType.Melee;
 
         public override void AI()
         {

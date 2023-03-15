@@ -11,11 +11,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
 {
     public class SlavesOfFearStandFinal : StandClass
     {
-        public override int halfStandHeight => 37;
-        public override int punchDamage => 98;
-        public override int altDamage => 112;
-        public override int punchTime => 10;
-        public override StandType standType => StandType.Melee;
+        public override int HalfStandHeight => 37;
+        public override int PunchDamage => 98;
+        public override int AltDamage => 112;
+        public override int PunchTime => 10;
+        public override int TierNumber => 4;
+        public override StandAttackType StandType => StandAttackType.Melee;
 
         private bool weldFrames = false;
 
@@ -80,10 +81,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
                     NPC npc = Main.npc[n];
                     if (npc.active && Projectile.Distance(npc.Center) <= 15f)
                     {
-                        npc.StrikeNPC(altDamage, 8f, Projectile.direction);
+                        npc.StrikeNPC(AltDamage, 8f, Projectile.direction);
                     }
                 }
-                if (distanceTo > maxDistance * 2)
+                if (distanceTo > MaxDistance * 2)
                 {
                     secondaryAbilityFrames = false;
                 }

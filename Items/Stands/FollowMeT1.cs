@@ -1,3 +1,4 @@
+using JoJoStands;
 using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
 using JoJoStands.Tiles;
@@ -10,10 +11,10 @@ namespace JoJoFanStands.Items.Stands
 {
     public class FollowMeT1 : FanStandItemClass
     {
-        public override int standSpeed => 12;
-        public override int standType => 1;
-        public override string standProjectileName => "FollowMe";
-        public override int standTier => 1;
+        public override int StandSpeed => 12;
+        public override int StandType => 1;
+        public override string StandProjectileName => "FollowMe";
+        public override int StandTier => 1;
         public override bool FanStandItem => true;
 
         public override void SetStaticDefaults()
@@ -31,6 +32,13 @@ namespace JoJoFanStands.Items.Stands
             Item.value = 0;
             Item.noUseGraphic = true;
             Item.rare = ItemRarityID.LightPurple;
+        }
+
+        public override bool ManualStandSpawning(Player player)
+        {
+            player.GetModPlayer<MyPlayer>().standDefenseToAdd = 6;
+            player.GetModPlayer<FanPlayer>().SpawnFanStand();
+            return true;
         }
 
         public override void AddRecipes()
