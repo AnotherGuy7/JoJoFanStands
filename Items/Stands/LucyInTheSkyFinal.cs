@@ -23,7 +23,7 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Lucy in the Sky (Tier 3)");
+            DisplayName.SetDefault("Lucy in the Sky (Final Tier)");
             Tooltip.SetDefault("Left-click to barrage the life out of enemies and right-click on a light source to create a marker!" +
                 "\nHold right-click on a light source to hide inside of the network!" +
                 "\nSpecial: Electrify all active highways!" +

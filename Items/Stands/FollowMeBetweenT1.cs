@@ -1,6 +1,7 @@
 using JoJoStands.Items.Armor.VampirismArmors;
 using JoJoStands.Items.CraftingMaterials;
 using JoJoStands.Tiles;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -13,6 +14,7 @@ namespace JoJoFanStands.Items.Stands
         public override string Texture => Mod.Name + "/Items/Stands/FollowMeT1";
         public override int StandSpeed => 12;
         public override int StandType => 1;
+        public override Color StandTierDisplayColor => Color.Pink;
         public override bool FanStandItem => true;
 
         public override void SetStaticDefaults()

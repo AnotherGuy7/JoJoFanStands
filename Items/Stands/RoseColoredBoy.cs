@@ -2,6 +2,7 @@ using JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy;
 using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
 using JoJoStands.Tiles;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -14,6 +15,7 @@ namespace JoJoFanStands.Items.Stands
         public override int StandSpeed => 10;
         public override int StandType => 1;
         public override int StandTier => 1;
+        public override Color StandTierDisplayColor => Color.Orange;
         public override bool FanStandItem => true;
 
         public override void SetStaticDefaults()

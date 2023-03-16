@@ -1,4 +1,5 @@
 using JoJoStands.Tiles;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -11,6 +12,7 @@ namespace JoJoFanStands.Items.Stands
         public override int StandType => 1;
         public override string StandProjectileName => "SlavesOfFear";
         public override int StandTier => 2;
+        public override Color StandTierDisplayColor => Color.ForestGreen;
         public override bool FanStandItem => true;
 
         public override string Texture

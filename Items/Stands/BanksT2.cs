@@ -1,5 +1,6 @@
 using JoJoStands.Items.CraftingMaterials;
 using JoJoStands.Tiles;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -13,6 +14,7 @@ namespace JoJoFanStands.Items.Stands
         public override int StandType => 2;
         public override string StandProjectileName => "Banks";
         public override int StandTier => 2;
+        public override Color StandTierDisplayColor => Color.Gold;
         public override bool FanStandItem => true;
 
         public override string Texture

@@ -1,14 +1,12 @@
+using JoJoFanStands.Buffs;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
-using JoJoFanStands.Projectiles;
-using JoJoFanStands.Buffs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using System;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.Expanses
 {
@@ -16,12 +14,22 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Expanses
     {
         public override int ProjectileDamage => 80;
         public override int AltDamage => 150;
-        public override int ShootTime => 4;
+        public override int ShootTime => 7;
         public override StandAttackType StandType => StandAttackType.Ranged;
         public override Vector2 StandOffset => Vector2.Zero;
         public override int HalfStandHeight => 37;
         public override float MaxDistance => 0f;
-	    private bool IsCrystallized = false;
+        private bool IsCrystallized = false;
+        private float[] crystalRotations;
+
+        public override void ExtraSpawnEffects()
+        {
+            crystalRotations = new float[4];
+            for (int i = 0; i < crystalRotations.Length; i++)
+            {
+                crystalRotations[i] = MathHelper.PiOver2 * i;
+            }
+        }
 
         public override void AI()
         {
@@ -29,85 +37,124 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Expanses
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             SelectAnimation();
             UpdateStandInfo();
-			base.Projectile.position = player.Center - new Vector2((float)base.Projectile.width / 2f, (float)player.height + 20f);
-			base.Projectile.spriteDirection = player.direction;
+            base.Projectile.position = player.Center - new Vector2((float)base.Projectile.width / 2f, (float)player.height + 20f);
+            base.Projectile.spriteDirection = player.direction;
             Lighting.AddLight(Projectile.position, 974);
             if (shootCount > 0) shootCount--;
             if (mPlayer.standOut) Projectile.timeLeft = 2;
-            if (Main.mouseLeft )
+
+            for (int i = 0; i < crystalRotations.Length; i++)
+            {
+                crystalRotations[i] -= MathHelper.PiOver4 / 16f;
+                if (crystalRotations[i] <= -MathHelper.TwoPi)
+                    crystalRotations[i] = 0f;
+            }
+            if (Main.mouseLeft)
             {
                 if (shootCount <= 0f)
                 {
                     SoundEngine.PlaySound(SoundID.Item28, Projectile.position);
                     shootCount += newShootTime;
                     Vector2 shootVel = Main.MouseWorld - Projectile.Center;
-                    if (shootVel == Vector2.Zero){shootVel = new Vector2(0f, 1f);}
+                    if (shootVel == Vector2.Zero) { shootVel = new Vector2(0f, 1f); }
                     shootVel.Normalize();
-                    shootVel *= 30f;
-                    int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<CrystalProj>(), newProjectileDamage, 8f, Main.myPlayer);
+                    shootVel *= 12f;
+                    int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<CrystalProj>(), newProjectileDamage, 2f, Main.myPlayer);
                     Main.projectile[proj].netUpdate = true;
                     Projectile.netUpdate = true;
                 }
             }
-            if(player.ownedProjectileCounts[ModContent.ProjectileType<ColumnProj>()] == 0) {idleFrames = true;attackFrames = false;}
-			
-            if (Main.mouseRight && shootCount <= 0f && player.ownedProjectileCounts[ModContent.ProjectileType<ColumnProj>()] <= 3 && Projectile.owner == Main.myPlayer)
+            if (player.ownedProjectileCounts[ModContent.ProjectileType<ColumnProj>()] == 0) { idleFrames = true; attackFrames = false; }
+
+            if (Main.mouseRight && shootCount <= 0f && Projectile.owner == Main.myPlayer)
             {
-				idleFrames = false;
+                idleFrames = false;
                 attackFrames = true;
-				Vector2 shootVel = Main.MouseWorld - Projectile.Center;shootVel.Normalize();shootVel *= 25f;
-				Projectile.ai[0] += 1f;
-                int column = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<ColumnProj>(), (int)(AltDamage * mPlayer.standDamageBoosts), 8f, Main.myPlayer);
-                Main.projectile[column].netUpdate = true;
-			if (Projectile.ai[0]== 180f)
-			{
-                int columnb = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<ColumnProj>(), (int)(AltDamage * mPlayer.standDamageBoosts), 4f, Main.myPlayer);
-                Main.projectile[columnb].netUpdate = true;
-			}
-			if (Projectile.ai[0] == 360f)
-			{
-                int columnc = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<ColumnProj>(), (int)(AltDamage * mPlayer.standDamageBoosts), 4f, Main.myPlayer);
-                Main.projectile[columnc].netUpdate = true;
-			}
-			if (Projectile.ai[0] == 540f)
-			{
-                int columnd = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<ColumnProj>(), (int)(AltDamage * mPlayer.standDamageBoosts), 4f, Main.myPlayer);
-                Main.projectile[columnd].netUpdate = true;
-				Projectile.ai[0] = 0f;
-			}
+                Vector2 shootVel = Main.MouseWorld - Projectile.Center;
+                shootVel.Normalize();
+                shootVel *= 16f;
+
+                Projectile.ai[0] += 1;
+                if (Projectile.ai[0] >= 45)
+                {
+                    int columnb = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<ColumnProj>(), (int)(AltDamage * mPlayer.standDamageBoosts), 8f, Main.myPlayer);
+                    Main.projectile[columnb].netUpdate = true;
+                    Projectile.ai[0] = 0;
+                }
                 Projectile.netUpdate = true;
-			}
+            }
+            else
+                Projectile.ai[0] = 0f;
+
             if (SecondSpecialKeyPressed())
             {
-		IsCrystallized = !IsCrystallized;
-		if(!IsCrystallized){player.ClearBuff(ModContent.BuffType<SelfCrystallize>());}
-		else{player.AddBuff(ModContent.BuffType<SelfCrystallize>(), 16000, true, false);}
+                IsCrystallized = !IsCrystallized;
+                if (!IsCrystallized) { player.ClearBuff(ModContent.BuffType<SelfCrystallize>()); }
+                else { player.AddBuff(ModContent.BuffType<SelfCrystallize>(), 16000, true, false); }
             }
             if (SpecialKeyPressed())
             {
-			player.position = Main.MouseWorld;
-			SoundEngine.PlaySound(SoundID.Item8, Projectile.position);
-			player.AddBuff(JoJoFanStands.JoJoStandsMod.Find<ModBuff>("AbilityCooldown").Type, mPlayer.AbilityCooldownTime(5), true, false);
+                player.position = Main.MouseWorld;
+                SoundEngine.PlaySound(SoundID.Item8, Projectile.position);
+                player.AddBuff(JoJoFanStands.JoJoStandsMod.Find<ModBuff>("AbilityCooldown").Type, mPlayer.AbilityCooldownTime(5), true, false);
             }
-	}
+        }
+
         public override void SelectAnimation()
         {
-            if (idleFrames)
-            {attackFrames = false;PlayAnimation("Idle");}
-            if (attackFrames)
-            {idleFrames = false;PlayAnimation("Attack");}
+            if (idleFrames || attackFrames)
+            { PlayAnimation("Idle"); }
             if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().posing)
-            {idleFrames = false; PlayAnimation("Pose");}
+            { idleFrames = false; PlayAnimation("Pose"); }
         }
+
         public override void PlayAnimation(string animationName)
         {
             standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Expanses/Expanses_" + animationName).Value;
             if (animationName == "Idle")
-            {AnimateStand(animationName, 16, 7, true);}
-            if (animationName == "Attack")
-            {AnimateStand(animationName, 16, 7, true);}
+            { AnimateStand(animationName, 1, 15, true); }
             if (animationName == "Pose")
-            {AnimateStand(animationName, 1, 1, true);}
+            { AnimateStand(animationName, 1, 15, true); }
+        }
+
+        private Texture2D crystalTexture;
+        private readonly Vector2 crystalOrigin = new Vector2(5, 20);
+
+        public override bool PreDraw(ref Color drawColor)
+        {
+            if (crystalTexture == null)
+                crystalTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Expanses/CrystalPillar", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+
+            for (int i = 0; i < crystalRotations.Length; i++)
+            {
+                if (crystalRotations[i] < -MathHelper.Pi)
+                    continue;
+
+                Vector2 drawPosition = Projectile.Center - Main.screenPosition;
+                drawPosition += crystalRotations[i].ToRotationVector2() * new Vector2(20f, 17f);
+                
+                Main.EntitySpriteDraw(crystalTexture, drawPosition, null, drawColor, Projectile.rotation, crystalOrigin, 1f, effects, 0);
+            }
+
+            return base.PreDraw(ref drawColor);
+        }
+
+        public override void PostDraw(Color drawColor)
+        {
+            if (crystalTexture == null)
+                crystalTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Expanses/CrystalPillar", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+
+            for (int i = 0; i < crystalRotations.Length; i++)
+            {
+                if (crystalRotations[i] > -MathHelper.Pi)
+                    continue;
+
+                Vector2 drawPosition = Projectile.Center - Main.screenPosition;
+                drawPosition += crystalRotations[i].ToRotationVector2() * new Vector2(20f, 17f);
+
+                Main.EntitySpriteDraw(crystalTexture, drawPosition, null, drawColor, Projectile.rotation, crystalOrigin, 1f, effects, 0);
+            }
+            base.PostDraw(drawColor);
         }
     }
 }

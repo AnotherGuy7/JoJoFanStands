@@ -2,6 +2,7 @@ using JoJoFanStands.Buffs;
 using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
 using JoJoStands.Tiles;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -13,6 +14,7 @@ namespace JoJoFanStands.Items.Armor
     {
         public override int StandType => 2;
         public override int StandTier => 1;
+        public override Color StandTierDisplayColor => Color.DarkOrange;
 
         public override void SetStaticDefaults()
         {

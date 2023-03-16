@@ -52,7 +52,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MortalReminder
                     Main.projectile[afterImage].timeLeft = 300;
                     Main.projectile[afterImage].frame = Projectile.frame;
                     Main.projectile[afterImage].spriteDirection = Projectile.spriteDirection;
-                    Main.projFrames[afterImage] = Main.projFrames[Projectile.whoAmI];
+                    Main.projFrames[afterImage] = Main.projFrames[Projectile.type];
                     afterImageTimer = 60;
                 }
                 LimitDistance();
@@ -78,7 +78,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MortalReminder
         {
             if (Projectile.ai[0] == 1f)
             {
-                int frameHeight = standTexture.Height / Main.projFrames[Projectile.whoAmI];
+                int frameHeight = standTexture.Height / Main.projFrames[Projectile.type];
                 Rectangle sourceRect = new Rectangle(0, frameHeight * Projectile.frame, standTexture.Width, frameHeight);
                 Main.EntitySpriteDraw(standTexture, Projectile.Center - Main.screenPosition + new Vector2(19f, 1f), sourceRect, Color.White * Projectile.alpha, 0f, new Vector2(standTexture.Width / 2f, frameHeight / 2f), 1f, effects, 0);
             }

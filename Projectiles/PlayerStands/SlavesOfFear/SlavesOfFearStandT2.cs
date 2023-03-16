@@ -60,14 +60,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
                 {
                     NPC npc = Main.npc[n];
                     if (npc.active && Projectile.Distance(npc.Center) <= 15f)
-                    {
                         npc.StrikeNPC(AltDamage, 8f, Projectile.direction);
-                    }
                 }
                 if (distanceTo > newMaxDistance * 2)
-                {
                     secondaryAbilityFrames = false;
-                }
             }
             else
             {
@@ -108,7 +104,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
             }
             if (animationName == "Secondary")
             {
-                AnimateStand(animationName, 2, 10, true);
+                AnimateStand(animationName, 1, 15, true);
             }
         }
     }

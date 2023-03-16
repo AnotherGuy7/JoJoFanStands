@@ -6,6 +6,7 @@ using System.IO;
 using JoJoFanStands.NPCs;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria.ID;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
 {
@@ -19,7 +20,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
         public override StandAttackType StandType => StandAttackType.Melee;
 
         private bool weldFrames = false;
-
+        private bool welding = false;
 
         public override void AI()
         {
@@ -47,10 +48,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
                 }
             }
             if (Main.mouseRight)
-            {
                 secondaryAbilityFrames = true;
-            }
-            weldFrames = JoJoStands.JoJoStands.SpecialHotKey.Current;
+
+            if (SpecialKeyPressed(false))
+                welding = !welding;
+            weldFrames = welding;
             if (weldFrames)
             {
                 secondaryAbilityFrames = false;
@@ -58,8 +60,17 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
                 {
                     Projectile.velocity = Main.MouseWorld - Projectile.Center;
                     Projectile.velocity.Normalize();
-                    Projectile.velocity *= 2f;
+                    Projectile.velocity *= 6f;
+                    if (Projectile.velocity.X > 0)
+                        Projectile.direction = 1;
+                    else
+                        Projectile.direction = -1;
+                    Projectile.spriteDirection = Projectile.direction;
                 }
+
+                int dustIndex = Dust.NewDust(Projectile.Center + new Vector2(8 * Projectile.spriteDirection, 0f) - new Vector2(3), 6, 6, DustID.IceTorch);
+                Main.dust[dustIndex].noGravity = true;
+
                 for (int n = 0; n < Main.maxNPCs; n++)
                 {
                     NPC npc = Main.npc[n];
@@ -80,14 +91,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
                 {
                     NPC npc = Main.npc[n];
                     if (npc.active && Projectile.Distance(npc.Center) <= 15f)
-                    {
                         npc.StrikeNPC(AltDamage, 8f, Projectile.direction);
-                    }
                 }
                 if (distanceTo > MaxDistance * 2)
-                {
                     secondaryAbilityFrames = false;
-                }
             }
             else
             {
@@ -145,11 +152,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
             }
             if (animationName == "Secondary")
             {
-                AnimateStand(animationName, 2, 10, true);
+                AnimateStand(animationName, 1, 15, true);
             }
             if (animationName == "Weld")
             {
-                AnimateStand(animationName, 4, 13, true);
+                AnimateStand(animationName, 1, 15, true);
             }
         }
     }

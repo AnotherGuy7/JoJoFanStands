@@ -216,7 +216,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
 
         /*public virtual void AnimateStand(int frameAmount, float fps, bool loop, bool ability)        //remember that 'fps' refers to how many frames is supposed to play every second, not how fast it plays
         {
-            Main.projFrames[Projectile.whoAmI] = frameAmount;
+            Main.projFrames[Projectile.type] = frameAmount;
             Projectile.frameCounter++;
             standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Megalovania/M" + direction);
             float framesPerSecond = 60f / fps;

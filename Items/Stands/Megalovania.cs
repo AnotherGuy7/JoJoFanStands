@@ -2,6 +2,7 @@ using JoJoFanStands.Projectiles.PlayerStands.Megalovania;
 using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
 using JoJoStands.Tiles;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -14,6 +15,7 @@ namespace JoJoFanStands.Items.Stands
         public override int StandSpeed => 60;
         public override int StandType => 2;
         public override int StandTier => 1;
+        public override Color StandTierDisplayColor => Color.Gray;
         public override bool FanStandItem => true;
 
         public override void SetStaticDefaults()

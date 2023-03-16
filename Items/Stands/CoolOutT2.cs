@@ -1,6 +1,7 @@
 using JoJoStands;
 using JoJoStands.Items.CraftingMaterials;
 using JoJoStands.Tiles;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -14,6 +15,7 @@ namespace JoJoFanStands.Items.Stands
         public override int StandType => 2;
         public override string StandProjectileName => "CoolOut";
         public override int StandTier => 2;
+        public override Color StandTierDisplayColor => Color.LightBlue;
         public override bool FanStandItem => true;
 
         public override string Texture
@@ -31,7 +33,7 @@ namespace JoJoFanStands.Items.Stands
         {
             Item.damage = 24;
             Item.width = 36;
-            Item.height = 42;
+            Item.height = 40;
             Item.maxStack = 1;
             Item.value = 0;
             Item.noUseGraphic = true;

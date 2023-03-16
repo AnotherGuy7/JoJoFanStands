@@ -1,7 +1,7 @@
 using JoJoStands;
-using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
 using JoJoStands.Tiles;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -10,10 +10,11 @@ namespace JoJoFanStands.Items.Stands
 {
     public class ExpansesFinal : FanStandItemClass
     {
-        public override int StandSpeed => 4;
+        public override int StandSpeed => 7;
         public override int StandType => 2;
         public override string StandProjectileName => "Expanses";
         public override int StandTier => 4;
+        public override Color StandTierDisplayColor => Color.Blue;
         public override bool FanStandItem => true;
 
         public override string Texture

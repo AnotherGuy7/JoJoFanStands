@@ -140,7 +140,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
 
             if (standTexture != null && Main.netMode != NetmodeID.Server)
             {
-                int frameHeight = standTexture.Height / Main.projFrames[Projectile.whoAmI];
+                int frameHeight = standTexture.Height / Main.projFrames[Projectile.type];
                 Vector2 drawOffset = StandOffset;
                 drawOffset.X *= Projectile.spriteDirection;
                 Vector2 drawPosition = Projectile.Center - Main.screenPosition + drawOffset;

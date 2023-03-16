@@ -1,6 +1,7 @@
 using JoJoStands;
 using JoJoStands.Items.CraftingMaterials;
 using JoJoStands.Tiles;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -15,6 +16,7 @@ namespace JoJoFanStands.Items.Stands
         public override int StandType => 1;
         public override string StandProjectileName => "FollowMe";
         public override int StandTier => 2;
+        public override Color StandTierDisplayColor => Color.Pink;
         public override bool FanStandItem => true;
 
         public override void SetStaticDefaults()

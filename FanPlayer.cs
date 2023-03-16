@@ -76,7 +76,7 @@ namespace JoJoFanStands
                             player.mount.SetMount(MountType<SkySawMount>(), player);
                 }
             }
-            if (anyBrianEno && JoJoStands.JoJoStands.SpecialHotKey.Current && !player.wet && hPlayer.amountOfHamon > 0)
+            if (anyBrianEno && JoJoStands.JoJoStands.SpecialHotKey.JustPressed && !player.wet && hPlayer.amountOfHamon > 0)
             {
                 hPlayer.amountOfHamon -= 1;
                 spinBoost = true;
