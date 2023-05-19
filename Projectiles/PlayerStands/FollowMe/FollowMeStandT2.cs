@@ -151,7 +151,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
                 npc.velocity = Vector2.Zero;
                 if (Projectile.frame == 7)
                 {
-                    npc.StrikeNPC(newPunchDamage, 7f, Projectile.direction, true);
+                    NPC.HitInfo hitInfo = new NPC.HitInfo()
+                    {
+                        Damage = newPunchDamage,
+                        Knockback = 7f,
+                        HitDirection = Projectile.direction
+                        };
+                    npc.StrikeNPC(hitInfo, noPlayerInteraction: true);
                     shootCount += 180;
                     Projectile.ai[0] = -1f;
                     grabbing = false;

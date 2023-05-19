@@ -9,8 +9,8 @@ namespace JoJoFanStands.Buffs
 	{
 		public override void SetStaticDefaults() 
 		{
-			DisplayName.SetDefault("Self-Crystallized");
-			Description.SetDefault("All of your internal organs is turned into a light crystals\n" + "You gain immense mobility boost(doesn't works in a mount) and immune to fall damage\n" + "However, your physical capabilities are weakened");
+			// DisplayName.SetDefault("Self-Crystallized");
+			// Description.SetDefault("All of your internal organs is turned into a light crystals\n" + "You gain immense mobility boost(doesn't works in a mount) and immune to fall damage\n" + "However, your physical capabilities are weakened");
 			Main.persistentBuff[base.Type] = true;
 			Main.buffNoSave[Type] = true;
 			BuffID.Sets.NurseCannotRemoveDebuff[base.Type] = true;

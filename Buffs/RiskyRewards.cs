@@ -9,8 +9,8 @@ namespace JoJoFanStands.Buffs
     {
         public override void SetStaticDefaults()
         {
-			DisplayName.SetDefault("Risky Rewards");
-            Description.SetDefault("Enemies now drop more loot in exchange for lower defense.");
+			// DisplayName.SetDefault("Risky Rewards");
+            // Description.SetDefault("Enemies now drop more loot in exchange for lower defense.");
             Main.buffNoTimeDisplay[Type] = true;
             BuffID.Sets.NurseCannotRemoveDebuff[Type] = true;
         }

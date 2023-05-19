@@ -20,8 +20,8 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("The Fates (Tier 1)");
-            Tooltip.SetDefault("Left-click to ??? and right-click foresee future attacks! \nUser Name: StringsArn'tRealNumbers \nReference: Emerson Lake and Palmer song, 'The Three Fates'");
+            // DisplayName.SetDefault("The Fates (Tier 1)");
+            // Tooltip.SetDefault("Left-click to ??? and right-click foresee future attacks! \nUser Name: StringsArn'tRealNumbers \nReference: Emerson Lake and Palmer song, 'The Three Fates'");
         }
 
         public override void SetDefaults()

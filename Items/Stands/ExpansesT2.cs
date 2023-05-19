@@ -24,8 +24,8 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Expanses (Tier 2)");
-            Tooltip.SetDefault("Left-click to shoot sharp, glass-like crystals and right-click to launch a 2 piercing columns. \nUser Name: Prime Emperor \nReference: Expanses, album by The Green Kingdom");
+            // DisplayName.SetDefault("Expanses (Tier 2)");
+            // Tooltip.SetDefault("Left-click to shoot sharp, glass-like crystals and right-click to launch a 2 piercing columns. \nUser Name: Prime Emperor \nReference: Expanses, album by The Green Kingdom");
         }
 
         public override void SetDefaults()

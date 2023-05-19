@@ -25,8 +25,8 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Cool Out (Tier 3)");
-            Tooltip.SetDefault("Left-click to shoot an Ice Bolt and press right-click to use the selected ability!\nSpecial: Cycle throgh abilities!\nUser Name: NekroSektor \nReference: Cool Out and Natural by Imagine Dragons");
+            // DisplayName.SetDefault("Cool Out (Tier 3)");
+            // Tooltip.SetDefault("Left-click to shoot an Ice Bolt and press right-click to use the selected ability!\nSpecial: Cycle throgh abilities!\nUser Name: NekroSektor \nReference: Cool Out and Natural by Imagine Dragons");
         }
 
         public override void SetDefaults()

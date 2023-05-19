@@ -44,7 +44,7 @@ namespace JoJoFanStands.Projectiles
             }
         }
 
-        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             SoundEngine.PlaySound(SoundID.Item28, Projectile.position);
             target.AddBuff(BuffID.Frostburn, 180);

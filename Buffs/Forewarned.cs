@@ -11,8 +11,8 @@ namespace JoJoFanStands.Buffs
     {
         public override void SetStaticDefaults()
         {
-			DisplayName.SetDefault("Forwarned");
-            Description.SetDefault("You've already seen everything in the next 3 seconds...");
+			// DisplayName.SetDefault("Forwarned");
+            // Description.SetDefault("You've already seen everything in the next 3 seconds...");
         }
  
         public override void Update(Player player, ref int buffIndex)

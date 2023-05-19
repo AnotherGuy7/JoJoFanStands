@@ -22,6 +22,6 @@ namespace JoJoFanStands.Projectiles
 	    Projectile.tileCollide = false;
         }
 		public override void AI(){Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.ToRadians(90f);}
-		public override void OnHitNPC(NPC target, int damage, float knockback, bool crit) {target.immune[Projectile.owner] = 0;}
+		public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone) {target.immune[Projectile.owner] = 0;}
     }
 }

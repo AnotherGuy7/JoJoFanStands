@@ -55,7 +55,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Megalovania
                             if (npcDist <= 25f)
                             {
                                 shootCount += newShootTime;
-                                npc.StrikeNPC(97, 0f, Projectile.direction * -1);
+                                NPC.HitInfo hitInfo = new NPC.HitInfo()
+                                {
+                                    Damage = 97,
+                                    HitDirection = -Projectile.direction
+                                };
+                                npc.StrikeNPC(hitInfo);
                             }
                         }
                     }

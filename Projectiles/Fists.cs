@@ -19,14 +19,12 @@ namespace JoJoFanStands.Projectiles
             Projectile.alpha = 255;     //completely transparent
         }
 
-        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
         {
             Player player = Main.player[Projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             if (Main.rand.NextFloat(0, 101) <= mPlayer.standCritChangeBoosts)
-            {
-                crit = true;
-            }
+                modifiers.SetCrit();
 
             if (mPlayer.crackedPearlEquipped)
             {
@@ -37,21 +35,14 @@ namespace JoJoFanStands.Projectiles
             }
         }
 
-        public override void ModifyHitPvp(Player target, ref int damage, ref bool crit)
+        public override void ModifyHitPlayer(Player target, ref Player.HurtModifiers modifiers)
         {
-            Player player = Main.player[Projectile.owner];
-            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-            if (Main.rand.NextFloat(0, 101) <= mPlayer.standCritChangeBoosts)
+            if (modifiers.PvP)
             {
-                crit = true;
-            }
-
-            if (mPlayer.crackedPearlEquipped)
-            {
-                if (Main.rand.NextFloat(0, 101) >= 60)
-                {
+                Player player = Main.player[Projectile.owner];
+                MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
+                if (mPlayer.crackedPearlEquipped && Main.rand.NextFloat(0, 101) >= 60)
                     target.AddBuff(Mod.Find<ModBuff>("Infected").Type, 10 * 60);
-                }
             }
         }
     }

@@ -20,8 +20,8 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Rose Colored Boy");
-            Tooltip.SetDefault("Left-click to punch and right-click to shoot burning rose petals!\nLook on the bright side, if you want to go blind.\nUser Name: Placement \nReference: Rose Colored Boy by Paramore");
+            // DisplayName.SetDefault("Rose Colored Boy");
+            // Tooltip.SetDefault("Left-click to punch and right-click to shoot burning rose petals!\nLook on the bright side, if you want to go blind.\nUser Name: Placement \nReference: Rose Colored Boy by Paramore");
         }
 
         public override void SetDefaults()

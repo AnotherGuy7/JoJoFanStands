@@ -8,8 +8,8 @@ namespace JoJoFanStands.Buffs
     {
         public override void SetStaticDefaults()
         {
-			DisplayName.SetDefault("Brian Eno Active");
-            Description.SetDefault("Brian Eno is active!");
+			// DisplayName.SetDefault("Brian Eno Active");
+            // Description.SetDefault("Brian Eno is active!");
             Main.buffNoTimeDisplay[Type] = true;
         }
  

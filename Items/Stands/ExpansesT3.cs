@@ -23,8 +23,8 @@ namespace JoJoFanStands.Items.Stands
         }
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Expanses (Tier 3)");
-            Tooltip.SetDefault("Left-click to shoot sharp, glass-like crystals and hold right to launch a 3 piercing columns.\nSpecial: Crystallize the space in front of you and get through it.\nUser Name: WarOn \nReference: Prime Emperor, album by The Green Kingdom");
+            // DisplayName.SetDefault("Expanses (Tier 3)");
+            // Tooltip.SetDefault("Left-click to shoot sharp, glass-like crystals and hold right to launch a 3 piercing columns.\nSpecial: Crystallize the space in front of you and get through it.\nUser Name: WarOn \nReference: Prime Emperor, album by The Green Kingdom");
         }
 
         public override void SetDefaults()

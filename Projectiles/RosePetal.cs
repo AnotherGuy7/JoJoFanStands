@@ -17,7 +17,7 @@ namespace JoJoFanStands.Projectiles
             Projectile.tileCollide = true;
         }
 
-        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             if (Main.rand.Next(0, 2) == 0)
             {

@@ -1,0 +1,513 @@
+Mods: {
+	JoJoFanStands: {
+		Buffs: {
+			BrianEnoActiveBuff: {
+				DisplayName: Brian Eno Active
+				Description: Brian Eno is active!
+			}
+
+			Forewarned: {
+				DisplayName: Forwarned
+				Description: You've already seen everything in the next 3 seconds...
+			}
+
+			Intangible: {
+				DisplayName: Intangible!
+				Description: Everything goes through you and you go through everything
+			}
+
+			IntangibleCooldown: {
+				DisplayName: Intangible Cooldown
+				Description: You got sick of going through everything.
+			}
+
+			RiskyRewards: {
+				DisplayName: Risky Rewards
+				Description: Enemies now drop more loot in exchange for lower defense.
+			}
+
+			RoseColoredSunBuff: {
+				DisplayName: Rose Colored Sun
+				Description: A Rose Colored Sun will burn all your enemies away!
+			}
+
+			SelfCrystallize: {
+				DisplayName: Self-Crystallized
+				Description:
+					'''
+					All of your internal organs is turned into a light crystals
+					You gain immense mobility boost(doesn't works in a mount) and immune to fall damage
+					However, your physical capabilities are weakened
+					'''
+			}
+
+			SoreEye: {
+				DisplayName: Sore Eye
+				Description: Your eyes are in pain.
+			}
+
+			LightningFastReflex: {
+				DisplayName: Lightning Fast Reflex
+				Description: Your reflexes are so fast that the world around you slowed to a crawl!
+			}
+
+			InfiniteVelocity: {
+				DisplayName: Infinite Velocity
+				Description: Your speed is infinite and cannot be matched by the world.
+			}
+
+			Vibration: {
+				DisplayName: Vibration
+				Description: You're vibrating beyond physical contraints!
+			}
+		}
+
+		Items: {
+			BrianEnoAct1: {
+				DisplayName: Brian Eno (Act 1, The True Wheel)
+				Tooltip:
+					'''
+					While using any mount gain +10% movement speed, +5% chance to dodge attacks, and a +10% critical strike chance!
+					Press special while in a mount to move faster and dodge all attacks!
+					Press special while there is no mount to have Brain Eno carry you in a box!
+					'''
+			}
+
+			BrianEnoAct2: {
+				DisplayName: Brian Eno (Act 2, Mother Whale Eyeless)
+				Tooltip:
+					'''
+					While using any mount gain +10% movement speed, +5% chance to dodge attacks, and a +10% critical strike chance!
+					Press special while in a mount to move faster and dodge all attacks!
+					Press special while there is no mount to have Brain Eno carry you!
+					'''
+			}
+
+			BrianEnoAct3: {
+				DisplayName: Brian Eno (Act 3, Mother Whale Eyeless)
+				Tooltip:
+					'''
+					While using any mount gain +10% movement speed, +5% chance to dodge attacks, and a +10% critical strike chance!
+					Press special while in a mount to move faster and dodge all attacks!
+					Press special while there is no mount to have Brain Eno carry you!
+					'''
+			}
+
+			BackInBlack: {
+				DisplayName: Back In Black
+				Tooltip:
+					'''
+					Left-click to shoot enemy-chasing shots and right-click to save a position.
+					User Name: AnotherGuy
+					'''
+			}
+
+			BanksFinal: {
+				DisplayName: Banks (Final Tier)
+				Tooltip:
+					'''
+					Left-click shoot a random enemy and right-click to use a shotgun.
+					Special: Enemies killed drop 2.0x the amount of coins. Defense reduced by 10.
+					User Name: Pauline 
+					Reference: Banks by Lincoln
+					'''
+			}
+
+			BanksT1: {
+				DisplayName: Banks (Tier 1)
+				Tooltip:
+					'''
+					Left-click shoot a random enemy.
+					User Name: Pauline 
+					Reference: Banks by Lincoln
+					'''
+			}
+
+			BanksT2: {
+				DisplayName: Banks (Tier 2)
+				Tooltip:
+					'''
+					Left-click shoot a random enemy and right-click to use a shotgun.
+					User Name: Pauline 
+					Reference: Banks by Lincoln
+					'''
+			}
+
+			BanksT3: {
+				DisplayName: Banks (Tier 3)
+				Tooltip:
+					'''
+					Left-click shoot a random enemy and right-click to use a shotgun.
+					Special: Enemies killed drop 1.5x the amount of coins. Defense reduced by 6.
+					User Name: Pauline 
+					Reference: Banks by Lincoln
+					'''
+			}
+
+			BlurFinal: {
+				DisplayName: Blur (Final Tier)
+				Tooltip:
+					'''
+					Left-click to punch at a really fast rate!
+					Right-click to dash to the mouse position, slashing enemies along the way!
+					Special: Slow down the world around you!
+					Second Special: Toggle the Ability Wheel.
+					Passive: Build up energy over time by using the Stand. Can increase speed and damage by up to 30%.
+					User Name: Slime 
+					Reference: Blur by Stellar
+					'''
+			}
+
+			BlurT1: {
+				DisplayName: Blur (Tier 1)
+				Tooltip:
+					'''
+					Left-click to punch at a really fast rate!
+					Passive: Build up energy over time by using the Stand. Can increase speed and damage by up to 20%.
+					User Name: Slime 
+					Reference: Blur by Stellar
+					'''
+			}
+
+			BlurT2: {
+				DisplayName: Blur (Tier 2)
+				Tooltip:
+					'''
+					Left-click to punch at a really fast rate!
+					Right-click to dash to the mouse position, slashing enemies along the way!
+					Special: Slow down the world around you!
+					Passive: Build up energy over time by using the Stand. Can increase speed and damage by up to 25%.
+					User Name: Slime 
+					Reference: Blur by Stellar
+					'''
+			}
+
+			BlurT3: {
+				DisplayName: Blur (Tier 3)
+				Tooltip:
+					'''
+					Left-click to punch at a really fast rate!
+					Right-click to dash to the mouse position, slashing enemies along the way!
+					Special: Slow down the world around you!
+					Second Special: Throw a stream of dual knives!
+					Passive: Build up energy over time by using the Stand. Can increase speed and damage by up to 30%.
+					User Name: Slime
+					Reference: Blur by Stellar
+					'''
+			}
+
+			CoolOutFinal: {
+				DisplayName: Cool Out (Final Tier)
+				Tooltip:
+					'''
+					Left-click to shoot an Ice Bolt and hold right-click to charge up a spear!
+					Special: Send out an ice wave!
+					User Name: NekroSektor 
+					Reference: Cool Out and Natural by Imagine Dragons
+					'''
+			}
+
+			CoolOutT1: {
+				DisplayName: Cool Out (Tier 1)
+				Tooltip:
+					'''
+					Left-click to shoot an Ice Bolt and right-click to charge and throw an Ice Spear!
+					Special: Summon an infinite Ice Wave!
+					User Name: NekroSektor 
+					Reference: Cool Out and Natural by Imagine Dragons
+					'''
+			}
+
+			CoolOutT2: {
+				DisplayName: Cool Out (Tier 2)
+				Tooltip:
+					'''
+					Left-click to shoot an Ice Bolt and hold right-click to charge up a spear!
+					Special: Send out an ice wave!
+					User Name: NekroSektor 
+					Reference: Cool Out and Natural by Imagine Dragons
+					'''
+			}
+
+			CoolOutT3: {
+				DisplayName: Cool Out (Tier 3)
+				Tooltip:
+					'''
+					Left-click to shoot an Ice Bolt and press right-click to use the selected ability!
+					Special: Cycle throgh abilities!
+					User Name: NekroSektor 
+					Reference: Cool Out and Natural by Imagine Dragons
+					'''
+			}
+
+			ExpansesFinal: {
+				DisplayName: Expanses (Final Tier)
+				Tooltip:
+					'''
+					Left-click to shoot sharp, glass-like crystals and hold right to launch a 4 piercing columns.
+					Special: Crystallize the space in front of you and get through it. 
+					Secondary Special: Crystallize yourself. 
+					User Name: Prime Emperor 
+					Reference: Expanses, album by The Green Kingdom
+					'''
+			}
+
+			ExpansesT1: {
+				DisplayName: Expanses (Tier 1)
+				Tooltip:
+					'''
+					Left-click to shoot sharp, glass-like crystals and right-click to launch a 1 piercing column. 
+					User Name: Prime Emperor 
+					Reference: Expanses, album by The Green Kingdom
+					'''
+			}
+
+			ExpansesT2: {
+				DisplayName: Expanses (Tier 2)
+				Tooltip:
+					'''
+					Left-click to shoot sharp, glass-like crystals and right-click to launch a 2 piercing columns. 
+					User Name: Prime Emperor 
+					Reference: Expanses, album by The Green Kingdom
+					'''
+			}
+
+			ExpansesT3: {
+				DisplayName: Expanses (Tier 3)
+				Tooltip:
+					'''
+					Left-click to shoot sharp, glass-like crystals and hold right to launch a 3 piercing columns.
+					Special: Crystallize the space in front of you and get through it.
+					User Name: WarOn 
+					Reference: Prime Emperor, album by The Green Kingdom
+					'''
+			}
+
+			FanStandItemClass: {
+				DisplayName: Fan Stand Item Class
+				Tooltip: ""
+			}
+
+			FollowMeBetweenT1: {
+				DisplayName: Follow Me: Between (Tier 1)
+				Tooltip:
+					'''
+					Left-click to wind-up a punch and Right-click to grab enemies!
+					Special: Intangible
+					User Name: Agatha/Betty/Thabita/Mrs Destiny/Hot Pants 
+					Reference: ???
+					'''
+			}
+
+			FollowMeT1: {
+				DisplayName: Follow Me (Tier 1)
+				Tooltip:
+					'''
+					Left-click to wind-up a punch and Right-click to grab enemies!
+					User Name: Agatha/Betty/Thabita/Mrs Destiny/Hot Pants 
+					Reference: ???
+					'''
+			}
+
+			FollowMeT2: {
+				DisplayName: Follow Me (Tier 2)
+				Tooltip:
+					'''
+					Left-click to wind-up a punch and Right-click to grab enemies!
+					Special: Intangible
+					User Name: Agatha/Betty/Thabita/Mrs Destiny/Hot Pants 
+					Reference: ???
+					'''
+			}
+
+			LucyInTheSkyFinal: {
+				DisplayName: Lucy in the Sky (Final Tier)
+				Tooltip:
+					'''
+					Left-click to barrage the life out of enemies and right-click on a light source to create a marker!
+					Hold right-click on a light source to hide inside of the network!
+					Special: Electrify all active highways!
+					Second Special: Show/Hide the Marker Menu
+					Held Second Special: Shoot bullets out of the selected marker toward the nearest enemy!
+					Note: Up to 12 Light Markers can be placed.
+					The held Second Special only works when the player has ammo in their ammo slots!
+					User Name: Archerous
+					Reference: Lucy in the Sky by The Beatles
+					'''
+			}
+
+			LucyInTheSkyT1: {
+				DisplayName: Lucy in the Sky (Tier 1)
+				Tooltip:
+					'''
+					Left-click to barrage the life out of enemies and right-click on a light source to create a marker!
+					Second Special: Show/Hide the Marker Menu
+					Note: Up to 3 Light Markers can be placed.
+					User Name: Archerous
+					Reference: Lucy in the Sky by The Beatles
+					'''
+			}
+
+			LucyInTheSkyT2: {
+				DisplayName: Lucy in the Sky (Tier 2)
+				Tooltip:
+					'''
+					Left-click to barrage the life out of enemies and right-click on a light source to create a marker!
+					Hold right-click on a light source to hide inside of the network!
+					Second Special: Show/Hide the Marker Menu
+					Note: Up to 5 Light Markers can be placed.
+					User Name: Archerous
+					Reference: Lucy in the Sky by The Beatles
+					'''
+			}
+
+			LucyInTheSkyT3: {
+				DisplayName: Lucy in the Sky (Tier 3)
+				Tooltip:
+					'''
+					Left-click to barrage the life out of enemies and right-click on a light source to create a marker!
+					Hold right-click on a light source to hide inside of the network!
+					Special: Electrify all active highways!
+					Second Special: Show/Hide the Marker Menu
+					Note: Up to 8 Light Markers can be placed.
+					User Name: Archerous
+					Reference: Lucy in the Sky by The Beatles
+					'''
+			}
+
+			Megalovania: {
+				DisplayName: Megalovania
+				Tooltip:
+					'''
+					Left-click to stare at an enemy and right-click to choose an ability.
+					User Name: AnotherGuy
+					'''
+			}
+
+			MortalReminderT1: {
+				DisplayName: Mortal Reminder (Tier 1)
+				Tooltip:
+					'''
+					Left-click to punch enemies at a really fast rate!
+					User Name: Benney 
+					Reference: Mortal Reminder by Pentakill
+					'''
+			}
+
+			RoseColoredBoy: {
+				DisplayName: Rose Colored Boy
+				Tooltip:
+					'''
+					Left-click to punch and right-click to shoot burning rose petals!
+					Look on the bright side, if you want to go blind.
+					User Name: Placement 
+					Reference: Rose Colored Boy by Paramore
+					'''
+			}
+
+			SlavesOfFearFinal: {
+				DisplayName: Slaves Of Fear (Final Tier)
+				Tooltip:
+					'''
+					Left-click to punch enemies at a really fast rate and right click to shunt into enemies!
+					Special: Weld an enemy to tiles!
+					User Name: The Phantom One 
+					Reference: SLAVES OF FEAR by HEALTH
+					'''
+			}
+
+			SlavesOfFearT1: {
+				DisplayName: Slaves Of Fear (Tier 1)
+				Tooltip:
+					'''
+					Left-click to punch enemies at a really fast rate!
+					User Name: The Phantom One 
+					Reference: SLAVES OF FEAR by HEALTH
+					'''
+			}
+
+			SlavesOfFearT2: {
+				DisplayName: Slaves Of Fear (Tier 2)
+				Tooltip:
+					'''
+					Left-click to punch enemies at a really fast rate and right click to shunt into enemies!
+					User Name: The Phantom One 
+					Reference: SLAVES OF FEAR by HEALTH
+					'''
+			}
+
+			SlavesOfFearT3: {
+				DisplayName: Slaves Of Fear (Tier 3)
+				Tooltip:
+					'''
+					Left-click to punch enemies at a really fast rate and right click to shunt into enemies!
+					Special: Weld an enemy to tiles!
+					User Name: The Phantom One 
+					Reference: SLAVES OF FEAR by HEALTH
+					'''
+			}
+
+			TheFatesT1: {
+				DisplayName: The Fates (Tier 1)
+				Tooltip:
+					'''
+					Left-click to ??? and right-click foresee future attacks! 
+					User Name: StringsArn'tRealNumbers 
+					Reference: Emerson Lake and Palmer song, 'The Three Fates'
+					'''
+			}
+		}
+
+		NPCs.Pao.DisplayName: Pao
+
+		Projectiles: {
+			BackInBlackOrb.DisplayName: Back In Black Orb
+			BlackHole.DisplayName: Black Hole
+			ColumnProj.DisplayName: Column Proj
+			CrystalProj.DisplayName: Crystal Proj
+			Fists.DisplayName: Fists
+			IceBolt.DisplayName: Ice Bolt
+			IceSpear.DisplayName: Ice Spear
+			IceSpike.DisplayName: Ice Spike
+			Icicle.DisplayName: Icicle
+			RoseColoredSun.DisplayName: Rose Colored Sun
+			BackInBlackStand.DisplayName: Back In Black Stand
+			BanksStandFinal.DisplayName: Banks Stand Final
+			BanksStandT1.DisplayName: Banks Stand T1
+			BanksStandT2.DisplayName: Banks Stand T2
+			BanksStandT3.DisplayName: Banks Stand T3
+			CoolOutStandFinal.DisplayName: Cool Out Stand Final
+			CoolOutStandT1.DisplayName: Cool Out Stand T1
+			CoolOutStandT2.DisplayName: Cool Out Stand T2
+			CoolOutStandT3.DisplayName: Cool Out Stand T3
+			ExpansesStandFinal.DisplayName: Expanses Stand Final
+			ExpansesStandT1.DisplayName: Expanses Stand T1
+			ExpansesStandT2.DisplayName: Expanses Stand T2
+			ExpansesStandT3.DisplayName: Expanses Stand T3
+			FollowMeStandT1.DisplayName: Follow Me Stand T1
+			FollowMeStandT2.DisplayName: Follow Me Stand T2
+			LightMarker.DisplayName: Light Marker
+			LucyInTheSkyBeam.DisplayName: Lucy In The Sky Beam
+			LucyInTheSkyStandFinal.DisplayName: Lucy In The Sky Stand Final
+			LucyInTheSkyStandT1.DisplayName: Lucy In The Sky Stand T1
+			LucyInTheSkyStandT2.DisplayName: Lucy In The Sky Stand T2
+			LucyInTheSkyStandT3.DisplayName: Lucy In The Sky Stand T3
+			MegalovaniaStand.DisplayName: Megalovania Stand
+			MortalReminderStandT1.DisplayName: Mortal Reminder Stand T1
+			RoseColoredBoyStand.DisplayName: Rose Colored Boy Stand
+			SlavesOfFearStandFinal.DisplayName: Slaves Of Fear Stand Final
+			SlavesOfFearStandT1.DisplayName: Slaves Of Fear Stand T1
+			SlavesOfFearStandT2.DisplayName: Slaves Of Fear Stand T2
+			SlavesOfFearStandT3.DisplayName: Slaves Of Fear Stand T3
+			TheFates.DisplayName: The Fates
+			RosePetal.DisplayName: Rose Petal
+			SnowGlobe.DisplayName: Snow Globe
+			TeleportationWormhole.DisplayName: Teleportation Wormhole
+			BlurStandFinal.DisplayName: Blur Stand Final
+			BlurStandT1.DisplayName: Blur Stand T1
+			BlurStandT2.DisplayName: Blur Stand T2
+			BlurStandT3.DisplayName: Blur Stand T3
+			SlavesOfFearT1.DisplayName: Slaves Of Fear T1
+		}
+	}
+}

@@ -77,7 +77,7 @@ namespace JoJoFanStands.NPCs
                 int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.position, Vector2.Zero, ProjectileID.Bomb, 250, 10f);
                 Main.projectile[proj].timeLeft = 2;
                 Main.NewText("Bye dad.");
-                NPC.StrikeNPC(NPC.life + 1, 999f, 1, true);
+                NPC.StrikeInstantKill();
             }
             if (NPC.ai[0] >= NPC.ai[1])
             {

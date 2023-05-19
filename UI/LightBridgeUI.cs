@@ -51,7 +51,7 @@ namespace JoJoFanStands.UI
                 float x = i * 16f;
                 float y = (i / amountOfColumns) * 16f;
                 markerButtons[i] = new AdjustableButton(ModContent.Request<Texture2D>("JoJoFanStands/UI/InnerPanelBackground"), buttonStartPos + new Vector2(x, y), new Vector2(24f), Color.White, false);
-                markerButtons[i].OnClick += OnClickLightBridgeButton;
+                markerButtons[i].OnLeftClick += OnClickLightBridgeButton;
                 markerButtons[i].invisible = true;
                 lightBridgeUI.Append(markerButtons[i]);
             }

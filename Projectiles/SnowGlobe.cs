@@ -54,7 +54,13 @@ namespace JoJoFanStands.Projectiles
                 {
                     globeHealth -= npc.damage;
                     npc.velocity.X = 10f * -Projectile.spriteDirection;
-                    npc.StrikeNPC(npc.damage / 2, 5f, -npc.direction);
+                    NPC.HitInfo hitInfo = new NPC.HitInfo()
+                    {
+                        Damage = npc.damage / 2,
+                        Knockback = 5f,
+                        HitDirection = -npc.direction
+                        };
+                    npc.StrikeNPC(hitInfo);
                     npc.AddBuff(BuffID.Chilled, 180);
                 }
             }

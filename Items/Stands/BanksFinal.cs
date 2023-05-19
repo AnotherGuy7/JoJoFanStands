@@ -24,8 +24,8 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Banks (Final Tier)");
-            Tooltip.SetDefault("Left-click shoot a random enemy and right-click to use a shotgun.\nSpecial: Enemies killed drop 2.0x the amount of coins. Defense reduced by 10.\nUser Name: Pauline \nReference: Banks by Lincoln");
+            // DisplayName.SetDefault("Banks (Final Tier)");
+            // Tooltip.SetDefault("Left-click shoot a random enemy and right-click to use a shotgun.\nSpecial: Enemies killed drop 2.0x the amount of coins. Defense reduced by 10.\nUser Name: Pauline \nReference: Banks by Lincoln");
         }
 
         public override void SetDefaults()

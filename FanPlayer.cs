@@ -16,6 +16,8 @@ namespace JoJoFanStands
     {
         public static bool NaturalPaoSpawns = false;
 
+        public const int MaxBlur = 100;
+
         private int standKeyPressTimer = 0;
 
         public bool brianEnoAct1 = false;
@@ -26,14 +28,20 @@ namespace JoJoFanStands
         public bool roseColoredSunActive = false;
         public bool hidingInLucyMarker = false;
         public bool litsIntoTheLightAbilityActive = false;
+        public bool blurLightningFastReflexes = false;
+        public bool blurInfiniteVelocity = false;
 
         public int banksDefenseReduction = 0;
         public int lucySelectedMarkerWhoAmI;
+        public int amountOfBlurEnergy = 0;
+        public int blurStage = 0;
 
         public override void ResetEffects()
         {
             spinBoost = false;
             roseColoredSunActive = false;
+            blurLightningFastReflexes = false;
+            blurInfiniteVelocity = false;
         }
 
         public override void ProcessTriggers(TriggersSet triggersSet)
@@ -45,6 +53,7 @@ namespace JoJoFanStands
             if (JoJoStands.JoJoStands.StandOutHotKey.JustPressed && mPlayer.standOut && standKeyPressTimer <= 0)
             {
                 standKeyPressTimer += 30;
+                mPlayer.immuneToTimestopEffects = false;
                 if (anyBrianEno)
                 {
                     brianEnoAct1 = false;
@@ -129,6 +138,25 @@ namespace JoJoFanStands
                     player.moveSpeed += 0.4f;
                 }
             }
+
+            if (!Main.dedServ && Player.whoAmI == Main.myPlayer)
+            {
+                //if (blurLightningFastReflexes)
+                //Filters.Scene.Activate(JoJoFanStandsShaders.CircularGreyscale);
+                JoJoStandsShaders.ChangeShaderActiveState(JoJoFanStandsShaders.CircularGreyscale, blurLightningFastReflexes || blurInfiniteVelocity);
+                if (blurInfiniteVelocity)
+                    JoJoStandsShaders.ChangeShaderUseProgress(JoJoFanStandsShaders.CircularGreyscale, 2f);
+                else
+                    JoJoStandsShaders.ChangeShaderUseProgress(JoJoFanStandsShaders.CircularGreyscale, 1f);
+            }
+        }
+
+        public override bool FreeDodge(Player.HurtInfo info)
+        {
+            if (Player.HasBuff<Vibration>())
+                return true;
+
+            return false;
         }
 
         public void SpawnFanStand()
@@ -145,13 +173,13 @@ namespace JoJoFanStands
             Projectile.NewProjectile(inputItem.GetSource_FromThis(), Player.position, Player.velocity, standProjectileType, 0, 0f, Player.whoAmI);
         }
 
-        public override void ModifyHitByNPC(NPC npc, ref int damage, ref bool crit)
+        public override void ModifyHitByNPC(NPC npc, ref Player.HurtModifiers modifiers)
         {
             if (anyBrianEno && Player.mount.Type != MountID.None && !Player.wet)
             {
                 if (brianEnoAct1 && (Main.rand.NextFloat(0, 101) <= 5f || spinBoost))
                 {
-                    damage = 0;
+                    modifiers.FinalDamage *= 0;
                     Player.velocity.X -= 5f * Player.direction;
                 }
             }

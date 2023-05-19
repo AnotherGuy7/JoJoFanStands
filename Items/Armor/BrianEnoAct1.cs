@@ -18,8 +18,8 @@ namespace JoJoFanStands.Items.Armor
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Brian Eno (Act 1, The True Wheel)");
-            Tooltip.SetDefault("While using any mount gain +10% movement speed, +5% chance to dodge attacks, and a +10% critical strike chance!\nPress special while in a mount to move faster and dodge all attacks!\nPress special while there is no mount to have Brain Eno carry you in a box!");
+            // DisplayName.SetDefault("Brian Eno (Act 1, The True Wheel)");
+            // Tooltip.SetDefault("While using any mount gain +10% movement speed, +5% chance to dodge attacks, and a +10% critical strike chance!\nPress special while in a mount to move faster and dodge all attacks!\nPress special while there is no mount to have Brain Eno carry you in a box!");
         }
 
         public override void SetDefaults()

@@ -1,10 +1,10 @@
 using JoJoFanStands.Items.Armor;
 using JoJoFanStands.Items.Stands;
+using JoJoFanStands.Projectiles.PlayerStands.Blur;
+using JoJoStands.UI;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
-using Terraria.Graphics.Effects;
-using Terraria.Graphics.Shaders;
 using Terraria.ModLoader;
 
 namespace JoJoFanStands
@@ -19,16 +19,14 @@ namespace JoJoFanStands
             Instance = ModContent.GetInstance<JoJoFanStands>();
             JoJoStandsMod = ModLoader.GetMod("JoJoStands");
 
-            if (!Main.dedServ)
-            {
-                //Shader stuff
-                Ref<Effect> distortedReality = new Ref<Effect>(ModContent.Request<Effect>("JoJoFanStands/Effects/MonotoneRealityShader", AssetRequestMode.ImmediateLoad).Value);
-                Filters.Scene["MonotoneRealityEffect"] = new Filter(new ScreenShaderData(distortedReality, "MonotoneRealityEffect"), EffectPriority.VeryHigh);
-                Filters.Scene["MonotoneRealityEffect"].Load();
+            BlurStandT1.punchTextures = new Texture2D[2];
+            BlurStandT1.punchTextures[0] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Blur/Blur_Punch_1", AssetRequestMode.ImmediateLoad).Value;
+            BlurStandT1.punchTextures[1] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Blur/Blur_Punch_2", AssetRequestMode.ImmediateLoad).Value;
 
-                Ref<Effect> backInBlackDistortion = new Ref<Effect>((Effect)ModContent.Request<Effect>("JoJoFanStands/Effects/BackInBlackDistortion", AssetRequestMode.ImmediateLoad));
-                GameShaders.Misc["BackInBlackDistortion"] = new MiscShaderData(backInBlackDistortion, "BackInBlackDistortionEffect");
-            }
+            BlurBar.blurBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/BlurEnergyBar", AssetRequestMode.ImmediateLoad).Value;
+
+            if (!Main.dedServ)
+                JoJoFanStandsShaders.LoadShaders();
 
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<CoolOutT1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<FollowMeT1>());
@@ -38,6 +36,7 @@ namespace JoJoFanStands
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<BanksT1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<BrianEnoAct1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<ExpansesT1>());
+            JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<BlurT1>());
         }
 
         public override void Unload()

@@ -1,4 +1,6 @@
 ﻿using JoJoFanStands.UI;
+using JoJoFanStands.UI.AbilityWheel.Blur;
+using JoJoStands.UI;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria;
@@ -11,9 +13,13 @@ namespace JoJoFanStands
     {
         private UserInterface _abilityui;
         private UserInterface _lightBridgeUI;
+        private UserInterface _blurBarUI;
+        private UserInterface _blurAbilityWheelUI;
 
         internal AbilityChooserUI AbilityUI;
         public static LightBridgeUI LightBridgeUI;
+        public static BlurBar BlurBarUI;
+        public static BlurAbilityWheel BlurAbilityWheelUI;
 
         public override void Load()
         {
@@ -28,6 +34,16 @@ namespace JoJoFanStands
                 LightBridgeUI.Activate();
                 _lightBridgeUI = new UserInterface();
                 _lightBridgeUI.SetState(LightBridgeUI);
+
+                BlurBarUI = new BlurBar();
+                BlurBarUI.Activate();
+                _blurBarUI = new UserInterface();
+                _blurBarUI.SetState(BlurBarUI);
+
+                BlurAbilityWheelUI = new BlurAbilityWheel();
+                BlurAbilityWheelUI.Activate();
+                _blurAbilityWheelUI = new UserInterface();
+                _blurAbilityWheelUI.SetState(BlurAbilityWheelUI);
             }
         }
 
@@ -38,6 +54,28 @@ namespace JoJoFanStands
 
             if (LightBridgeUI.Visible)
                 _lightBridgeUI.Update(gameTime);
+
+            if (BlurBar.Visible)
+                _blurBarUI.Update(gameTime);
+
+            if (BlurAbilityWheel.Visible)
+                _blurAbilityWheelUI.Update(gameTime);
+        }
+
+        public override void Unload()
+        {
+            BlurAbilityWheelUI = null;
+            for (int i = 0; i < BlurAbilityWheel.blurAbilityWheel.abilityButtons.Length; i++)
+                BlurAbilityWheel.blurAbilityWheel.abilityButtons[i] = null;
+            BlurAbilityWheel.blurAbilityWheel = null;
+        }
+
+        public override void OnWorldUnload()
+        {
+            GoldExperienceAbilityWheel.CloseAbilityWheel();
+            GoldExperienceRequiemAbilityWheel.CloseAbilityWheel();
+            StoneFreeAbilityWheel.CloseAbilityWheel();
+            BlurAbilityWheel.CloseAbilityWheel();
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)     //from ExampleMod's ExampleUI
@@ -52,6 +90,12 @@ namespace JoJoFanStands
 
             if (LightBridgeUI.Visible)
                 _lightBridgeUI.Draw(Main.spriteBatch, new GameTime());
+
+            if (BlurBar.Visible)
+                _blurBarUI.Draw(Main.spriteBatch, new GameTime());
+
+            if (BlurAbilityWheel.Visible)
+                _blurAbilityWheelUI.Draw(Main.spriteBatch, new GameTime());
             return true;
         }
     }

@@ -19,8 +19,8 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Mortal Reminder (Tier 1)");
-            Tooltip.SetDefault("Left-click to punch enemies at a really fast rate!\nUser Name: Benney \nReference: Mortal Reminder by Pentakill");
+            // DisplayName.SetDefault("Mortal Reminder (Tier 1)");
+            // Tooltip.SetDefault("Left-click to punch enemies at a really fast rate!\nUser Name: Benney \nReference: Mortal Reminder by Pentakill");
         }
 
         public override void SetDefaults()

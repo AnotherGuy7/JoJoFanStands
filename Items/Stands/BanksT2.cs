@@ -24,8 +24,8 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Banks (Tier 2)");
-            Tooltip.SetDefault("Left-click shoot a random enemy and right-click to use a shotgun.\nUser Name: Pauline \nReference: Banks by Lincoln");
+            // DisplayName.SetDefault("Banks (Tier 2)");
+            // Tooltip.SetDefault("Left-click shoot a random enemy and right-click to use a shotgun.\nUser Name: Pauline \nReference: Banks by Lincoln");
         }
 
         public override void SetDefaults()

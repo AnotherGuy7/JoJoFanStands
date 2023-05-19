@@ -21,12 +21,12 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Lucy in the Sky (Tier 1)");
-            Tooltip.SetDefault("Left-click to barrage the life out of enemies and right-click on a light source to create a marker!" +
+            // DisplayName.SetDefault("Lucy in the Sky (Tier 1)");
+            /* Tooltip.SetDefault("Left-click to barrage the life out of enemies and right-click on a light source to create a marker!" +
                 "\nSecond Special: Show/Hide the Marker Menu" +
                 "\nNote: Up to 3 Light Markers can be placed." + 
                 "\nUser Name: Archerous" +
-                "\nReference: Lucy in the Sky by The Beatles");
+                "\nReference: Lucy in the Sky by The Beatles"); */
         }
 
         public override void SetDefaults()

@@ -11,8 +11,8 @@ namespace JoJoFanStands.Buffs
     {
         public override void SetStaticDefaults()
         {
-			DisplayName.SetDefault("Intangible Cooldown");
-            Description.SetDefault("You got sick of going through everything.");
+			// DisplayName.SetDefault("Intangible Cooldown");
+            // Description.SetDefault("You got sick of going through everything.");
             Main.debuff[Type] = true;
         }
     }

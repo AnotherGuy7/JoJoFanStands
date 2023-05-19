@@ -11,8 +11,8 @@ namespace JoJoFanStands.Buffs
     {
         public override void SetStaticDefaults()
         {
-			DisplayName.SetDefault("Sore Eye");
-            Description.SetDefault("Your eyes are in pain.");
+			// DisplayName.SetDefault("Sore Eye");
+            // Description.SetDefault("Your eyes are in pain.");
             Main.debuff[Type] = true;
         }
     }

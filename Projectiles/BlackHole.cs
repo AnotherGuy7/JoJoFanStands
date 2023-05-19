@@ -65,7 +65,7 @@ namespace JoJoFanStands.Projectiles
                         npc.velocity = positionDifference * vacuumStrength;
 
                         if (Collision.CheckAABBvAABBCollision(npc.position, npc.Size, Projectile.position, new Vector2(Projectile.width, Projectile.height)))
-                            npc.StrikeNPC(npc.lifeMax + 50, 90f, 1);
+                            npc.StrikeInstantKill();
                     }
                 }
                 for (int p = 0; p < Main.maxProjectiles; p++)

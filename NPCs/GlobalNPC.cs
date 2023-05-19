@@ -1,3 +1,4 @@
+using JoJoStands.Buffs.EffectBuff;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria;
@@ -17,6 +18,7 @@ namespace JoJoFanStands.NPCs
         public bool affectedByAvalance = false;
         public int icicleTimer = 0;
         public float banksCoinMultiplier = 1f;
+        public int frameCounterDelayTimer = 0;
 
         public override bool InstancePerEntity
         {
@@ -25,7 +27,7 @@ namespace JoJoFanStands.NPCs
 
         public override bool PreAI(NPC npc)
         {
-            FanPlayer FPlayer = Main.LocalPlayer.GetModPlayer<FanPlayer>();
+            FanPlayer fPlayer = Main.LocalPlayer.GetModPlayer<FanPlayer>();
             /*if (FPlayer.avalanche)
             {
                 affectedByAvalance = true;
@@ -40,6 +42,25 @@ namespace JoJoFanStands.NPCs
                     weldMaxTimer = 0;
                     welded = false;
                 }
+                return false;
+            }
+            if (fPlayer.blurLightningFastReflexes)
+            {
+                npc.velocity *= 0.1f;
+                frameCounterDelayTimer++;
+                if (frameCounterDelayTimer >= 2)
+                {
+                    npc.frameCounter--;
+                    frameCounterDelayTimer = 0;
+                }    
+            }
+            if (fPlayer.blurInfiniteVelocity)
+            {
+                npc.velocity = Vector2.Zero;
+                npc.frameCounter = 1;
+                if (!npc.noGravity)
+                    npc.velocity.Y -= 0.3f;
+                npc.netUpdate = true;
                 return false;
             }
             /*if (affectedByAvalance)
@@ -67,6 +88,11 @@ namespace JoJoFanStands.NPCs
                 return false;
             }*/
             return true;
+        }
+
+        public override void PostAI(NPC npc)
+        {
+            base.PostAI(npc);
         }
 
         public override void OnKill(NPC npc)

@@ -10,8 +10,8 @@ namespace JoJoFanStands.Buffs
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Rose Colored Sun");
-            Description.SetDefault("A Rose Colored Sun will burn all your enemies away!");
+            // DisplayName.SetDefault("Rose Colored Sun");
+            // Description.SetDefault("A Rose Colored Sun will burn all your enemies away!");
             Main.debuff[Type] = false;
             Main.buffNoTimeDisplay[Type] = false;
         }

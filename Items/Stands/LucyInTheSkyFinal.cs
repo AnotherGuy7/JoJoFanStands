@@ -23,8 +23,8 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Lucy in the Sky (Final Tier)");
-            Tooltip.SetDefault("Left-click to barrage the life out of enemies and right-click on a light source to create a marker!" +
+            // DisplayName.SetDefault("Lucy in the Sky (Final Tier)");
+            /* Tooltip.SetDefault("Left-click to barrage the life out of enemies and right-click on a light source to create a marker!" +
                 "\nHold right-click on a light source to hide inside of the network!" +
                 "\nSpecial: Electrify all active highways!" +
                 "\nSecond Special: Show/Hide the Marker Menu" +
@@ -32,7 +32,7 @@ namespace JoJoFanStands.Items.Stands
                 "\nNote: Up to 12 Light Markers can be placed." +
                 "\nThe held Second Special only works when the player has ammo in their ammo slots!" +
                 "\nUser Name: Archerous" +
-                "\nReference: Lucy in the Sky by The Beatles");
+                "\nReference: Lucy in the Sky by The Beatles"); */
         }
 
         public override void SetDefaults()

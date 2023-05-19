@@ -11,8 +11,8 @@ namespace JoJoFanStands.Buffs
     {
         public override void SetStaticDefaults()
         {
-			DisplayName.SetDefault("Intangible!");
-            Description.SetDefault("Everything goes through you and you go through everything");
+			// DisplayName.SetDefault("Intangible!");
+            // Description.SetDefault("Everything goes through you and you go through everything");
         }
  
         public override void Update(Player player, ref int buffIndex)

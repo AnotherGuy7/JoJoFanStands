@@ -21,8 +21,8 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Follow Me (Tier 1)");
-            Tooltip.SetDefault("Left-click to wind-up a punch and Right-click to grab enemies!\nUser Name: Agatha/Betty/Thabita/Mrs Destiny/Hot Pants \nReference: ???");
+            // DisplayName.SetDefault("Follow Me (Tier 1)");
+            // Tooltip.SetDefault("Left-click to wind-up a punch and Right-click to grab enemies!\nUser Name: Agatha/Betty/Thabita/Mrs Destiny/Hot Pants \nReference: ???");
         }
 
         public override void SetDefaults()

@@ -57,7 +57,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
                     if (shootCount <= 0 && Projectile.frame == 2)
                     {
                         shootCount += ShootTime;
-                        target.StrikeNPC(newProjectileDamage, 0.2f, Projectile.direction);
+                        NPC.HitInfo hitInfo = new NPC.HitInfo()
+                        {
+                            Damage = newProjectileDamage,
+                            Knockback = 0.2f,
+                            HitDirection = Projectile.direction
+                        };
+                        target.StrikeNPC(hitInfo);
                         SoundStyle item41 = SoundID.Item41;
                         item41.Pitch = 3f;
                         SoundEngine.PlaySound(item41, Projectile.Center);

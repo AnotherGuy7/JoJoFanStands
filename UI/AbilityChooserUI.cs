@@ -31,7 +31,7 @@ namespace JoJoFanStands.UI
             pushBack.VAlign = 0.2f;
             pushBack.Width.Set(48f, 0f);
             pushBack.Height.Set(48f, 0f);
-            pushBack.OnClick += new MouseEvent(PushBackClicked);
+            pushBack.OnLeftClick += new MouseEvent(PushBackClicked);
             AbilityUI.Append(pushBack);
 
             UIImageButton forceField = new UIImageButton(ModContent.Request<Texture2D>("JoJoFanStands/UI/ForceField", AssetRequestMode.ImmediateLoad));
@@ -39,7 +39,7 @@ namespace JoJoFanStands.UI
             forceField.VAlign = 0.2f;
             forceField.Width.Set(48f, 0f);
             forceField.Height.Set(48f, 0f);
-            forceField.OnClick += new MouseEvent(ForceFieldClicked);
+            forceField.OnLeftClick += new MouseEvent(ForceFieldClicked);
             AbilityUI.Append(forceField);
 
             UIImageButton crystal = new UIImageButton(ModContent.Request<Texture2D>("JoJoFanStands/UI/Crystal", AssetRequestMode.ImmediateLoad));
@@ -47,7 +47,7 @@ namespace JoJoFanStands.UI
             crystal.VAlign = 0.2f;
             crystal.Width.Set(48f, 0f);
             crystal.Height.Set(48f, 0f);
-            crystal.OnClick += new MouseEvent(CrystalClicked);
+            crystal.OnLeftClick += new MouseEvent(CrystalClicked);
             AbilityUI.Append(crystal);
 
             UIImageButton gravity = new UIImageButton(ModContent.Request<Texture2D>("JoJoFanStands/UI/Gravity", AssetRequestMode.ImmediateLoad));
@@ -55,7 +55,7 @@ namespace JoJoFanStands.UI
             gravity.VAlign = 0.2f;
             gravity.Width.Set(48f, 0f);
             gravity.Height.Set(48f, 0f);
-            gravity.OnClick += new MouseEvent(GravityClicked);
+            gravity.OnLeftClick += new MouseEvent(GravityClicked);
             AbilityUI.Append(gravity);
 
             UIImageButton genocide = new UIImageButton(ModContent.Request<Texture2D>("JoJoFanStands/UI/Genocide", AssetRequestMode.ImmediateLoad));
@@ -63,7 +63,7 @@ namespace JoJoFanStands.UI
             genocide.VAlign = 0.2f;
             genocide.Width.Set(48f, 0f);
             genocide.Height.Set(48f, 0f);
-            genocide.OnClick += new MouseEvent(GenocideClicked);
+            genocide.OnLeftClick += new MouseEvent(GenocideClicked);
             AbilityUI.Append(genocide);
 
             UIImageButton distortedReality = new UIImageButton(ModContent.Request<Texture2D>("JoJoFanStands/UI/MonotoneReality", AssetRequestMode.ImmediateLoad));
@@ -71,7 +71,7 @@ namespace JoJoFanStands.UI
             distortedReality.VAlign = 0.2f;
             distortedReality.Width.Set(48f, 0f);
             distortedReality.Height.Set(48f, 0f);
-            distortedReality.OnClick += new MouseEvent(MonotoneRealityClicked);
+            distortedReality.OnLeftClick += new MouseEvent(MonotoneRealityClicked);
             AbilityUI.Append(distortedReality);
 
             UITextBox chooseText = new UITextBox("Choose an ability...");

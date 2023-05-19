@@ -91,7 +91,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
                 {
                     NPC npc = Main.npc[n];
                     if (npc.active && Projectile.Distance(npc.Center) <= 15f)
-                        npc.StrikeNPC(AltDamage, 8f, Projectile.direction);
+                    {
+                        NPC.HitInfo hitInfo = new NPC.HitInfo()
+                        {
+                            Damage = AltDamage,
+                            Knockback = 8f,
+                            HitDirection = Projectile.direction
+                        };
+                        npc.StrikeNPC(hitInfo);
+                    }
                 }
                 if (distanceTo > MaxDistance * 2)
                     secondaryAbilityFrames = false;

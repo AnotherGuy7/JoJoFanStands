@@ -1,0 +1,553 @@
+using JoJoFanStands.Buffs;
+using JoJoFanStands.UI.AbilityWheel.Blur;
+using JoJoStands;
+using JoJoStands.Buffs.Debuffs;
+using JoJoStands.Items;
+using JoJoStands.Projectiles;
+using JoJoStands.Projectiles.PlayerStands;
+using JoJoStands.UI;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Terraria;
+using Terraria.ModLoader;
+
+namespace JoJoFanStands.Projectiles.PlayerStands.Blur
+{
+    public class BlurStandFinal : StandClass
+    {
+        public override int HalfStandHeight => 37;
+        public override int PunchDamage => 68;
+        public override int AltDamage => 101;
+        public override int PunchTime => 5;
+        public override int TierNumber => 4;
+        public override float MaxDistance => 62.5f * 16f;
+        public override Vector2 StandOffset => new Vector2(-2 * 2, 0f);
+        public override StandAttackType StandType => StandAttackType.Melee;
+
+        private int punchAnimationTimer = 0;
+        private int afterImageTimer = 0;
+        private int extraAfterImagePlayTime = 0;
+        private int blurBarIncreaseTimer = 0;
+        private bool dashChargeFrames = false;
+        private bool dashChargeHitFrame = false;
+        private int dashChargeTimer = 0;
+        private int averageAmountOfDashAfterImages;
+        private Vector2 dashStartPosition;
+        private Vector2 dashTargetPosition;
+        private List<PunchFrame> backPunchFrames = new List<PunchFrame>();
+        private List<PunchFrame> frontPunchFrames = new List<PunchFrame>();
+        private List<AfterimageData> afterImages = new List<AfterimageData>();
+        private readonly int BlurPercentageChargeTime = 60;
+        private readonly float MaxPercentageGain = 0.35f;
+        private readonly int KnifeThrowTime = 6;
+
+        public struct PunchFrame
+        {
+            public Vector2 offset;
+            public Vector2 targetOffset;
+            public int punchAnimationTimeStart;
+            public int punchLifeTime;
+            public bool flipped;
+            public int textureType;
+        }
+
+        public struct AfterimageData
+        {
+            public Vector2 position;
+            public Rectangle animRect;
+            public int lifeTime;
+            public int afterImageTimeStart;
+            public int direction;
+            public float rotation;
+        }
+
+        public override void ExtraSpawnEffects()
+        {
+            if (Projectile.owner != Main.myPlayer)
+                return;
+
+            if (Main.player[Projectile.owner].GetModPlayer<FanPlayer>().amountOfBlurEnergy > 20)
+                Main.player[Projectile.owner].GetModPlayer<FanPlayer>().amountOfBlurEnergy -= 20;
+            else
+                Main.player[Projectile.owner].GetModPlayer<FanPlayer>().amountOfBlurEnergy = 0;
+            BlurBar.ShowBlurBar();
+            Main.player[Projectile.owner].GetModPlayer<MyPlayer>().immuneToTimestopEffects = true;
+        }
+
+        public override void AI()
+        {
+            Player player = Main.player[Projectile.owner];
+            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
+            FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
+
+            fPlayer.blurStage = fPlayer.amountOfBlurEnergy / 20;
+            float gainPercentage = 1f + (MaxPercentageGain * (fPlayer.blurStage / 5f));
+            mPlayer.standDamageBoosts *= gainPercentage;
+            mPlayer.standSpeedBoosts = (int)(mPlayer.standSpeedBoosts * (1f / gainPercentage));
+
+            SelectAnimation();
+            UpdateStandInfo();
+            if (shootCount > 0)
+                shootCount--;
+
+            if (mPlayer.standOut)
+                Projectile.timeLeft = 2;
+
+            if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
+            {
+                if (Main.mouseLeft && Projectile.whoAmI == player.whoAmI)
+                {
+                    if (fPlayer.amountOfBlurEnergy < 100)
+                    {
+                        blurBarIncreaseTimer++;
+                        if (blurBarIncreaseTimer >= BlurPercentageChargeTime)
+                        {
+                            fPlayer.amountOfBlurEnergy += 1;
+                            blurBarIncreaseTimer = 0;
+                        }
+                    }
+
+                    Punch(7f * gainPercentage);
+                    int amountOfPunches = Main.rand.Next(3, 5);
+                    for (int i = 0; i < amountOfPunches; i++)
+                    {
+                        bool behind = Main.rand.Next(0, 1 + 1) == 0;
+                        Vector2 punchOffset = new Vector2(Main.rand.Next(-8, 4 + 1) * Projectile.spriteDirection, Main.rand.Next(-HalfStandHeight + 6, HalfStandHeight - 6 + 1));
+                        PunchFrame punchFrame = new PunchFrame()
+                        {
+                            offset = punchOffset,
+                            targetOffset = punchOffset + new Vector2(Main.rand.Next(16, 24 + 1) * Projectile.spriteDirection, 0f),
+                            punchAnimationTimeStart = punchAnimationTimer,
+                            punchLifeTime = Main.rand.Next(5, 12 + 1),
+                            flipped = Main.rand.Next(0, 1 + 1) == 0,
+                            textureType = Main.rand.Next(0, 1 + 1)
+                        };
+                        if (behind)
+                            backPunchFrames.Add(punchFrame);
+                        else
+                            frontPunchFrames.Add(punchFrame);
+                    }
+                    punchAnimationTimer++;
+                }
+                else if (Main.mouseRight && Projectile.whoAmI == player.whoAmI)
+                {
+                    if (mPlayer.chosenAbility == 0 && player.HasItem(ModContent.ItemType<Knife>()))
+                    {
+                        idleFrames = false;
+                        attackFrames = false;
+                        secondaryAbilityFrames = true;
+                        StayBehind();
+                        Vector2 shootVel = Main.MouseWorld - Projectile.Center;
+                        if (shootCount <= 0 && Projectile.frame == 1)
+                        {
+                            shootCount += KnifeThrowTime - mPlayer.standSpeedBoosts;
+                            float numberOfKnives = 2;
+                            float knivesAngleSpread = MathHelper.ToRadians(6f);
+                            if (shootVel == Vector2.Zero)
+                                shootVel = new Vector2(0f, 1f);
+
+                            shootVel.Normalize();
+                            shootVel *= 160f;
+                            for (int i = 0; i < numberOfKnives; i++)
+                            {
+                                Vector2 shootPosition = Projectile.position + new Vector2(5f * Projectile.spriteDirection, -3f);
+                                Vector2 perturbedSpeed = shootVel.RotatedBy(MathHelper.Lerp(-knivesAngleSpread, knivesAngleSpread, i / (numberOfKnives - 1))) * .2f;
+                                int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), shootPosition, perturbedSpeed, ModContent.ProjectileType<KnifeProjectile>(), (int)(AltDamage * mPlayer.standDamageBoosts), 2f, player.whoAmI);
+                                Main.projectile[projIndex].netUpdate = true;
+                                player.ConsumeItem(ModContent.ItemType<Knife>());
+                                Projectile.netUpdate = true;
+                            }
+                        }
+                        Projectile.spriteDirection = (int)(Math.Abs(shootVel.X) / shootVel.X);
+                    }
+                    else
+                    {
+                        if (!playerHasAbilityCooldown && dashChargeTimer <= 0)
+                        {
+                            dashChargeTimer = 9;
+                            dashStartPosition = Projectile.Center;
+                            dashTargetPosition = Main.MouseWorld;
+                            averageAmountOfDashAfterImages = (int)((Vector2.Distance(dashStartPosition, dashTargetPosition) / 16f) / 9f);
+                            dashChargeFrames = true;
+                            dashChargeHitFrame = false;
+                            fPlayer.amountOfBlurEnergy += 5;
+                            Projectile.netUpdate = true;
+                        }
+                    }
+                }
+                else
+                {
+                    secondaryAbilityFrames = false;
+                    if (dashChargeTimer == 0 && player.whoAmI == Main.myPlayer)
+                    {
+                        StayBehind();
+                        punchAnimationTimer = 0;
+                        backPunchFrames.Clear();
+                        frontPunchFrames.Clear();
+                    }
+                }
+
+                bool usingAfterImages = false;
+                if (dashChargeTimer > 0)
+                {
+                    dashChargeTimer--;
+                    usingAfterImages = true;
+                    if (dashChargeTimer > 0 && !dashChargeHitFrame)
+                    {
+                        Vector2 previousPosition = Projectile.Center;
+                        Projectile.Center = Vector2.Lerp(dashStartPosition, dashTargetPosition, (9 - dashChargeTimer) / 9f);
+                        Projectile.spriteDirection = previousPosition.X < Projectile.Center.X ? 1 : -1;
+                        for (int i = 0; i < averageAmountOfDashAfterImages; i++)
+                        {
+                            AfterimageData afterimageData = new AfterimageData()
+                            {
+                                position = Vector2.Lerp(previousPosition, Projectile.Center, i / (float)averageAmountOfDashAfterImages),
+                                animRect = new Rectangle(0, Projectile.frame * (HalfStandHeight * 2), standTexture.Width / 2, HalfStandHeight * 2),
+                                lifeTime = 8,
+                                afterImageTimeStart = afterImageTimer,
+                                direction = Projectile.spriteDirection,
+                                rotation = Projectile.rotation
+                            };
+                            afterImages.Add(afterimageData);
+                        }
+                        for (int n = 0; n < Main.maxNPCs; n++)
+                        {
+                            NPC npc = Main.npc[n];
+                            if (npc.active && npc.lifeMax > 5 && npc.CanBeChasedBy(this))
+                            {
+                                if (Collision.CheckAABBvLineCollision(npc.position, npc.Size, previousPosition, Projectile.Center))
+                                {
+                                    int difference = (int)Projectile.Center.X - (int)npc.Center.X;
+                                    NPC.HitInfo hitInfo = new NPC.HitInfo()
+                                    {
+                                        Damage = (int)(AltDamage * mPlayer.standDamageBoosts),
+                                        Knockback = 6f,
+                                        HitDirection = Math.Abs(difference) / difference,
+                                        Crit = Main.rand.Next(1, 100 + 1) <= mPlayer.standCritChangeBoosts
+                                    };
+                                    npc.StrikeNPC(hitInfo);
+                                }
+                            }
+                        }
+                    }
+                    if (dashChargeTimer <= 0)
+                    {
+                        if (!dashChargeHitFrame)
+                        {
+                            dashChargeHitFrame = true;
+                            dashChargeTimer = 10;
+                        }
+                        else
+                        {
+                            dashChargeTimer = 0;
+                            dashChargeFrames = false;
+                            dashChargeHitFrame = false;
+                            extraAfterImagePlayTime = 15;
+                            player.AddBuff(ModContent.BuffType<AbilityCooldown>(), mPlayer.AbilityCooldownTime(4));
+                        }
+                    }
+                }
+                if (SpecialKeyPressed() && !player.HasBuff<Vibration>() && !player.HasBuff<LightningFastReflex>() && !player.HasBuff<InfiniteVelocity>())
+                {
+                    if (mPlayer.chosenAbility == 1)
+                        player.AddBuff(ModContent.BuffType<Vibration>(), 6 * 60);
+                    else if (mPlayer.chosenAbility == 2)
+                        player.AddBuff(ModContent.BuffType<InfiniteVelocity>(), 4 * 60);
+                    else
+                        player.AddBuff(ModContent.BuffType<LightningFastReflex>(), 8 * 60);
+                }
+
+                if (player.HasBuff<Vibration>())
+                {
+                    usingAfterImages = true;
+                    player.armorEffectDrawShadow = true;
+                    AfterimageData afterimageData = new AfterimageData()
+                    {
+                        position = Projectile.Center + new Vector2(-8, 0),
+                        animRect = new Rectangle(0, Projectile.frame * (HalfStandHeight * 2), standTexture.Width / 2, HalfStandHeight * 2),
+                        lifeTime = 2,
+                        afterImageTimeStart = afterImageTimer,
+                        direction = Projectile.spriteDirection,
+                        rotation = Projectile.rotation
+                    };
+                    AfterimageData afterimageData2 = new AfterimageData()
+                    {
+                        position = Projectile.Center + new Vector2(8, 0),
+                        animRect = new Rectangle(0, Projectile.frame * (HalfStandHeight * 2), standTexture.Width / 2, HalfStandHeight * 2),
+                        lifeTime = 2,
+                        afterImageTimeStart = afterImageTimer,
+                        direction = Projectile.spriteDirection,
+                        rotation = Projectile.rotation
+                    };
+                    afterImages.Add(afterimageData);
+                    afterImages.Add(afterimageData2);
+                }
+                if (player.HasBuff<LightningFastReflex>())
+                {
+                    usingAfterImages = true;
+                    player.armorEffectDrawShadow = true;
+                    if (afterImageTimer % 2 == 0)
+                    {
+                        AfterimageData afterimageData = new AfterimageData()
+                        {
+                            position = Projectile.Center,
+                            animRect = new Rectangle(0, Projectile.frame * (HalfStandHeight * 2), standTexture.Width / 2, HalfStandHeight * 2),
+                            lifeTime = 60,
+                            afterImageTimeStart = afterImageTimer,
+                            direction = Projectile.spriteDirection,
+                            rotation = Projectile.rotation
+                        };
+                        afterImages.Add(afterimageData);
+                    }
+                    if (player.buffTime[player.FindBuffIndex(ModContent.BuffType<LightningFastReflex>())] == 1)
+                        extraAfterImagePlayTime = 60;
+                }
+                if (player.HasBuff<InfiniteVelocity>())
+                {
+                    usingAfterImages = true;
+                    player.armorEffectDrawShadow = true;
+                    if (afterImageTimer % 2 == 0)
+                    {
+                        AfterimageData afterimageData = new AfterimageData()
+                        {
+                            position = Projectile.Center,
+                            animRect = new Rectangle(0, Projectile.frame * (HalfStandHeight * 2), standTexture.Width / 2, HalfStandHeight * 2),
+                            lifeTime = 120,
+                            afterImageTimeStart = afterImageTimer,
+                            direction = Projectile.spriteDirection,
+                            rotation = Projectile.rotation
+                        };
+                        afterImages.Add(afterimageData);
+                    }
+                    if (player.buffTime[player.FindBuffIndex(ModContent.BuffType<InfiniteVelocity>())] == 1)
+                        extraAfterImagePlayTime = 120;
+                }
+                if (SecondSpecialKeyPressed(false))
+                {
+                    if (BlurAbilityWheel.Visible)
+                        BlurAbilityWheel.CloseAbilityWheel();
+                    else
+                        BlurAbilityWheel.OpenAbilityWheel(mPlayer, 3);
+                }
+
+                if (fPlayer.blurStage == 4)
+                {
+                    usingAfterImages = true;
+                    player.armorEffectDrawShadow = true;
+                    if (afterImageTimer % 30 == 0)
+                    {
+                        AfterimageData afterimageData = new AfterimageData()
+                        {
+                            position = Projectile.Center,
+                            animRect = new Rectangle(0, Projectile.frame * (HalfStandHeight * 2), standTexture.Width / 2, HalfStandHeight * 2),
+                            lifeTime = 8,
+                            afterImageTimeStart = afterImageTimer,
+                            direction = Projectile.spriteDirection,
+                            rotation = Projectile.rotation
+                        };
+                        afterImages.Add(afterimageData);
+                    }
+                }
+                else if (fPlayer.blurStage == 5)
+                {
+                    usingAfterImages = true;
+                    player.armorEffectDrawShadow = true;
+                    if (afterImageTimer % 5 == 0)
+                    {
+                        AfterimageData afterimageData = new AfterimageData()
+                        {
+                            position = Projectile.Center,
+                            animRect = new Rectangle(0, Projectile.frame * (HalfStandHeight * 2), standTexture.Width / 2, HalfStandHeight * 2),
+                            lifeTime = 8,
+                            afterImageTimeStart = afterImageTimer,
+                            direction = Projectile.spriteDirection,
+                            rotation = Projectile.rotation
+                        };
+                        afterImages.Add(afterimageData);
+                    }
+                }
+                if (extraAfterImagePlayTime > 0)
+                {
+                    extraAfterImagePlayTime--;
+                    usingAfterImages = true;
+                }
+
+                if (!usingAfterImages)
+                {
+                    afterImageTimer = 0;
+                    if (afterImages.Count > 0)
+                        afterImages.Clear();
+                }
+                else
+                    afterImageTimer++;
+            }
+            else
+            {
+                BasicPunchAI();
+            }
+            if (dashChargeTimer < 0)
+                LimitDistance();
+        }
+
+        public override void SelectAnimation()
+        {
+            if (attackFrames)
+            {
+                idleFrames = false;
+                PlayAnimation("Attack");
+            }
+            if (idleFrames)
+            {
+                attackFrames = false;
+                PlayAnimation("Idle");
+            }
+            if (dashChargeFrames)
+                PlayAnimation("Dash");
+            if (dashChargeHitFrame)
+                PlayAnimation("Stab");
+            if (secondaryAbilityFrames)
+                PlayAnimation("KnifeThrow");
+            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().posing)
+            {
+                idleFrames = false;
+                attackFrames = false;
+                PlayAnimation("Pose");
+            }
+        }
+
+        public override void StandKillEffects()
+        {
+            Main.player[Projectile.owner].GetModPlayer<MyPlayer>().immuneToTimestopEffects = false;
+            if (Projectile.owner != Main.myPlayer)
+                return;
+
+            BlurBar.HideBlurBar();
+            BlurAbilityWheel.CloseAbilityWheel();
+        }
+
+
+        public override bool PreDrawExtras()
+        {
+            if (attackFrames)
+            {
+                for (int i = 0; i < backPunchFrames.Count; i++)
+                {
+                    float percentageLife = (punchAnimationTimer - backPunchFrames[i].punchAnimationTimeStart) / (float)backPunchFrames[i].punchLifeTime;
+                    Vector2 drawPosition = Projectile.Center + Vector2.Lerp(backPunchFrames[i].offset, backPunchFrames[i].targetOffset, percentageLife);
+                    SpriteEffects spriteEffects = Projectile.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+                    Main.EntitySpriteDraw(BlurStandT1.punchTextures[backPunchFrames[i].textureType], drawPosition - Main.screenPosition, null, Color.Gray * (1f - percentageLife), Projectile.rotation, BlurStandT1.PunchOrigin, Projectile.scale, spriteEffects, 0f);
+                    if (percentageLife == 1f)
+                    {
+                        backPunchFrames.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+            if (afterImages.Count != 0)
+            {
+                for (int i = 0; i < afterImages.Count; i++)
+                {
+                    float percentageLife = (afterImageTimer - afterImages[i].afterImageTimeStart) / (float)afterImages[i].lifeTime;
+                    int frameHeight = standTexture.Height / Main.projFrames[Projectile.type];
+
+                    Vector2 drawOffset = StandOffset;
+                    drawOffset.X *= afterImages[i].direction;
+                    Vector2 drawPosition = afterImages[i].position - Main.screenPosition + drawOffset;
+                    Vector2 standOrigin = new Vector2(standTexture.Width / 2f, frameHeight / 2f);
+                    SpriteEffects effect = SpriteEffects.None;
+                    if (afterImages[i].direction == -1)
+                    {
+                        drawPosition.X += 32f;
+                        effect = SpriteEffects.FlipHorizontally;
+                    }
+                    Main.EntitySpriteDraw(standTexture, drawPosition, afterImages[i].animRect, Color.White * (1f - percentageLife) * 0.4f, afterImages[i].rotation, standOrigin, Projectile.scale, effect, 0f);
+                    if (percentageLife == 1f)
+                    {
+                        afterImages.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public override void PostDrawExtras()
+        {
+            if (attackFrames)
+            {
+                for (int i = 0; i < frontPunchFrames.Count; i++)
+                {
+                    float percentageLife = (punchAnimationTimer - frontPunchFrames[i].punchAnimationTimeStart) / (float)frontPunchFrames[i].punchLifeTime;
+                    Vector2 drawPosition = Projectile.Center + Vector2.Lerp(frontPunchFrames[i].offset, frontPunchFrames[i].targetOffset, percentageLife);
+                    SpriteEffects spriteEffects = Projectile.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+                    Main.EntitySpriteDraw(BlurStandT1.punchTextures[frontPunchFrames[i].textureType], drawPosition - Main.screenPosition, null, Color.White * (1f - percentageLife), Projectile.rotation, BlurStandT1.PunchOrigin, Projectile.scale, spriteEffects, 0f);
+                    if (percentageLife == 1f)
+                    {
+                        frontPunchFrames.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+        }
+
+        public override void SendExtraStates(BinaryWriter writer)
+        {
+            Player player = Main.player[Projectile.owner];
+            FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
+
+            writer.Write(dashChargeFrames);
+            writer.Write(dashChargeHitFrame);
+            writer.Write((byte)fPlayer.amountOfBlurEnergy);
+            writer.Write(dashStartPosition.X);
+            writer.Write(dashStartPosition.Y);
+            writer.Write(dashTargetPosition.X);
+            writer.Write(dashTargetPosition.Y);
+            writer.Write((byte)averageAmountOfDashAfterImages);
+
+        }
+        public override void ReceiveExtraStates(BinaryReader reader)
+        {
+            Player player = Main.player[Projectile.owner];
+            FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
+
+            dashChargeFrames = reader.ReadBoolean();
+            dashChargeHitFrame = reader.ReadBoolean();
+            fPlayer.amountOfBlurEnergy = reader.ReadByte();
+            dashStartPosition = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+            dashTargetPosition = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+            averageAmountOfDashAfterImages = reader.ReadByte();
+        }
+
+        public override void PlayAnimation(string animationName)
+        {
+            standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Blur/Blur_" + animationName).Value;
+            if (animationName == "Idle")
+            {
+                AnimateStand(animationName, 4, 8, true);
+            }
+            if (animationName == "Attack")
+            {
+                AnimateStand(animationName, 4, newPunchTime / 2, true);
+            }
+            if (animationName == "Dash")
+            {
+                AnimateStand(animationName, 1, 600, true);
+            }
+            if (animationName == "Stab")
+            {
+                AnimateStand(animationName, 1, 600, true);
+            }
+            if (animationName == "KnifeThrow")
+            {
+                AnimateStand(animationName, 3, (KnifeThrowTime - Main.player[Projectile.owner].GetModPlayer<MyPlayer>().standSpeedBoosts) / 3, true);
+            }
+            if (animationName == "Pose")
+            {
+                AnimateStand(animationName, 1, 600, true);
+            }
+        }
+    }
+}

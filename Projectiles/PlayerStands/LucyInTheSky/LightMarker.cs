@@ -135,7 +135,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.LucyInTheSky
                             if (npc.active && npc.lifeMax > 5 && !npc.townNPC && !npc.friendly && Collision.CheckAABBvLineCollision(npc.position, npc.Hitbox.Size(), Projectile.Center, marker.Center))
                             {
                                 abilityHurtCooldown += 5;
-                                npc.StrikeNPC(46 + ((mPlayer.standTier - 3) * 17), 4f + ((mPlayer.standTier - 3) * 2f), -npc.direction, Main.rand.Next(1, 100 + 1) <= mPlayer.standCritChangeBoosts ? true : false);
+                                NPC.HitInfo hitInfo = new NPC.HitInfo()
+                                {
+                                    Damage = 46 + ((mPlayer.standTier - 3) * 17),
+                                    Knockback = 4f + ((mPlayer.standTier - 3) * 2f),
+                                    HitDirection = -npc.direction,
+                                    Crit = Main.rand.Next(1, 100 + 1) <= mPlayer.standCritChangeBoosts ? true : false
+                                };
+                                npc.StrikeNPC(hitInfo);
                             }
                         }
                     }
