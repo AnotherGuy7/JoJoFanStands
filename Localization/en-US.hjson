@@ -509,5 +509,16 @@ Mods: {
 			BlurStandT3.DisplayName: Blur Stand T3
 			SlavesOfFearT1.DisplayName: Slaves Of Fear T1
 		}
+
+		Configs: {
+			CustomizableOptions: {
+				DisplayName: Customizable Options
+
+				PaoSpawning: {
+					Label: Pao NPC Spawns
+					Tooltip: Determines whether or not you want an NPC called 'Pao' to spawn. Enable at your own risk!
+				}
+			}
+		}
 	}
 }

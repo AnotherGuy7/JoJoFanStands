@@ -19,6 +19,7 @@ namespace JoJoFanStands
             Instance = ModContent.GetInstance<JoJoFanStands>();
             JoJoStandsMod = ModLoader.GetMod("JoJoStands");
 
+
             BlurStandT1.punchTextures = new Texture2D[2];
             BlurStandT1.punchTextures[0] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Blur/Blur_Punch_1", AssetRequestMode.ImmediateLoad).Value;
             BlurStandT1.punchTextures[1] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Blur/Blur_Punch_2", AssetRequestMode.ImmediateLoad).Value;
@@ -42,6 +43,10 @@ namespace JoJoFanStands
         public override void Unload()
         {
             JoJoStandsMod = null;
+            BlurBar.blurBarTexture.Dispose();
+            BlurStandT1.punchTextures[0].Dispose();
+            BlurStandT1.punchTextures[1].Dispose();
+            BlurStandT1.punchTextures = null;
             Instance = null;
         }
     }
