@@ -20,6 +20,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
         public override int AltDamage => 54;
         public override int PunchTime => 12;
         public override int TierNumber => 2;
+        public override bool CanUseAfterImagePunches => false;
         public override StandAttackType StandType => StandAttackType.Melee;
 
         public override void AI()
@@ -32,28 +33,27 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
             if (mPlayer.standOut)
                 Projectile.timeLeft = 2;
 
-            if (Main.mouseLeft)
+            if (Projectile.owner == Main.myPlayer)
             {
-                Punch();
-            }
-            else
-            {
-                if (!secondaryAbilityFrames)
+                if (Main.mouseLeft)
+                    Punch(afterImages: false);
+                else
                 {
-                    idleFrames = true;
-                    StayBehind();
+                    if (!secondaryAbility)
+                        StayBehind();
+                }
+                if (Main.mouseRight)
+                {
+                    secondaryAbility = true;
+                    currentAnimationState = AnimationState.SecondaryAbility;
                 }
             }
-            if (Main.mouseRight)
-            {
-                secondaryAbilityFrames = true;
-            }
+
             Vector2 direction = player.Center - Projectile.Center;
             float distanceTo = direction.Length();
-            if (secondaryAbilityFrames)
+            if (secondaryAbility)
             {
-                idleFrames = false;
-                attackFrames = false;
+                currentAnimationState = AnimationState.SecondaryAbility;
                 Projectile.velocity.X = 10f * Projectile.direction;
                 Projectile.position.Y = player.position.Y;
                 for (int n = 0; n < Main.maxNPCs; n++)
@@ -61,17 +61,21 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
                     NPC npc = Main.npc[n];
                     if (npc.active && Projectile.Distance(npc.Center) <= 15f)
                     {
-                        NPC.HitInfo hitInfo = new NPC.HitInfo()
+                        if (Projectile.owner == Main.myPlayer)
                         {
-                            Damage = AltDamage,
-                            Knockback = 8f,
-                            HitDirection = Projectile.direction
-                        };
-                        npc.StrikeNPC(hitInfo);
+                            NPC.HitInfo hitInfo = new NPC.HitInfo()
+                            {
+                                Damage = AltDamage,
+                                Knockback = 8f,
+                                HitDirection = Projectile.direction
+                            };
+                            npc.StrikeNPC(hitInfo);
+                            NetMessage.SendStrikeNPC(npc, hitInfo, Main.myPlayer);
+                        }
                     }
                 }
                 if (distanceTo > newMaxDistance * 2)
-                    secondaryAbilityFrames = false;
+                    secondaryAbility = false;
             }
             else
             {
@@ -81,39 +85,31 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
 
         public override void SelectAnimation()
         {
-            if (attackFrames)
+            if (oldAnimationState != currentAnimationState)
             {
-                idleFrames = false;
-                PlayAnimation("Attack");
+                Projectile.frame = 0;
+                Projectile.frameCounter = 0;
+                oldAnimationState = currentAnimationState;
+                Projectile.netUpdate = true;
             }
-            if (idleFrames)
-            {
-                attackFrames = false;
+
+            if (currentAnimationState == AnimationState.Idle)
                 PlayAnimation("Idle");
-            }
-            if (secondaryAbilityFrames)
-            {
-                idleFrames = false;
-                attackFrames = false;
+            else if (currentAnimationState == AnimationState.Attack)
+                PlayAnimation("Attack");
+            else if (currentAnimationState == AnimationState.SecondaryAbility)
                 PlayAnimation("Secondary");
-            }
         }
 
         public override void PlayAnimation(string animationName)
         {
             standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/SlavesOfFear/SlavesOfFear_" + animationName).Value;
             if (animationName == "Idle")
-            {
                 AnimateStand(animationName, 2, 14, true);
-            }
-            if (animationName == "Attack")
-            {
+            else if (animationName == "Attack")
                 AnimateStand(animationName, 4, newPunchTime, true);
-            }
-            if (animationName == "Secondary")
-            {
+            else if (animationName == "Secondary")
                 AnimateStand(animationName, 1, 15, true);
-            }
         }
     }
 }

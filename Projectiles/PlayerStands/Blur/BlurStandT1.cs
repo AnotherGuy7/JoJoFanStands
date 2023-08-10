@@ -19,6 +19,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
         public override int TierNumber => 1;
         public override float MaxDistance => 25 * 16;
         public override Vector2 StandOffset => new Vector2(-2 * 2, 0f);
+        public override bool CanUseAfterImagePunches => false;
         public override StandAttackType StandType => StandAttackType.Melee;
         public static Texture2D[] punchTextures;
 
@@ -86,46 +87,49 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
 
             if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
             {
-                if (Main.mouseLeft && Projectile.whoAmI == player.whoAmI)
+                if (Projectile.whoAmI == Main.myPlayer)
                 {
-                    if (fPlayer.amountOfBlurEnergy < 100)
+                    if (Main.mouseLeft)
                     {
-                        blurBarIncreaseTimer++;
-                        if (blurBarIncreaseTimer >= BlurPercentageChargeTime)
+                        if (fPlayer.amountOfBlurEnergy < 100)
                         {
-                            fPlayer.amountOfBlurEnergy += 1;
-                            blurBarIncreaseTimer = 0;
+                            blurBarIncreaseTimer++;
+                            if (blurBarIncreaseTimer >= BlurPercentageChargeTime)
+                            {
+                                fPlayer.amountOfBlurEnergy += 1;
+                                blurBarIncreaseTimer = 0;
+                            }
                         }
-                    }
 
-                    Punch(5f * gainPercentage);
-                    int amountOfPunches = Main.rand.Next(3, 5);
-                    for (int i = 0; i < amountOfPunches; i++)
-                    {
-                        bool behind = Main.rand.Next(0, 1 + 1) == 0;
-                        Vector2 punchOffset = new Vector2(Main.rand.Next(-8, 4 + 1) * Projectile.spriteDirection, Main.rand.Next(-HalfStandHeight + 6, HalfStandHeight - 6 + 1));
-                        PunchFrame punchFrame = new PunchFrame()
+                        Punch(5f * gainPercentage, afterImages: false);
+                        int amountOfPunches = Main.rand.Next(3, 5);
+                        for (int i = 0; i < amountOfPunches; i++)
                         {
-                            offset = punchOffset,
-                            targetOffset = punchOffset + new Vector2(Main.rand.Next(16, 24 + 1) * Projectile.spriteDirection, 0f),
-                            punchAnimationTimeStart = punchAnimationTimer,
-                            punchLifeTime = Main.rand.Next(5, 12 + 1),
-                            flipped = Main.rand.Next(0, 1 + 1) == 0,
-                            textureType = Main.rand.Next(0, 1 + 1)
-                        };
-                        if (behind)
-                            backPunchFrames.Add(punchFrame);
-                        else
-                            frontPunchFrames.Add(punchFrame);
+                            bool behind = Main.rand.Next(0, 1 + 1) == 0;
+                            Vector2 punchOffset = new Vector2(Main.rand.Next(-8, 4 + 1) * Projectile.spriteDirection, Main.rand.Next(-HalfStandHeight + 6, HalfStandHeight - 6 + 1));
+                            PunchFrame punchFrame = new PunchFrame()
+                            {
+                                offset = punchOffset,
+                                targetOffset = punchOffset + new Vector2(Main.rand.Next(16, 24 + 1) * Projectile.spriteDirection, 0f),
+                                punchAnimationTimeStart = punchAnimationTimer,
+                                punchLifeTime = Main.rand.Next(5, 12 + 1),
+                                flipped = Main.rand.Next(0, 1 + 1) == 0,
+                                textureType = Main.rand.Next(0, 1 + 1)
+                            };
+                            if (behind)
+                                backPunchFrames.Add(punchFrame);
+                            else
+                                frontPunchFrames.Add(punchFrame);
+                        }
+                        punchAnimationTimer++;
                     }
-                    punchAnimationTimer++;
-                }
-                else
-                {
-                    StayBehind();
-                    punchAnimationTimer = 0;
-                    backPunchFrames.Clear();
-                    frontPunchFrames.Clear();
+                    else
+                    {
+                        StayBehind();
+                        punchAnimationTimer = 0;
+                        backPunchFrames.Clear();
+                        frontPunchFrames.Clear();
+                    }
                 }
 
                 if (fPlayer.blurStage == 4)
@@ -170,26 +174,26 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
             else
                 BasicPunchAI();
             LimitDistance();
+            if (mPlayer.posing)
+                currentAnimationState = AnimationState.Pose;
         }
 
         public override void SelectAnimation()
         {
-            if (attackFrames)
+            if (oldAnimationState != currentAnimationState)
             {
-                idleFrames = false;
-                PlayAnimation("Attack");
+                Projectile.frame = 0;
+                Projectile.frameCounter = 0;
+                oldAnimationState = currentAnimationState;
+                Projectile.netUpdate = true;
             }
-            if (idleFrames)
-            {
-                attackFrames = false;
+
+            if (currentAnimationState == AnimationState.Idle)
                 PlayAnimation("Idle");
-            }
-            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().posing)
-            {
-                idleFrames = false;
-                attackFrames = false;
+            else if (currentAnimationState == AnimationState.Attack)
+                PlayAnimation("Attack");
+            else if (currentAnimationState == AnimationState.Pose)
                 PlayAnimation("Pose");
-            }
         }
 
         public override void StandKillEffects()
@@ -203,7 +207,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
 
         public override bool PreDrawExtras()
         {
-            if (attackFrames)
+            if (attacking)
             {
                 for (int i = 0; i < backPunchFrames.Count; i++)
                 {
@@ -223,7 +227,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
                 for (int i = 0; i < afterImages.Count; i++)
                 {
                     float percentageLife = (afterImageTimer - afterImages[i].afterImageTimeStart) / (float)afterImages[i].lifeTime;
-                    int frameHeight = standTexture.Height / Main.projFrames[Projectile.type];
+                    int frameHeight = standTexture.Height / amountOfFrames;
 
                     Vector2 drawOffset = StandOffset;
                     drawOffset.X *= Projectile.spriteDirection;
@@ -248,7 +252,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
 
         public override void PostDrawExtras()
         {
-            if (attackFrames)
+            if (attacking)
             {
                 for (int i = 0; i < frontPunchFrames.Count; i++)
                 {
@@ -285,17 +289,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
         {
             standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Blur/Blur_" + animationName).Value;
             if (animationName == "Idle")
-            {
                 AnimateStand(animationName, 4, 8, true);
-            }
-            if (animationName == "Attack")
-            {
+            else if (animationName == "Attack")
                 AnimateStand(animationName, 4, newPunchTime / 2, true);
-            }
-            if (animationName == "Pose")
-            {
+            else if (animationName == "Pose")
                 AnimateStand(animationName, 1, 600, true);
-            }
         }
     }
 }

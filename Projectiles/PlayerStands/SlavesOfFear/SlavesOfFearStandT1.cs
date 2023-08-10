@@ -13,6 +13,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
         public override int AltDamage => 96;
         public override int HalfStandHeight => 37;
         public override int TierNumber => 1;
+        public override bool CanUseAfterImagePunches => false;
         public override StandAttackType StandType => StandAttackType.Melee;
 
         public override void AI()
@@ -27,42 +28,39 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
             if (mPlayer.standOut)
                 Projectile.timeLeft = 2;
 
-            if (Main.mouseLeft)
+            if (Projectile.owner == Main.myPlayer)
             {
-                Punch();
-            }
-            else
-            {
-                StayBehind();
+                if (Main.mouseLeft)
+                    Punch(afterImages: false);
+                else
+                    StayBehind();
             }
             LimitDistance();
         }
 
         public override void SelectAnimation()
         {
-            if (attackFrames)
+            if (oldAnimationState != currentAnimationState)
             {
-                idleFrames = false;
-                PlayAnimation("Attack");
+                Projectile.frame = 0;
+                Projectile.frameCounter = 0;
+                oldAnimationState = currentAnimationState;
+                Projectile.netUpdate = true;
             }
-            if (idleFrames)
-            {
-                attackFrames = false;
+
+            if (currentAnimationState == AnimationState.Idle)
                 PlayAnimation("Idle");
-            }
+            else if (currentAnimationState == AnimationState.Attack)
+                PlayAnimation("Attack");
         }
 
         public override void PlayAnimation(string animationName)
         {
             standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/SlavesOfFear/SlavesOfFear_" + animationName).Value;
             if (animationName == "Idle")
-            {
                 AnimateStand(animationName, 2, 14, true);
-            }
-            if (animationName == "Attack")
-            {
+            else if (animationName == "Attack")
                 AnimateStand(animationName, 4, newPunchTime, true);
-            }
         }
     }
 }

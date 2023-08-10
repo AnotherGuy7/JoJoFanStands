@@ -29,7 +29,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
             UpdateStandInfo();
             Player player = Main.player[Projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-            secondaryAbilityFrames = player.ownedProjectileCounts[ModContent.ProjectileType<BlackHole>()] != 0;
+            secondaryAbility = player.ownedProjectileCounts[ModContent.ProjectileType<BlackHole>()] != 0;
 
             if (shootCount > 0)
                 shootCount--;
@@ -38,74 +38,83 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
             if (player.ownedProjectileCounts[ModContent.ProjectileType<BlackHole>()] == 0)
                 blackHoleWhoAmI = -1;
 
-            if (!secondaryAbilityFrames)
+            if (!secondaryAbility)
             {
-                StayBehind();
+                if (!attacking)
+                    StayBehind();
+                else
+                {
+                    int direction = Main.MouseWorld.X < Projectile.Center.X ? -1 : 1;
+                    GoInFront(direction);
+                }
             }
             else
             {
                 Projectile.velocity = Vector2.Zero;
                 Projectile.position = Main.projectile[blackHoleWhoAmI].Center - new Vector2(0f, -300f);
             }
-            /*if (blackHoleWhoAmI == 0 && player.ownedProjectileCounts[ModContent.ProjectileType<BlackHole")] != 0)
+
+            if (Projectile.owner == Main.myPlayer)
             {
-                blackHoleWhoAmI = BlackHole.whoAmI;
-            }*/
-
-            if (Main.mouseLeft && !secondaryAbilityFrames)
-            {
-                int xOffset = 0;
-                if (Projectile.spriteDirection == -1)
-                    xOffset = 12;
-
-                Vector2 armPosition = Projectile.Center + new Vector2((-10f + xOffset) * Projectile.spriteDirection, 0f);
-                attackFrames = true;
-                if (shootCount <= 0)
+                if (!secondaryAbility)
                 {
-                    SoundEngine.PlaySound(SoundID.Item78, Projectile.position);
-                    shootCount += newShootTime;
-                    Vector2 shootVel = Main.MouseWorld - Projectile.Center;
-                    if (shootVel == Vector2.Zero)
-                        shootVel = new Vector2(0f, 1f);
+                    if (Main.mouseLeft)
+                    {
+                        attacking = true;
+                        int xOffset = 0;
+                        if (Projectile.spriteDirection == -1)
+                            xOffset = 12;
 
-                    shootVel.Normalize();
-                    shootVel *= 1.5f;
-                    Vector2 perturbedSpeed = new Vector2(shootVel.X, shootVel.Y);
-                    int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), armPosition + new Vector2(4f), perturbedSpeed, ModContent.ProjectileType<BackInBlackOrb>(), newProjectileDamage, 2f, player.whoAmI);
-                    Main.projectile[proj].netUpdate = true;
-                    Projectile.netUpdate = true;
-                }
-                if (Main.rand.Next(0, 2 + 1) == 1)
-                {
+                        Vector2 armPosition = Projectile.Center + new Vector2((-10f + xOffset) * Projectile.spriteDirection, 0f);
+                        currentAnimationState = AnimationState.Attack;
+                        if (shootCount <= 0)
+                        {
+                            SoundEngine.PlaySound(SoundID.Item78, Projectile.position);
+                            shootCount += newShootTime;
+                            Vector2 shootVel = Main.MouseWorld - Projectile.Center;
+                            if (shootVel == Vector2.Zero)
+                                shootVel = new Vector2(0f, 1f);
 
-                    int dustIndex = Dust.NewDust(armPosition, 16, 16, DustID.Smoke, Scale: 0.5f);
-                    Vector2 velocity = armPosition - Main.dust[dustIndex].position;
-                    velocity.Normalize();
-                    Main.dust[dustIndex].velocity = velocity * 0.5f;
-                    Main.dust[dustIndex].color = Color.Black;
+                            shootVel.Normalize();
+                            shootVel *= 1.5f;
+                            Vector2 perturbedSpeed = new Vector2(shootVel.X, shootVel.Y);
+                            int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), armPosition + new Vector2(4f), perturbedSpeed, ModContent.ProjectileType<BackInBlackOrb>(), newProjectileDamage, 2f, player.whoAmI);
+                            Main.projectile[proj].netUpdate = true;
+                        }
+                        if (Main.rand.Next(0, 2 + 1) == 1)
+                        {
+                            int dustIndex = Dust.NewDust(armPosition, 16, 16, DustID.Smoke, Scale: 0.5f);
+                            Vector2 velocity = armPosition - Main.dust[dustIndex].position;
+                            velocity.Normalize();
+                            Main.dust[dustIndex].velocity = velocity * 0.5f;
+                            Main.dust[dustIndex].color = Color.Black;
+                        }
+                        Projectile.netUpdate = true;
+                    }
+                    else
+                    {
+                        attacking = false;
+                        currentAnimationState = AnimationState.Idle;
+                    }
+                    if (Main.mouseRight && shootCount <= 0)
+                    {
+                        if (player.ownedProjectileCounts[ModContent.ProjectileType<TeleportationWormhole>()] == 0)
+                        {
+                            wormholeWhoAmI = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Main.MouseWorld, Vector2.Zero, ModContent.ProjectileType<TeleportationWormhole>(), 0, 0f, player.whoAmI);
+                            shootCount += 60;
+                        }
+                        else
+                        {
+                            Projectile wormhole = Main.projectile[wormholeWhoAmI];
+                            player.position = wormhole.position;
+                            wormholeWhoAmI = -1;
+                            wormhole.Kill();
+                            shootCount += 60;
+                        }
+                    }
                 }
             }
-            if (!Main.mouseLeft && !secondaryAbilityFrames)
-            {
-                idleFrames = true;
-                attackFrames = false;
-            }
-            if (Main.mouseRight && shootCount <= 0 && player.whoAmI == Main.myPlayer && !secondaryAbilityFrames)
-            {
-                if (player.ownedProjectileCounts[ModContent.ProjectileType<TeleportationWormhole>()] == 0)
-                {
-                    wormholeWhoAmI = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Main.MouseWorld, Vector2.Zero, ModContent.ProjectileType<TeleportationWormhole>(), 0, 0f, player.whoAmI);
-                    shootCount += 60;
-                }
-                else
-                {
-                    Projectile wormhole = Main.projectile[wormholeWhoAmI];
-                    player.position = wormhole.position;
-                    wormholeWhoAmI = -1;
-                    wormhole.Kill();
-                    shootCount += 60;
-                }
-            }
+
             if (SpecialKeyCurrent())
             {
                 if (player.ownedProjectileCounts[ModContent.ProjectileType<BlackHole>()] == 0)
@@ -120,10 +129,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
                     Main.projectile[blackHoleWhoAmI].timeLeft += 2;
                 }
             }
-            if (!SpecialKeyCurrent() && secondaryAbilityFrames)
-            {
+            if (!SpecialKeyCurrent() && secondaryAbility)
                 Main.projectile[blackHoleWhoAmI].scale -= 0.005f;
-            }
+            if (secondaryAbility)
+                currentAnimationState = AnimationState.SecondaryAbility;
+            if (mPlayer.posing)
+                currentAnimationState = AnimationState.Pose;
         }
 
         public override bool PreDraw(ref Color drawColor)      //from ExampleMod ExampleDeathShader
@@ -140,7 +151,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
 
             if (standTexture != null && Main.netMode != NetmodeID.Server)
             {
-                int frameHeight = standTexture.Height / Main.projFrames[Projectile.type];
+                int frameHeight = standTexture.Height / amountOfFrames;
                 Vector2 drawOffset = StandOffset;
                 drawOffset.X *= Projectile.spriteDirection;
                 Vector2 drawPosition = Projectile.Center - Main.screenPosition + drawOffset;
@@ -153,49 +164,36 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
 
         public override void SelectAnimation()
         {
-            if (attackFrames)
+            if (oldAnimationState != currentAnimationState)
             {
-                idleFrames = false;
-                PlayAnimation("Attack");
+                Projectile.frame = 0;
+                Projectile.frameCounter = 0;
+                oldAnimationState = currentAnimationState;
+                Projectile.netUpdate = true;
             }
-            if (idleFrames)
-            {
-                attackFrames = false;
+
+            if (currentAnimationState == AnimationState.Idle)
                 PlayAnimation("Idle");
-            }
-            if (secondaryAbilityFrames)
-            {
-                idleFrames = false;
-                attackFrames = false;
+            else if (currentAnimationState == AnimationState.Attack)
+                PlayAnimation("Attack");
+            else if (currentAnimationState == AnimationState.SecondaryAbility)
                 PlayAnimation("BlackHole");
-            }
-            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().posing)
-            {
-                idleFrames = false;
-                attackFrames = false;
+            else if (currentAnimationState == AnimationState.Pose)
                 PlayAnimation("Pose");
-            }
         }
 
         public override void PlayAnimation(string animationName)
         {
             standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/BackInBlack/BackInBlack_" + animationName).Value;
+
             if (animationName == "Idle")
-            {
                 AnimateStand(animationName, 4, 10, true);
-            }
-            if (animationName == "Attack")
-            {
+            else if (animationName == "Attack")
                 AnimateStand(animationName, 1, 8, true);
-            }
-            if (animationName == "BlackHole")
-            {
+            else if (animationName == "BlackHole")
                 AnimateStand(animationName, 1, 8, true);
-            }
-            if (animationName == "Pose")
-            {
+            else if (animationName == "Pose")
                 AnimateStand(animationName, 4, 15, true);
-            }
         }
     }
 }

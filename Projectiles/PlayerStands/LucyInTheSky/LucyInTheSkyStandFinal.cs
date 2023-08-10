@@ -19,6 +19,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.LucyInTheSky
         public override int TierNumber => 4;
         public override int AltDamage => 98;
         //public override Vector2 StandOffset => Vector2.Zero;
+        public override bool CanUseAfterImagePunches => false;
         public override StandAttackType StandType => StandAttackType.Melee;
         public override bool UseProjectileAlpha => true;
 
@@ -84,76 +85,76 @@ namespace JoJoFanStands.Projectiles.PlayerStands.LucyInTheSky
 
             if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
             {
-                if (Main.mouseLeft && !fPlayer.hidingInLucyMarker)
+                if (Projectile.owner == Main.myPlayer)
                 {
-                    Punch();
-                }
-                else
-                {
-                    StayBehind();
-                    Projectile.position.X += 4f * -Projectile.direction;
-                    if (secondaryAbilityFrames)
-                        idleFrames = false;
-                }
-
-                if (Main.mouseRight && !fPlayer.hidingInLucyMarker && shootCount <= 0 && !playerHasAbilityCooldown && player.whoAmI == Main.myPlayer)
-                {
-                    bool attemptingTeleport = false;
-                    for (int p = 0; p < Main.maxProjectiles; p++)
-                    {
-                        Projectile marker = Main.projectile[p];
-                        if (marker.active && marker.type == ModContent.ProjectileType<LightMarker>() && marker.owner == player.whoAmI && marker.Hitbox.Contains(Main.MouseWorld.ToPoint()))
-                        {
-                            shootCount = 60;
-                            attemptingTeleport = true;
-                            break;
-                        }
-                    }
-                    if (!attemptingTeleport)
-                    {
-                        Vector3 lightLevel = Lighting.GetColor((int)Main.MouseWorld.X / 16, (int)Main.MouseWorld.Y / 16).ToVector3();       //1.703 is max light
-                        if (lightLevel.Length() > 1.3f && Main.tile[(int)Main.MouseWorld.X / 16, (int)Main.MouseWorld.Y / 16].TileType == TileID.Torches)
-                        {
-                            secondaryAbilityFrames = true;
-                            lightBridgeShootPosition = Main.MouseWorld - new Vector2(8f);
-                        }
-                        shootCount += 30;
-                    }
-                }
-
-                if (secondaryAbilityFrames)
-                {
-                    if (lightBridgeShootPosition.X > Projectile.Center.X)
-                        Projectile.spriteDirection = 1;
+                    if (Main.mouseLeft && !fPlayer.hidingInLucyMarker)
+                        Punch(afterImages: false);
                     else
-                        Projectile.spriteDirection = -1;
-                    lightBridgeShootTimer++;
-                    if (lightBridgeShootTimer >= 10)
                     {
-                        if (amountOfBridges >= MaxAmountOfMarkers)
+                        StayBehind();
+                        Projectile.position.X += 4f * -Projectile.direction;
+                    }
+
+                    if (Main.mouseRight && !fPlayer.hidingInLucyMarker && shootCount <= 0 && !playerHasAbilityCooldown)
+                    {
+                        bool attemptingTeleport = false;
+                        for (int p = 0; p < Main.maxProjectiles; p++)
                         {
-                            amountOfBridges -= 1;
-                            for (int p = 0; p < Main.maxProjectiles; p++)
+                            Projectile marker = Main.projectile[p];
+                            if (marker.active && marker.type == ModContent.ProjectileType<LightMarker>() && marker.owner == player.whoAmI && marker.Hitbox.Contains(Main.MouseWorld.ToPoint()))
                             {
-                                Projectile marker = Main.projectile[p];
-                                if (marker.active && marker.type == ModContent.ProjectileType<LightMarker>() && marker.owner == player.whoAmI)
-                                {
-                                    if (marker.ai[0] == 0)
-                                        marker.Kill();
-                                    else
-                                        marker.ai[0] -= 1;
-                                }
+                                shootCount = 60;
+                                attemptingTeleport = true;
+                                break;
                             }
                         }
+                        if (!attemptingTeleport)
+                        {
+                            Vector3 lightLevel = Lighting.GetColor((int)Main.MouseWorld.X / 16, (int)Main.MouseWorld.Y / 16).ToVector3();       //1.703 is max light
+                            if (lightLevel.Length() > 1.3f && Main.tile[(int)Main.MouseWorld.X / 16, (int)Main.MouseWorld.Y / 16].TileType == TileID.Torches)
+                            {
+                                secondaryAbility = true;
+                                lightBridgeShootPosition = Main.MouseWorld - new Vector2(8f);
+                            }
+                            shootCount += 30;
+                        }
+                    }
 
-                        secondaryAbilityFrames = false;
-                        Vector2 velocity = Main.MouseWorld - Projectile.Center;
-                        velocity.Normalize();
-                        velocity *= 12f;
-                        int index = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, velocity, ModContent.ProjectileType<LucyInTheSkyBeam>(), 0, 0f, Projectile.owner, amountOfBridges);
-                        (Main.projectile[index].ModProjectile as LucyInTheSkyBeam).targetPosition = Main.MouseWorld;
-                        lightBridgeShootTimer = 0;
-                        amountOfBridges += 1;
+                    if (secondaryAbility)
+                    {
+                        currentAnimationState = AnimationState.SecondaryAbility;
+                        if (lightBridgeShootPosition.X > Projectile.Center.X)
+                            Projectile.spriteDirection = 1;
+                        else
+                            Projectile.spriteDirection = -1;
+                        lightBridgeShootTimer++;
+                        if (lightBridgeShootTimer >= 10)
+                        {
+                            if (amountOfBridges >= MaxAmountOfMarkers)
+                            {
+                                amountOfBridges -= 1;
+                                for (int p = 0; p < Main.maxProjectiles; p++)
+                                {
+                                    Projectile marker = Main.projectile[p];
+                                    if (marker.active && marker.type == ModContent.ProjectileType<LightMarker>() && marker.owner == player.whoAmI)
+                                    {
+                                        if (marker.ai[0] == 0)
+                                            marker.Kill();
+                                        else
+                                            marker.ai[0] -= 1;
+                                    }
+                                }
+                            }
+
+                            secondaryAbility = false;
+                            Vector2 velocity = Main.MouseWorld - Projectile.Center;
+                            velocity.Normalize();
+                            velocity *= 12f;
+                            int index = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, velocity, ModContent.ProjectileType<LucyInTheSkyBeam>(), 0, 0f, Projectile.owner, amountOfBridges);
+                            (Main.projectile[index].ModProjectile as LucyInTheSkyBeam).targetPosition = Main.MouseWorld;
+                            lightBridgeShootTimer = 0;
+                            amountOfBridges += 1;
+                        }
                     }
                 }
 
@@ -257,6 +258,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.LucyInTheSky
             else if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Auto)
                 BasicPunchAI();
             LimitDistance();
+            if (mPlayer.posing)
+                currentAnimationState = AnimationState.Pose;
         }
 
         private Texture2D leftArmSheet;
@@ -268,7 +271,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.LucyInTheSky
         {
             Player player = Main.player[Projectile.owner];
             FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
-            if (secondaryAbilityFrames)
+            if (secondaryAbility)
             {
                 if (Projectile.spriteDirection == 1)
                 {
@@ -352,7 +355,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.LucyInTheSky
         {
             base.PostDraw(drawColor);
 
-            if (secondaryAbilityFrames)
+            if (secondaryAbility)
             {
                 if (Projectile.spriteDirection == 1)
                 {
@@ -443,49 +446,35 @@ namespace JoJoFanStands.Projectiles.PlayerStands.LucyInTheSky
 
         public override void SelectAnimation()
         {
-            if (attackFrames)
+            if (oldAnimationState != currentAnimationState)
             {
-                idleFrames = false;
-                PlayAnimation("Attack");
+                Projectile.frame = 0;
+                Projectile.frameCounter = 0;
+                oldAnimationState = currentAnimationState;
+                Projectile.netUpdate = true;
             }
-            if (idleFrames)
-            {
-                attackFrames = false;
+
+            if (currentAnimationState == AnimationState.Idle)
                 PlayAnimation("Idle");
-            }
-            if (secondaryAbilityFrames)
-            {
-                attackFrames = false;
-                idleFrames = false;
+            else if (currentAnimationState == AnimationState.Attack)
+                PlayAnimation("Attack");
+            else if (currentAnimationState == AnimationState.SecondaryAbility)
                 PlayAnimation("Armless");
-            }
-            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().posing)
-            {
-                idleFrames = false;
-                attackFrames = false;
+            else if (currentAnimationState == AnimationState.Pose)
                 PlayAnimation("Pose");
-            }
         }
 
         public override void PlayAnimation(string animationName)
         {
             standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/LucyInTheSky/LucyInTheSky_" + animationName).Value;
             if (animationName == "Idle")
-            {
                 AnimateStand(animationName, 4, 15, true);
-            }
-            if (animationName == "Attack")
-            {
+            else if (animationName == "Attack")
                 AnimateStand(animationName, 4, newPunchTime, true);
-            }
-            if (animationName == "Armless")
-            {
+            else if (animationName == "Armless")
                 AnimateStand(animationName, 4, 2, false);
-            }
-            if (animationName == "Pose")
-            {
+            else if (animationName == "Pose")
                 AnimateStand(animationName, 1, 60, true);
-            }
         }
     }
 }

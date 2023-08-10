@@ -22,13 +22,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
         public override int TierNumber => 2;
         public override float MaxDistance => 37.5f * 16f;
         public override Vector2 StandOffset => new Vector2(-2 * 2, 0f);
+        public override bool CanUseAfterImagePunches => false;
         public override StandAttackType StandType => StandAttackType.Melee;
+        public new AnimationState currentAnimationState;
+        public new AnimationState oldAnimationState;
 
         private int punchAnimationTimer = 0;
         private int afterImageTimer = 0;
         private int extraAfterImagePlayTime = 0;
         private int blurBarIncreaseTimer = 0;
-        private bool dashChargeFrames = false;
         private bool dashChargeHitFrame = false;
         private int dashChargeTimer = 0;
         private int averageAmountOfDashAfterImages;
@@ -58,6 +60,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
             public int afterImageTimeStart;
             public int direction;
             public float rotation;
+        }
+
+        public new enum AnimationState
+        {
+            Idle,
+            Attack,
+            Secondary,
+            Stab,
+            Pose
         }
 
         public override void ExtraSpawnEffects()
@@ -93,60 +104,70 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
 
             if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
             {
-                if (Main.mouseLeft && Projectile.whoAmI == player.whoAmI)
+                if (Projectile.owner == Main.myPlayer)
                 {
-                    if (fPlayer.amountOfBlurEnergy < 100)
+                    if (Main.mouseLeft)
                     {
-                        blurBarIncreaseTimer++;
-                        if (blurBarIncreaseTimer >= BlurPercentageChargeTime)
+                        if (fPlayer.amountOfBlurEnergy < 100)
                         {
-                            fPlayer.amountOfBlurEnergy += 1;
-                            blurBarIncreaseTimer = 0;
+                            blurBarIncreaseTimer++;
+                            if (blurBarIncreaseTimer >= BlurPercentageChargeTime)
+                            {
+                                fPlayer.amountOfBlurEnergy += 1;
+                                blurBarIncreaseTimer = 0;
+                            }
+                        }
+
+                        Punch(6f * gainPercentage, afterImages: false);
+                        currentAnimationState = AnimationState.Attack;
+                        int amountOfPunches = Main.rand.Next(3, 5);
+                        for (int i = 0; i < amountOfPunches; i++)
+                        {
+                            bool behind = Main.rand.Next(0, 1 + 1) == 0;
+                            Vector2 punchOffset = new Vector2(Main.rand.Next(-8, 4 + 1) * Projectile.spriteDirection, Main.rand.Next(-HalfStandHeight + 6, HalfStandHeight - 6 + 1));
+                            PunchFrame punchFrame = new PunchFrame()
+                            {
+                                offset = punchOffset,
+                                targetOffset = punchOffset + new Vector2(Main.rand.Next(16, 24 + 1) * Projectile.spriteDirection, 0f),
+                                punchAnimationTimeStart = punchAnimationTimer,
+                                punchLifeTime = Main.rand.Next(5, 12 + 1),
+                                flipped = Main.rand.Next(0, 1 + 1) == 0,
+                                textureType = Main.rand.Next(0, 1 + 1)
+                            };
+                            if (behind)
+                                backPunchFrames.Add(punchFrame);
+                            else
+                                frontPunchFrames.Add(punchFrame);
+                        }
+                        punchAnimationTimer++;
+                    }
+                    else if (Main.mouseRight && !playerHasAbilityCooldown && dashChargeTimer <= 0)
+                    {
+                        dashChargeTimer = 15;
+                        dashStartPosition = Projectile.Center;
+                        dashTargetPosition = Main.MouseWorld;
+                        averageAmountOfDashAfterImages = (int)((Vector2.Distance(dashStartPosition, dashTargetPosition) / 16f) / 15f);
+                        secondaryAbility = true;
+                        dashChargeHitFrame = false;
+                        fPlayer.amountOfBlurEnergy += 5;
+                    }
+                    else
+                    {
+                        if (dashChargeTimer == 0)
+                        {
+                            StayBehind();
+                            currentAnimationState = AnimationState.Idle;
+                            punchAnimationTimer = 0;
+                            backPunchFrames.Clear();
+                            frontPunchFrames.Clear();
                         }
                     }
-
-                    Punch(6f * gainPercentage);
-                    int amountOfPunches = Main.rand.Next(3, 5);
-                    for (int i = 0; i < amountOfPunches; i++)
-                    {
-                        bool behind = Main.rand.Next(0, 1 + 1) == 0;
-                        Vector2 punchOffset = new Vector2(Main.rand.Next(-8, 4 + 1) * Projectile.spriteDirection, Main.rand.Next(-HalfStandHeight + 6, HalfStandHeight - 6 + 1));
-                        PunchFrame punchFrame = new PunchFrame()
-                        {
-                            offset = punchOffset,
-                            targetOffset = punchOffset + new Vector2(Main.rand.Next(16, 24 + 1) * Projectile.spriteDirection, 0f),
-                            punchAnimationTimeStart = punchAnimationTimer,
-                            punchLifeTime = Main.rand.Next(5, 12 + 1),
-                            flipped = Main.rand.Next(0, 1 + 1) == 0,
-                            textureType = Main.rand.Next(0, 1 + 1)
-                        };
-                        if (behind)
-                            backPunchFrames.Add(punchFrame);
-                        else
-                            frontPunchFrames.Add(punchFrame);
-                    }
-                    punchAnimationTimer++;
                 }
-                else if (Main.mouseRight && !playerHasAbilityCooldown && dashChargeTimer <= 0 && Projectile.whoAmI == player.whoAmI)
+                if (dashChargeTimer == 0 && !attacking)
                 {
-                    dashChargeTimer = 15;
-                    dashStartPosition = Projectile.Center;
-                    dashTargetPosition = Main.MouseWorld;
-                    averageAmountOfDashAfterImages = (int)((Vector2.Distance(dashStartPosition, dashTargetPosition) / 16f) / 15f);
-                    dashChargeFrames = true;
-                    dashChargeHitFrame = false;
-                    fPlayer.amountOfBlurEnergy += 5;
-
-                }
-                else
-                {
-                    if (dashChargeTimer == 0 && player.whoAmI == Main.myPlayer)
-                    {
-                        StayBehind();
-                        punchAnimationTimer = 0;
-                        backPunchFrames.Clear();
-                        frontPunchFrames.Clear();
-                    }
+                    StayBehind();
+                    currentAnimationState = AnimationState.Idle;
+                    punchAnimationTimer = 0;
                 }
 
                 bool usingAfterImages = false;
@@ -154,6 +175,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
                 {
                     dashChargeTimer--;
                     usingAfterImages = true;
+                    currentAnimationState = AnimationState.Secondary;
                     if (dashChargeTimer > 0 && !dashChargeHitFrame)
                     {
                         Vector2 previousPosition = Projectile.Center;
@@ -202,13 +224,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
                         else
                         {
                             dashChargeTimer = 0;
-                            dashChargeFrames = false;
+                            secondaryAbility = false;
                             dashChargeHitFrame = false;
                             extraAfterImagePlayTime = 15;
                             player.AddBuff(ModContent.BuffType<AbilityCooldown>(), mPlayer.AbilityCooldownTime(10));
                         }
                     }
                 }
+                if (dashChargeHitFrame)
+                    currentAnimationState = AnimationState.Stab;
                 if (SpecialKeyPressed())
                     player.AddBuff(ModContent.BuffType<LightningFastReflex>(), 8 * 60);
                 if (player.HasBuff<LightningFastReflex>())
@@ -289,30 +313,33 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
             }
             if (dashChargeTimer < 0)
                 LimitDistance();
+            if (mPlayer.posing)
+                currentAnimationState = AnimationState.Pose;
         }
+
+        public override byte SendAnimationState() => (byte)currentAnimationState;
+        public override void ReceiveAnimationState(byte state) => currentAnimationState = (AnimationState)state;
 
         public override void SelectAnimation()
         {
-            if (attackFrames)
+            if (oldAnimationState != currentAnimationState)
             {
-                idleFrames = false;
-                PlayAnimation("Attack");
+                Projectile.frame = 0;
+                Projectile.frameCounter = 0;
+                oldAnimationState = currentAnimationState;
+                Projectile.netUpdate = true;
             }
-            if (idleFrames)
-            {
-                attackFrames = false;
+
+            if (currentAnimationState == AnimationState.Idle)
                 PlayAnimation("Idle");
-            }
-            if (dashChargeFrames)
+            else if (currentAnimationState == AnimationState.Attack)
+                PlayAnimation("Attack");
+            else if (currentAnimationState == AnimationState.Secondary)
                 PlayAnimation("Dash");
-            if (dashChargeHitFrame)
+            else if (currentAnimationState == AnimationState.Stab)
                 PlayAnimation("Stab");
-            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().posing)
-            {
-                idleFrames = false;
-                attackFrames = false;
+            else if (currentAnimationState == AnimationState.Pose)
                 PlayAnimation("Pose");
-            }
         }
 
         public override void StandKillEffects()
@@ -326,7 +353,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
 
         public override bool PreDrawExtras()
         {
-            if (attackFrames)
+            if (attacking)
             {
                 for (int i = 0; i < backPunchFrames.Count; i++)
                 {
@@ -346,7 +373,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
                 for (int i = 0; i < afterImages.Count; i++)
                 {
                     float percentageLife = (afterImageTimer - afterImages[i].afterImageTimeStart) / (float)afterImages[i].lifeTime;
-                    int frameHeight = standTexture.Height / Main.projFrames[Projectile.type];
+                    int frameHeight = standTexture.Height / amountOfFrames;
 
                     Vector2 drawOffset = StandOffset;
                     drawOffset.X *= afterImages[i].direction;
@@ -371,7 +398,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
 
         public override void PostDrawExtras()
         {
-            if (attackFrames)
+            if (attacking)
             {
                 for (int i = 0; i < frontPunchFrames.Count; i++)
                 {
@@ -393,7 +420,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
             Player player = Main.player[Projectile.owner];
             FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
 
-            writer.Write(dashChargeFrames);
+            writer.Write(secondaryAbility);
             writer.Write(dashChargeHitFrame);
             writer.Write((byte)fPlayer.amountOfBlurEnergy);
             writer.Write(dashStartPosition.X);
@@ -408,7 +435,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
             Player player = Main.player[Projectile.owner];
             FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
 
-            dashChargeFrames = reader.ReadBoolean();
+            secondaryAbility = reader.ReadBoolean();
             dashChargeHitFrame = reader.ReadBoolean();
             fPlayer.amountOfBlurEnergy = reader.ReadByte();
             dashStartPosition = new Vector2(reader.ReadSingle(), reader.ReadSingle());
@@ -420,25 +447,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
         {
             standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Blur/Blur_" + animationName).Value;
             if (animationName == "Idle")
-            {
                 AnimateStand(animationName, 4, 8, true);
-            }
-            if (animationName == "Attack")
-            {
+            else if (animationName == "Attack")
                 AnimateStand(animationName, 4, newPunchTime / 2, true);
-            }
-            if (animationName == "Dash")
-            {
+            else if (animationName == "Dash")
                 AnimateStand(animationName, 1, 600, true);
-            }
-            if (animationName == "Stab")
-            {
+            else if (animationName == "Stab")
                 AnimateStand(animationName, 1, 600, true);
-            }
-            if (animationName == "Pose")
-            {
+            else if (animationName == "Pose")
                 AnimateStand(animationName, 1, 600, true);
-            }
         }
     }
 }

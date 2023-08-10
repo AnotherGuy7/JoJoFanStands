@@ -4,6 +4,7 @@ using Terraria;
 using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
 using Terraria.ModLoader;
+using System.Collections.Generic;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.MortalReminder
 {
@@ -13,10 +14,22 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MortalReminder
         public override int AltDamage => 96;
         public override int HalfStandHeight => 28;
         public override int PunchTime => 17;
+        public override bool CanUseAfterImagePunches => false;
         public override StandAttackType StandType => StandAttackType.Melee;
         public override Vector2 StandOffset => new Vector2(-25, 0);
 
         private int afterImageTimer = 60;
+        private List<AfterimageData> afterImages = new List<AfterimageData>();
+
+        public struct AfterimageData
+        {
+            public Vector2 position;
+            public Rectangle animRect;
+            public int lifeTime;
+            public int afterImageTimeStart;
+            public int direction;
+            public float rotation;
+        }
 
         public override void AI()
         {
@@ -27,102 +40,95 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MortalReminder
             if (mPlayer.standOut)
                 Projectile.timeLeft = 2;
 
-            if (Projectile.ai[0] == 0f)
-            {
-                if (shootCount > 0)
-                    shootCount--;
+            if (shootCount > 0)
+                shootCount--;
 
+            if (Projectile.owner == Main.myPlayer)
+            {
                 if (Main.mouseLeft)
                 {
-                    attackFrames = true;
                     Punch();
                     Projectile.ai[1] = 3f;
                 }
                 else
                 {
-                    idleFrames = true;
                     StayBehind();
                     Projectile.ai[1] = 1f;
                 }
+            }
 
-                afterImageTimer--;
-                if (afterImageTimer <= 0)
-                {
-                    int afterImage = Projectile.NewProjectile(Projectile.GetSource_FromAI(), Projectile.position, Vector2.Zero, ModContent.ProjectileType<MortalReminderStandT1>(), 0, 0f, Main.myPlayer, 1f, Projectile.ai[1]);
-                    Main.projectile[afterImage].timeLeft = 300;
-                    Main.projectile[afterImage].frame = Projectile.frame;
-                    Main.projectile[afterImage].spriteDirection = Projectile.spriteDirection;
-                    Main.projFrames[afterImage] = Main.projFrames[Projectile.type];
-                    afterImageTimer = 60;
-                }
-                LimitDistance();
-            }
-            else
+            afterImageTimer++;
+            if (afterImageTimer % 4 == 0)
             {
-                Projectile.alpha = 125 + (int)((float)Projectile.timeLeft / 2.4f);
-                if (Projectile.ai[1] == 1f)
+                AfterimageData afterimageData = new AfterimageData()
                 {
-                    idleFrames = true;
-                }
-                if (Projectile.ai[1] == 2f)
-                {
-                    secondaryAbilityFrames = true;
-                }
-                if (Projectile.ai[1] == 3f)
-                {
-                    attackFrames = true;
-                }
+                    position = Projectile.Center,
+                    animRect = new Rectangle(0, Projectile.frame * (HalfStandHeight * 2), standTexture.Width, HalfStandHeight * 2),
+                    lifeTime = 12,
+                    afterImageTimeStart = afterImageTimer,
+                    direction = Projectile.spriteDirection,
+                    rotation = Projectile.rotation
+                };
+                afterImages.Add(afterimageData);
             }
+            LimitDistance();
         }
+
         public override bool PreDrawExtras()
         {
-            if (Projectile.ai[0] == 1f)
+            if (afterImages.Count != 0)
             {
-                int frameHeight = standTexture.Height / Main.projFrames[Projectile.type];
-                Rectangle sourceRect = new Rectangle(0, frameHeight * Projectile.frame, standTexture.Width, frameHeight);
-                Main.EntitySpriteDraw(standTexture, Projectile.Center - Main.screenPosition + new Vector2(19f, 1f), sourceRect, Color.White * Projectile.alpha, 0f, new Vector2(standTexture.Width / 2f, frameHeight / 2f), 1f, effects, 0);
+                for (int i = 0; i < afterImages.Count; i++)
+                {
+                    float percentageLife = (afterImageTimer - afterImages[i].afterImageTimeStart) / (float)afterImages[i].lifeTime;
+                    int frameHeight = standTexture.Height / amountOfFrames;
+
+                    Vector2 drawOffset = StandOffset;
+                    drawOffset.X *= afterImages[i].direction;
+                    Vector2 drawPosition = afterImages[i].position - Main.screenPosition + drawOffset;
+                    Vector2 standOrigin = new Vector2(standTexture.Width / 2f, frameHeight / 2f);
+                    SpriteEffects effect = SpriteEffects.None;
+                    if (afterImages[i].direction == -1)
+                        effect = SpriteEffects.FlipHorizontally;
+
+                    Main.EntitySpriteDraw(standTexture, drawPosition, afterImages[i].animRect, Color.Green * (1f - percentageLife) * 0.8f, afterImages[i].rotation, standOrigin, Projectile.scale, effect, 0f);
+                    if (percentageLife >= 1f)
+                    {
+                        afterImages.RemoveAt(i);
+                        i--;
+                    }
+                }
             }
             return true;
         }
 
         public override void SelectAnimation()
         {
-            if (attackFrames)
+            if (oldAnimationState != currentAnimationState)
             {
-                idleFrames = false;
-                PlayAnimation("Attack");
-                Projectile.ai[1] = 3f;
+                Projectile.frame = 0;
+                Projectile.frameCounter = 0;
+                oldAnimationState = currentAnimationState;
+                Projectile.netUpdate = true;
             }
-            if (idleFrames)
-            {
-                attackFrames = false;
+
+            if (currentAnimationState == AnimationState.Idle)
                 PlayAnimation("Idle");
-                Projectile.ai[1] = 1f;
-            }
-            if (secondaryAbilityFrames)     //Dash
-            {
-                idleFrames = false;
-                attackFrames = false;
+            else if (currentAnimationState == AnimationState.Attack)
+                PlayAnimation("Attack");
+            else if (currentAnimationState == AnimationState.SecondaryAbility)
                 PlayAnimation("Dash");
-                Projectile.ai[1] = 2f;
-            }
         }
 
         public override void PlayAnimation(string animationName)
         {
             standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/MortalReminder/MortalReminder_" + animationName).Value;
             if (animationName == "Idle")
-            {
                 AnimateStand(animationName, 4, 12, true);
-            }
-            if (animationName == "Attack")
-            {
-                AnimateStand(animationName, 12, newPunchTime / 2, true);
-            }
-            if (animationName == "Dash")
-            {
+            else if (animationName == "Attack")
+                AnimateStand(animationName, 12, newPunchTime / 3, true);
+            else if (animationName == "Dash")
                 AnimateStand(animationName, 4, 10, true);
-            }
         }
     }
 }

@@ -27,21 +27,18 @@ namespace JoJoFanStands.Projectiles.PlayerStands.TheFates
             Projectile.ignoreWater = true;
         }
 
-        public Vector2 velocityAddition = Vector2.Zero;
-        public float mouseDistance = 0f;
         protected float ProjectileSpeed = 16f;       //how fast the Projectile the minion shoots goes
-        public bool idleFrames = false;
-        public bool attackFrames = false;
-        int shootCount = 0;
+        private bool idleFrames;
+        private bool attackFrames;
+        private int shootCount = 0;
 
         public override void AI()
         {
             SelectFrame();
-            shootCount--;
+            if (shootCount > 0)
+                shootCount--;
             Player player = Main.player[Projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-            FanPlayer FPlayer = player.GetModPlayer<FanPlayer>();
-            Projectile.frameCounter++;
             if (mPlayer.standOut)
                 Projectile.timeLeft = 2;
 
@@ -53,8 +50,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.TheFates
 
             if (Main.mouseLeft)
             {
-                attackFrames = true;
                 idleFrames = false;
+                attackFrames = true;
                 Main.mouseRight = false;        //so that the player can't just stop time while punching
                 float rotaY = Main.MouseWorld.Y - Projectile.Center.Y;
                 Projectile.rotation = MathHelper.ToRadians((rotaY * Projectile.spriteDirection) / 6f);
@@ -68,60 +65,45 @@ namespace JoJoFanStands.Projectiles.PlayerStands.TheFates
                     Projectile.spriteDirection = -1;
                     Projectile.direction = -1;
                 }
+                Vector2 velocityAddition = Vector2.Zero;
                 if (Projectile.position.X < Main.MouseWorld.X - 5f)
-                {
                     velocityAddition.X = 5f;
-                }
-                if (Projectile.position.X > Main.MouseWorld.X + 5f)
-                {
+                else if (Projectile.position.X > Main.MouseWorld.X + 5f)
                     velocityAddition.X = -5f;
-                }
-                if (Projectile.position.X > Main.MouseWorld.X - 5f && Projectile.position.X < Main.MouseWorld.X + 5f)
-                {
+                else if (Projectile.position.X > Main.MouseWorld.X - 5f && Projectile.position.X < Main.MouseWorld.X + 5f)
                     velocityAddition.X = 0f;
-                }
+
                 if (Projectile.position.Y > Main.MouseWorld.Y + 5f)
-                {
                     velocityAddition.Y = -5f;
-                }
-                if (Projectile.position.Y < Main.MouseWorld.Y - 5f)
-                {
+                else if (Projectile.position.Y < Main.MouseWorld.Y - 5f)
                     velocityAddition.Y = 5f;
-                }
-                if (Projectile.position.Y < Main.MouseWorld.Y + 5f && Projectile.position.Y > Main.MouseWorld.Y - 5f)
-                {
+                else if (Projectile.position.Y < Main.MouseWorld.Y + 5f && Projectile.position.Y > Main.MouseWorld.Y - 5f)
                     velocityAddition.Y = 0f;
-                }
-                mouseDistance = Vector2.Distance(Main.MouseWorld, Projectile.Center);
-                if (mouseDistance > 20f)
-                {
+
+                float mouseDistance = Vector2.Distance(Main.MouseWorld, Projectile.Center);
+                if (mouseDistance > 16f)
                     Projectile.velocity = player.velocity + velocityAddition;
-                }
-                if (mouseDistance <= 20f)
-                {
+                else
                     Projectile.velocity = Vector2.Zero;
-                }
+
                 if (shootCount <= 0)
                 {
                     shootCount += 12;
                     Vector2 shootVel = Main.MouseWorld - Projectile.Center;
                     if (shootVel == Vector2.Zero)
-                    {
                         shootVel = new Vector2(0f, 1f);
-                    }
+
                     shootVel.Normalize();
                     shootVel *= ProjectileSpeed;
                     int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y - 20f, shootVel.X, shootVel.Y, ModContent.ProjectileType<Fists>(), 7, 2f, Main.myPlayer, 0f, 0f);
                     Main.projectile[proj].netUpdate = true;
                     Projectile.netUpdate = true;
                 }
-                if (shootCount <= 0)
-                {
-                    shootCount = 0;
-                }
             }
             else
             {
+                idleFrames = true;
+                attackFrames = false;
                 Vector2 vector131 = player.Center;
                 vector131.X -= (float)((12 + player.width / 2) * player.direction);
                 vector131.Y -= -15f;
@@ -129,8 +111,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.TheFates
                 Projectile.velocity *= 0.8f;
                 Projectile.direction = (Projectile.spriteDirection = player.direction);
                 Projectile.rotation = 0;
-                idleFrames = true;
-                attackFrames = false;
             }
             if (Main.mouseRight && !player.HasBuff(Mod.Find<ModBuff>("SoreEye").Type))
             {
@@ -146,17 +126,18 @@ namespace JoJoFanStands.Projectiles.PlayerStands.TheFates
                     Projectile.position = new Vector2(Projectile.position.X + 0.2f, Projectile.position.Y);
                     Projectile.velocity = Vector2.Zero;
                 }
-                if (Projectile.position.X >= player.position.X + 15f)
+                else if (Projectile.position.X >= player.position.X + 15f)
                 {
                     Projectile.position = new Vector2(Projectile.position.X - 0.2f, Projectile.position.Y);
                     Projectile.velocity = Vector2.Zero;
                 }
+
                 if (Projectile.position.Y >= player.position.Y + 15f)
                 {
                     Projectile.position = new Vector2(Projectile.position.X, Projectile.position.Y - 0.2f);
                     Projectile.velocity = Vector2.Zero;
                 }
-                if (Projectile.position.Y <= player.position.Y - 15f)
+                else if (Projectile.position.Y <= player.position.Y - 15f)
                 {
                     Projectile.position = new Vector2(Projectile.position.X, Projectile.position.Y + 0.2f);
                     Projectile.velocity = Vector2.Zero;
@@ -182,13 +163,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.TheFates
                     Projectile.frameCounter = 0;
                 }
                 if (Projectile.frame <= 15)
-                {
                     Projectile.frame = 16;
-                }
                 if (Projectile.frame >= 20)
-                {
                     Projectile.frame = 16;
-                }
             }
             if (idleFrames)
             {
@@ -198,9 +175,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.TheFates
                     Projectile.frameCounter = 0;
                 }
                 if (Projectile.frame >= 16)
-                {
                     Projectile.frame = 0;
-                }
             }
         }
     }

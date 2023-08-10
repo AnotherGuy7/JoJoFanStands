@@ -38,137 +38,119 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
             if (mPlayer.standOut)
                 Projectile.timeLeft = 2;
 
-            if (Main.mouseLeft && player.whoAmI == Projectile.owner)
+            if (Projectile.owner == Main.myPlayer)
             {
-                if (target == null)
+                if (Main.mouseLeft)
                 {
-                    target = FindNearestTarget(TargetDetectionRange);
-                }
-                else
-                {
-                    attackFrames = true;
-                    Projectile.position = target.Center + new Vector2(((target.width / 2f) + Projectile.width) * -target.direction, 0f);
-                    Projectile.direction = target.direction;
-                    if (Projectile.Distance(target.Center) >= TargetDetectionRange)
+                    if (target == null)
+                        target = FindNearestTarget(TargetDetectionRange);
+                    else
                     {
-                        target = null;
-                    }
+                        currentAnimationState = AnimationState.Attack;
+                        Projectile.position = target.Center + new Vector2(((target.width / 2f) + Projectile.width) * -target.direction, 0f);
+                        Projectile.direction = target.direction;
+                        if (Projectile.Distance(target.Center) >= TargetDetectionRange)
+                            target = null;
 
-                    if (shootCount <= 0 && Projectile.frame == 2)
-                    {
-                        shootCount += ShootTime;
-                        NPC.HitInfo hitInfo = new NPC.HitInfo()
+                        if (shootCount <= 0 && Projectile.frame == 2)
                         {
-                            Damage = newProjectileDamage,
-                            Knockback = 0.2f,
-                            HitDirection = Projectile.direction
-                        };
-                        target.StrikeNPC(hitInfo);
-                        SoundStyle item41 = SoundID.Item41;
-                        item41.Pitch = 3f;
-                        SoundEngine.PlaySound(item41, Projectile.Center);
-                    }
-                }
-            }
-            if (Main.mouseRight && player.whoAmI == Projectile.owner && !attackFrames)
-            {
-                if (target == null)
-                {
-                    shotgunChargeTimer = 0;
-                    target = FindNearestTarget(TargetDetectionRange);
-                }
-                else
-                {
-                    secondaryAbilityFrames = true;
-                    Projectile.Center = target.Center + new Vector2(((target.width / 2f) + Projectile.width) * -target.direction, 0f);
-                    Projectile.direction = target.direction;
-                    if (Projectile.Distance(target.Center) >= TargetDetectionRange)
-                    {
-                        target = null;
-                    }
-
-                    shotgunChargeTimer++;
-                    if (shotgunChargeTimer >= 90)
-                    {
-                        shootCount += newShootTime;
-                        Vector2 shootVel = target.Center - Projectile.Center;
-                        shootVel.Normalize();
-                        shootVel *= ProjectileSpeed;
-
-                        float numberProjectiles = 6;
-                        float rotation = MathHelper.ToRadians(30f);
-                        float random = Main.rand.NextFloat(-6f, 6f + 1f);
-                        for (int i = 0; i < numberProjectiles; i++)
-                        {
-                            Vector2 perturbedSpeed = new Vector2(shootVel.X + random, shootVel.Y).RotatedBy(MathHelper.Lerp(-rotation, rotation, i / (numberProjectiles - 1))) * .2f;
-                            int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, perturbedSpeed, ProjectileID.Bullet, newProjectileDamage * 2, 1f, player.whoAmI);
-                            Main.projectile[proj].netUpdate = true;
+                            shootCount += ShootTime;
+                            NPC.HitInfo hitInfo = new NPC.HitInfo()
+                            {
+                                Damage = newProjectileDamage,
+                                Knockback = 0.2f,
+                                HitDirection = Projectile.direction
+                            };
+                            target.StrikeNPC(hitInfo);
+                            SoundStyle item41 = SoundID.Item41;
+                            item41.Pitch = 3f;
+                            SoundEngine.PlaySound(item41, Projectile.Center);
                         }
-                        shotgunChargeTimer = 0;
-                        SoundEngine.PlaySound(SoundID.Item36, Projectile.position);
                     }
                 }
-            }
-            if (!Main.mouseLeft && !Main.mouseRight)
-            {
-                idleFrames = true;
-                attackFrames = false;
-                secondaryAbilityFrames = false;
-                target = null;
+                else if (Main.mouseRight)
+                {
+                    if (target == null)
+                    {
+                        shotgunChargeTimer = 0;
+                        target = FindNearestTarget(TargetDetectionRange);
+                    }
+                    else
+                    {
+                        secondaryAbility = true;
+                        Projectile.Center = target.Center + new Vector2(((target.width / 2f) + Projectile.width) * -target.direction, 0f);
+                        Projectile.direction = target.direction;
+                        if (Projectile.Distance(target.Center) >= TargetDetectionRange)
+                            target = null;
+
+                        shotgunChargeTimer++;
+                        if (shotgunChargeTimer >= 90)
+                        {
+                            shootCount += newShootTime;
+                            Vector2 shootVel = target.Center - Projectile.Center;
+                            shootVel.Normalize();
+                            shootVel *= ProjectileSpeed;
+
+                            float numberProjectiles = 6;
+                            float rotation = MathHelper.ToRadians(30f);
+                            float random = Main.rand.NextFloat(-6f, 6f + 1f);
+                            for (int i = 0; i < numberProjectiles; i++)
+                            {
+                                Vector2 perturbedSpeed = new Vector2(shootVel.X + random, shootVel.Y).RotatedBy(MathHelper.Lerp(-rotation, rotation, i / (numberProjectiles - 1))) * .2f;
+                                int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, perturbedSpeed, ProjectileID.Bullet, newProjectileDamage * 2, 1f, player.whoAmI);
+                                Main.projectile[proj].netUpdate = true;
+                            }
+                            shotgunChargeTimer = 0;
+                            SoundEngine.PlaySound(SoundID.Item36, Projectile.position);
+                        }
+                    }
+                }
+                else
+                {
+                    currentAnimationState = AnimationState.Idle;
+                    secondaryAbility = false;
+                    target = null;
+                }
             }
 
-            if (!attackFrames && !secondaryAbilityFrames)
-            {
+            if (!attacking && !secondaryAbility)
                 StayBehind();
-            }
             Projectile.spriteDirection = Projectile.direction;
+            if (mPlayer.posing)
+                currentAnimationState = AnimationState.Pose;
         }
 
         public override void SelectAnimation()
         {
-            if (attackFrames)
+            if (oldAnimationState != currentAnimationState)
             {
-                idleFrames = false;
-                PlayAnimation("Attack");
+                Projectile.frame = 0;
+                Projectile.frameCounter = 0;
+                oldAnimationState = currentAnimationState;
+                Projectile.netUpdate = true;
             }
-            if (idleFrames)
-            {
-                attackFrames = false;
+
+            if (currentAnimationState == AnimationState.Idle)
                 PlayAnimation("Idle");
-            }
-            if (secondaryAbilityFrames)
-            {
-                idleFrames = false;
-                attackFrames = false;
+            else if (currentAnimationState == AnimationState.Attack)
+                PlayAnimation("Attack");
+            else if (currentAnimationState == AnimationState.SecondaryAbility)
                 PlayAnimation("Secondary");
-            }
-            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().posing)
-            {
-                idleFrames = false;
-                attackFrames = false;
+            else if (currentAnimationState == AnimationState.Pose)
                 PlayAnimation("Pose");
-            }
         }
 
         public override void PlayAnimation(string animationName)
         {
             standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Banks/BanksStand_" + animationName).Value;
             if (animationName == "Idle")
-            {
                 AnimateStand(animationName, 4, 15, true);
-            }
-            if (animationName == "Attack")
-            {
+            else if (animationName == "Attack")
                 AnimateStand(animationName, 5, ShootTime / 5, true);
-            }
-            if (animationName == "Secondary")
-            {
+            else if (animationName == "Secondary")
                 AnimateStand(animationName, 1, 60, true);
-            }
-            if (animationName == "Pose")
-            {
+            else if (animationName == "Pose")
                 AnimateStand(animationName, 1, 300, true);
-            }
         }
     }
 }

@@ -1,0 +1,8 @@
+- Ported to 1.4.4!
+
+- Ported the FanStands Mod to the JoJoStands backend (This means that FanStands should now sync much better and for developers, are much easier to make and maintain)
+- Fixed a bug that caused Blur to not function properly if the Stand was not the first projectile spawned in the game
+- Fixed Cool Out's Ice Spike floating above ground
+- Fixed Expanses attempting to play an invalid attack animation while attacking
+- Fixed Mortal Reminder not spawning
+- Fixed Mortal Reminder's afterimage abilities

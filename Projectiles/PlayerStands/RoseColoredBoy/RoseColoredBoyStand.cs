@@ -15,6 +15,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
         public override int PunchTime => 10;
         public override int AltDamage => 74;
         public override int HalfStandHeight => 32;
+        public override bool CanUseAfterImagePunches => false;
         public override StandAttackType StandType => StandAttackType.Melee;
 
         public override void AI()
@@ -31,44 +32,34 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
 
             if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
             {
-                if (Main.mouseLeft && player.whoAmI == Projectile.owner)
+                if (Projectile.owner == Main.myPlayer)
                 {
-                    Punch();
-                }
-                else
-                {
-                    if (player.whoAmI == Main.myPlayer)
-                        attackFrames = false;
-                }
-                if (Main.mouseRight && player.whoAmI == Projectile.owner)
-                {
-                    Projectile.direction = player.direction;
-                    if (shootCount <= 0)
+                    if (Main.mouseLeft)
+                        Punch(afterImages: false);
+                    else if (Main.mouseRight)
                     {
-                        shootCount = 70;
-                        Vector2 shootVel = Main.MouseWorld - Projectile.position;
-                        shootVel.Normalize();
-                        shootVel *= 12f;
-                        Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + new Vector2(28f * Projectile.direction, -8f), shootVel, ProjectileType<RosePetal>(), AltDamage, 6f, player.whoAmI);
-                    }
-                    Dust.NewDust(Projectile.Center + new Vector2(28f * Projectile.direction, -8f), 2, 2, DustID.Torch);
-                    secondaryAbilityFrames = true;
-                }
-                else
-                {
-                    secondaryAbilityFrames = false;
-                }
-                if (!attackFrames)
-                {
-                    if (!secondaryAbilityFrames)
-                    {
-                        StayBehind();
-                        idleFrames = true;
+                        Projectile.direction = player.direction;
+                        if (shootCount <= 0)
+                        {
+                            shootCount = 70;
+                            Vector2 shootVel = Main.MouseWorld - Projectile.position;
+                            shootVel.Normalize();
+                            shootVel *= 12f;
+                            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + new Vector2(28f * Projectile.direction, -8f), shootVel, ProjectileType<RosePetal>(), AltDamage, 6f, player.whoAmI);
+                        }
+                        Dust.NewDust(Projectile.Center + new Vector2(28f * Projectile.direction, -8f), 2, 2, DustID.Torch);
+                        secondaryAbility = true;
                     }
                     else
-                    {
+                        secondaryAbility = false;
+                }
+                
+                if (!attacking)
+                {
+                    if (!secondaryAbility)
+                        StayBehind();
+                    else
                         GoInFront();
-                    }
                 }
                 if (SpecialKeyPressed() && !player.HasBuff(BuffType<JoJoStands.Buffs.Debuffs.AbilityCooldown>()))
                 {
@@ -77,58 +68,44 @@ namespace JoJoFanStands.Projectiles.PlayerStands.RoseColoredBoy
                 }
             }
             if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Auto)
-            {
                 BasicPunchAI();
-            }
+
             LimitDistance();
+            if (mPlayer.posing)
+                currentAnimationState = AnimationState.Pose;
         }
 
         public override void SelectAnimation()
         {
-            if (attackFrames)
+            if (oldAnimationState != currentAnimationState)
             {
-                idleFrames = false;
-                PlayAnimation("Attack");
+                Projectile.frame = 0;
+                Projectile.frameCounter = 0;
+                oldAnimationState = currentAnimationState;
+                Projectile.netUpdate = true;
             }
-            if (idleFrames)
-            {
-                attackFrames = false;
+
+            if (currentAnimationState == AnimationState.Idle)
                 PlayAnimation("Idle");
-            }
-            if (secondaryAbilityFrames)
-            {
-                attackFrames = false;
-                idleFrames = false;
+            else if (currentAnimationState == AnimationState.Attack)
+                PlayAnimation("Attack");
+            else if (currentAnimationState == AnimationState.SecondaryAbility)
                 PlayAnimation("Secondary");
-            }
-            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().posing)
-            {
-                attackFrames = false;
-                idleFrames = false;
-                secondaryAbilityFrames = false;
+            else if (currentAnimationState == AnimationState.Pose)
                 PlayAnimation("Pose");
-            }
         }
 
         public override void PlayAnimation(string animationName)
         {
             standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/RoseColoredBoy/RoseColoredBoy_" + animationName).Value;
             if (animationName == "Idle")
-            {
                 AnimateStand(animationName, 4, 12, true);
-            }
-            if (animationName == "Attack")
-            {
+            else if (animationName == "Attack")
                 AnimateStand(animationName, 7, newPunchTime, true);
-            }
-            if (animationName == "Secondary")
-            {
+            else if (animationName == "Secondary")
                 AnimateStand(animationName, 1, 180, true);
-            }
-            if (animationName == "Pose")
-            {
+            else if (animationName == "Pose")
                 AnimateStand(animationName, 15, 20, true);
-            }
         }
     }
 }

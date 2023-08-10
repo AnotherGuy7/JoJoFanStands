@@ -25,13 +25,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
         public override int TierNumber => 4;
         public override float MaxDistance => 62.5f * 16f;
         public override Vector2 StandOffset => new Vector2(-2 * 2, 0f);
+        public override bool CanUseAfterImagePunches => false;
         public override StandAttackType StandType => StandAttackType.Melee;
+        public new AnimationState currentAnimationState;
+        public new AnimationState oldAnimationState;
 
         private int punchAnimationTimer = 0;
         private int afterImageTimer = 0;
         private int extraAfterImagePlayTime = 0;
         private int blurBarIncreaseTimer = 0;
-        private bool dashChargeFrames = false;
         private bool dashChargeHitFrame = false;
         private int dashChargeTimer = 0;
         private int averageAmountOfDashAfterImages;
@@ -62,6 +64,16 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
             public int afterImageTimeStart;
             public int direction;
             public float rotation;
+        }
+
+        public new enum AnimationState
+        {
+            Idle,
+            Attack,
+            Secondary,
+            Stab,
+            KnifeThrow,
+            Pose
         }
 
         public override void ExtraSpawnEffects()
@@ -98,96 +110,105 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
 
             if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
             {
-                if (Main.mouseLeft && Projectile.whoAmI == player.whoAmI)
+                if (Projectile.owner == Main.myPlayer)
                 {
-                    if (fPlayer.amountOfBlurEnergy < 100)
+                    if (Main.mouseLeft)
                     {
-                        blurBarIncreaseTimer++;
-                        if (blurBarIncreaseTimer >= BlurPercentageChargeTime)
+                        if (fPlayer.amountOfBlurEnergy < 100)
                         {
-                            fPlayer.amountOfBlurEnergy += 1;
-                            blurBarIncreaseTimer = 0;
-                        }
-                    }
-
-                    Punch(7f * gainPercentage);
-                    int amountOfPunches = Main.rand.Next(3, 5);
-                    for (int i = 0; i < amountOfPunches; i++)
-                    {
-                        bool behind = Main.rand.Next(0, 1 + 1) == 0;
-                        Vector2 punchOffset = new Vector2(Main.rand.Next(-8, 4 + 1) * Projectile.spriteDirection, Main.rand.Next(-HalfStandHeight + 6, HalfStandHeight - 6 + 1));
-                        PunchFrame punchFrame = new PunchFrame()
-                        {
-                            offset = punchOffset,
-                            targetOffset = punchOffset + new Vector2(Main.rand.Next(16, 24 + 1) * Projectile.spriteDirection, 0f),
-                            punchAnimationTimeStart = punchAnimationTimer,
-                            punchLifeTime = Main.rand.Next(5, 12 + 1),
-                            flipped = Main.rand.Next(0, 1 + 1) == 0,
-                            textureType = Main.rand.Next(0, 1 + 1)
-                        };
-                        if (behind)
-                            backPunchFrames.Add(punchFrame);
-                        else
-                            frontPunchFrames.Add(punchFrame);
-                    }
-                    punchAnimationTimer++;
-                }
-                else if (Main.mouseRight && Projectile.whoAmI == player.whoAmI)
-                {
-                    if (mPlayer.chosenAbility == 0 && player.HasItem(ModContent.ItemType<Knife>()))
-                    {
-                        idleFrames = false;
-                        attackFrames = false;
-                        secondaryAbilityFrames = true;
-                        StayBehind();
-                        Vector2 shootVel = Main.MouseWorld - Projectile.Center;
-                        if (shootCount <= 0 && Projectile.frame == 1)
-                        {
-                            shootCount += KnifeThrowTime - mPlayer.standSpeedBoosts;
-                            float numberOfKnives = 2;
-                            float knivesAngleSpread = MathHelper.ToRadians(6f);
-                            if (shootVel == Vector2.Zero)
-                                shootVel = new Vector2(0f, 1f);
-
-                            shootVel.Normalize();
-                            shootVel *= 160f;
-                            for (int i = 0; i < numberOfKnives; i++)
+                            blurBarIncreaseTimer++;
+                            if (blurBarIncreaseTimer >= BlurPercentageChargeTime)
                             {
-                                Vector2 shootPosition = Projectile.position + new Vector2(5f * Projectile.spriteDirection, -3f);
-                                Vector2 perturbedSpeed = shootVel.RotatedBy(MathHelper.Lerp(-knivesAngleSpread, knivesAngleSpread, i / (numberOfKnives - 1))) * .2f;
-                                int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), shootPosition, perturbedSpeed, ModContent.ProjectileType<KnifeProjectile>(), (int)(AltDamage * mPlayer.standDamageBoosts), 2f, player.whoAmI);
-                                Main.projectile[projIndex].netUpdate = true;
-                                player.ConsumeItem(ModContent.ItemType<Knife>());
+                                fPlayer.amountOfBlurEnergy += 1;
+                                blurBarIncreaseTimer = 0;
+                            }
+                        }
+
+                        Punch(7f * gainPercentage, afterImages: false);
+                        currentAnimationState = AnimationState.Attack;
+                        int amountOfPunches = Main.rand.Next(3, 5);
+                        for (int i = 0; i < amountOfPunches; i++)
+                        {
+                            bool behind = Main.rand.Next(0, 1 + 1) == 0;
+                            Vector2 punchOffset = new Vector2(Main.rand.Next(-8, 4 + 1) * Projectile.spriteDirection, Main.rand.Next(-HalfStandHeight + 6, HalfStandHeight - 6 + 1));
+                            PunchFrame punchFrame = new PunchFrame()
+                            {
+                                offset = punchOffset,
+                                targetOffset = punchOffset + new Vector2(Main.rand.Next(16, 24 + 1) * Projectile.spriteDirection, 0f),
+                                punchAnimationTimeStart = punchAnimationTimer,
+                                punchLifeTime = Main.rand.Next(5, 12 + 1),
+                                flipped = Main.rand.Next(0, 1 + 1) == 0,
+                                textureType = Main.rand.Next(0, 1 + 1)
+                            };
+                            if (behind)
+                                backPunchFrames.Add(punchFrame);
+                            else
+                                frontPunchFrames.Add(punchFrame);
+                        }
+                        punchAnimationTimer++;
+                        Projectile.netUpdate = true;
+                    }
+                    else if (Main.mouseRight)
+                    {
+                        if (mPlayer.chosenAbility == 0 && player.HasItem(ModContent.ItemType<Knife>()))
+                        {
+                            secondaryAbility = true;
+                            StayBehind();
+                            currentAnimationState = AnimationState.KnifeThrow;
+                            Vector2 shootVel = Main.MouseWorld - Projectile.Center;
+                            if (shootCount <= 0 && Projectile.frame == 1)
+                            {
+                                shootCount += KnifeThrowTime - mPlayer.standSpeedBoosts;
+                                float numberOfKnives = 2;
+                                float knivesAngleSpread = MathHelper.ToRadians(6f);
+                                if (shootVel == Vector2.Zero)
+                                    shootVel = new Vector2(0f, 1f);
+
+                                shootVel.Normalize();
+                                shootVel *= 160f;
+                                for (int i = 0; i < numberOfKnives; i++)
+                                {
+                                    Vector2 shootPosition = Projectile.position + new Vector2(5f * Projectile.spriteDirection, -3f);
+                                    Vector2 perturbedSpeed = shootVel.RotatedBy(MathHelper.Lerp(-knivesAngleSpread, knivesAngleSpread, i / (numberOfKnives - 1))) * .2f;
+                                    int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), shootPosition, perturbedSpeed, ModContent.ProjectileType<KnifeProjectile>(), (int)(AltDamage * mPlayer.standDamageBoosts), 2f, player.whoAmI);
+                                    Main.projectile[projIndex].netUpdate = true;
+                                    player.ConsumeItem(ModContent.ItemType<Knife>());
+                                }
+                            }
+                            Projectile.spriteDirection = (int)(Math.Abs(shootVel.X) / shootVel.X);
+                            Projectile.netUpdate = true;
+                        }
+                        else
+                        {
+                            if (!playerHasAbilityCooldown && dashChargeTimer <= 0)
+                            {
+                                dashChargeTimer = 9;
+                                dashStartPosition = Projectile.Center;
+                                dashTargetPosition = Main.MouseWorld;
+                                averageAmountOfDashAfterImages = (int)((Vector2.Distance(dashStartPosition, dashTargetPosition) / 16f) / 9f);
+                                secondaryAbility = true;
+                                dashChargeHitFrame = false;
+                                fPlayer.amountOfBlurEnergy += 5;
                                 Projectile.netUpdate = true;
                             }
                         }
-                        Projectile.spriteDirection = (int)(Math.Abs(shootVel.X) / shootVel.X);
                     }
                     else
                     {
-                        if (!playerHasAbilityCooldown && dashChargeTimer <= 0)
+                        secondaryAbility = false;
+                        if (dashChargeTimer == 0)
                         {
-                            dashChargeTimer = 9;
-                            dashStartPosition = Projectile.Center;
-                            dashTargetPosition = Main.MouseWorld;
-                            averageAmountOfDashAfterImages = (int)((Vector2.Distance(dashStartPosition, dashTargetPosition) / 16f) / 9f);
-                            dashChargeFrames = true;
-                            dashChargeHitFrame = false;
-                            fPlayer.amountOfBlurEnergy += 5;
+                            backPunchFrames.Clear();
+                            frontPunchFrames.Clear();
                             Projectile.netUpdate = true;
                         }
                     }
                 }
-                else
+                if (dashChargeTimer == 0 && !attacking)
                 {
-                    secondaryAbilityFrames = false;
-                    if (dashChargeTimer == 0 && player.whoAmI == Main.myPlayer)
-                    {
-                        StayBehind();
-                        punchAnimationTimer = 0;
-                        backPunchFrames.Clear();
-                        frontPunchFrames.Clear();
-                    }
+                    StayBehind();
+                    currentAnimationState = AnimationState.Idle;
+                    punchAnimationTimer = 0;
                 }
 
                 bool usingAfterImages = false;
@@ -195,6 +216,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
                 {
                     dashChargeTimer--;
                     usingAfterImages = true;
+                    currentAnimationState = AnimationState.Secondary;
                     if (dashChargeTimer > 0 && !dashChargeHitFrame)
                     {
                         Vector2 previousPosition = Projectile.Center;
@@ -243,13 +265,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
                         else
                         {
                             dashChargeTimer = 0;
-                            dashChargeFrames = false;
+                            secondaryAbility = false;
                             dashChargeHitFrame = false;
                             extraAfterImagePlayTime = 15;
                             player.AddBuff(ModContent.BuffType<AbilityCooldown>(), mPlayer.AbilityCooldownTime(4));
                         }
                     }
                 }
+                if (dashChargeHitFrame)
+                    currentAnimationState = AnimationState.Stab;
                 if (SpecialKeyPressed() && !player.HasBuff<Vibration>() && !player.HasBuff<LightningFastReflex>() && !player.HasBuff<InfiniteVelocity>())
                 {
                     if (mPlayer.chosenAbility == 1)
@@ -385,37 +409,38 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
                     afterImageTimer++;
             }
             else
-            {
                 BasicPunchAI();
-            }
             if (dashChargeTimer < 0)
                 LimitDistance();
+            if (mPlayer.posing)
+                currentAnimationState = AnimationState.Pose;
         }
+
+        public override byte SendAnimationState() => (byte)currentAnimationState;
+        public override void ReceiveAnimationState(byte state) => currentAnimationState = (AnimationState)state;
 
         public override void SelectAnimation()
         {
-            if (attackFrames)
+            if (oldAnimationState != currentAnimationState)
             {
-                idleFrames = false;
-                PlayAnimation("Attack");
+                Projectile.frame = 0;
+                Projectile.frameCounter = 0;
+                oldAnimationState = currentAnimationState;
+                Projectile.netUpdate = true;
             }
-            if (idleFrames)
-            {
-                attackFrames = false;
+
+            if (currentAnimationState == AnimationState.Idle)
                 PlayAnimation("Idle");
-            }
-            if (dashChargeFrames)
+            else if (currentAnimationState == AnimationState.Attack)
+                PlayAnimation("Attack");
+            else if (currentAnimationState == AnimationState.Secondary)
                 PlayAnimation("Dash");
-            if (dashChargeHitFrame)
+            else if (currentAnimationState == AnimationState.Stab)
                 PlayAnimation("Stab");
-            if (secondaryAbilityFrames)
+            else if (currentAnimationState == AnimationState.KnifeThrow)
                 PlayAnimation("KnifeThrow");
-            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().posing)
-            {
-                idleFrames = false;
-                attackFrames = false;
+            else if (currentAnimationState == AnimationState.Pose)
                 PlayAnimation("Pose");
-            }
         }
 
         public override void StandKillEffects()
@@ -431,7 +456,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
 
         public override bool PreDrawExtras()
         {
-            if (attackFrames)
+            if (attacking)
             {
                 for (int i = 0; i < backPunchFrames.Count; i++)
                 {
@@ -451,7 +476,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
                 for (int i = 0; i < afterImages.Count; i++)
                 {
                     float percentageLife = (afterImageTimer - afterImages[i].afterImageTimeStart) / (float)afterImages[i].lifeTime;
-                    int frameHeight = standTexture.Height / Main.projFrames[Projectile.type];
+                    int frameHeight = standTexture.Height / amountOfFrames;
 
                     Vector2 drawOffset = StandOffset;
                     drawOffset.X *= afterImages[i].direction;
@@ -476,7 +501,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
 
         public override void PostDrawExtras()
         {
-            if (attackFrames)
+            if (attacking)
             {
                 for (int i = 0; i < frontPunchFrames.Count; i++)
                 {
@@ -498,7 +523,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
             Player player = Main.player[Projectile.owner];
             FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
 
-            writer.Write(dashChargeFrames);
+            writer.Write(secondaryAbility);
             writer.Write(dashChargeHitFrame);
             writer.Write((byte)fPlayer.amountOfBlurEnergy);
             writer.Write(dashStartPosition.X);
@@ -513,7 +538,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
             Player player = Main.player[Projectile.owner];
             FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
 
-            dashChargeFrames = reader.ReadBoolean();
+            secondaryAbility = reader.ReadBoolean();
             dashChargeHitFrame = reader.ReadBoolean();
             fPlayer.amountOfBlurEnergy = reader.ReadByte();
             dashStartPosition = new Vector2(reader.ReadSingle(), reader.ReadSingle());
@@ -525,29 +550,17 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
         {
             standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Blur/Blur_" + animationName).Value;
             if (animationName == "Idle")
-            {
                 AnimateStand(animationName, 4, 8, true);
-            }
-            if (animationName == "Attack")
-            {
+            else if (animationName == "Attack")
                 AnimateStand(animationName, 4, newPunchTime / 2, true);
-            }
-            if (animationName == "Dash")
-            {
+            else if (animationName == "Dash")
                 AnimateStand(animationName, 1, 600, true);
-            }
-            if (animationName == "Stab")
-            {
+            else if (animationName == "Stab")
                 AnimateStand(animationName, 1, 600, true);
-            }
-            if (animationName == "KnifeThrow")
-            {
+            else if (animationName == "KnifeThrow")
                 AnimateStand(animationName, 3, (KnifeThrowTime - Main.player[Projectile.owner].GetModPlayer<MyPlayer>().standSpeedBoosts) / 3, true);
-            }
-            if (animationName == "Pose")
-            {
+            else if (animationName == "Pose")
                 AnimateStand(animationName, 1, 600, true);
-            }
         }
     }
 }
