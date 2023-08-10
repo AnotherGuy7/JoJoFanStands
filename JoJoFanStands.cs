@@ -43,10 +43,10 @@ namespace JoJoFanStands
         public override void Unload()
         {
             JoJoStandsMod = null;
-            BlurBar.blurBarTexture.Dispose();
-            BlurStandT1.punchTextures[0].Dispose();
-            BlurStandT1.punchTextures[1].Dispose();
-            BlurStandT1.punchTextures = null;
+            if (BlurBar.blurBarTexture != null)
+                BlurBar.blurBarTexture = null;
+            if (BlurStandT1.punchTextures != null)
+                BlurStandT1.punchTextures = null;
             Instance = null;
         }
     }
