@@ -1,4 +1,4 @@
 displayName = JoJoStands: FanStands
 author = AnotherGuy
-version = 1.2
+version = 1.2.1
 modReferences = JoJoStands
