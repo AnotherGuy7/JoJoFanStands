@@ -7,7 +7,7 @@ namespace JoJoFanStands.Projectiles
 {
     public class Fists : ModProjectile
     {
-
+        public const int TheWorldOverHeavenFists = 0;
         public override void SetDefaults()
         {
             Projectile.width = 30;
@@ -29,9 +29,7 @@ namespace JoJoFanStands.Projectiles
             if (mPlayer.crackedPearlEquipped)
             {
                 if (Main.rand.NextFloat(0, 101) >= 60)
-                {
                     target.AddBuff(Mod.Find<ModBuff>("Infected").Type, 10 * 60);
-                }
             }
         }
 

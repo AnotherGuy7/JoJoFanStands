@@ -30,6 +30,7 @@ namespace JoJoFanStands
         public bool litsIntoTheLightAbilityActive = false;
         public bool blurLightningFastReflexes = false;
         public bool blurInfiniteVelocity = false;
+        public bool realityRewriteActive = false;
 
         public int banksDefenseReduction = 0;
         public int lucySelectedMarkerWhoAmI;
