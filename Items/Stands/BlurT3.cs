@@ -44,6 +44,7 @@ namespace JoJoFanStands.Items.Stands
         public override void AddRecipes()
         {
             CreateRecipe()
+                .AddIngredient(ModContent.ItemType<BlurT2>())
                 .AddIngredient(ItemID.HallowedBar, 14)
                 .AddIngredient(ItemID.IronBar, 10)
                 .AddIngredient(ItemType<WillToControl>(), 2)
@@ -52,6 +53,7 @@ namespace JoJoFanStands.Items.Stands
                 .Register();
 
             CreateRecipe()
+                .AddIngredient(ModContent.ItemType<BlurT2>())
                 .AddIngredient(ItemID.HellstoneBar, 14)
                 .AddIngredient(ItemID.LeadBar, 10)
                 .AddIngredient(ItemType<WillToControl>(), 2)
