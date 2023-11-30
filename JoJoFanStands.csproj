@@ -8,9 +8,15 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Buffs\RealityRewriteBuff.png" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="tModLoader.CodeAssist" Version="0.1.*" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JoJoStands\JoJoStands.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Dusts\" />
   </ItemGroup>
 </Project>

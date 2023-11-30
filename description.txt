@@ -1,3 +1,7 @@
-JoJoStands: FanStands is a Mod where the stands of people who want their stands made are made! Dev-Stands for the contributors and stands for people who ask for them are made in this Mod.
+JoJoStands: FanStands is a mod implementing the stands of people who have created their own custom Stands! Contributor Dev-Stands are implemented in this mod.
 
-Warning: This mod does not support multiplayer! Attempting to play this mod in multiplayer can cause many issues with some or all Stands!
+Want to commission your own Stand into the mod?
+
+Join the JoJoStands Discord (https://discord.gg/EYKBhpK) and submit a fanstand commission request!
+
+Warning: Attempting to play this mod in multiplayer can cause a few or many issues with some Stands!

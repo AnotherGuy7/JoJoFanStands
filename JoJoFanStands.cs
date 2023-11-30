@@ -1,6 +1,7 @@
 using JoJoFanStands.Items.Armor;
 using JoJoFanStands.Items.Stands;
 using JoJoFanStands.Projectiles.PlayerStands.Blur;
+using JoJoFanStands.Projectiles.PlayerStands.TheWorldOverHeaven;
 using JoJoStands.UI;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -38,6 +39,8 @@ namespace JoJoFanStands
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<BrianEnoAct1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<ExpansesT1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<BlurT1>());
+
+            JoJoStands.JoJoStands.timestopImmune.Add(ModContent.ProjectileType<TheWorldOverHeavenStandFinal>());
         }
 
         public override void Unload()

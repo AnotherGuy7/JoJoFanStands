@@ -1,3 +1,4 @@
+using JoJoFanStands.Buffs;
 using JoJoStands.Buffs.EffectBuff;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
@@ -106,9 +107,7 @@ namespace JoJoFanStands.NPCs
             for (int n = 0; n < nonExistantTypes.Count; n++)
             {
                 if (npc.type == nonExistantTypes[n])
-                {
                     npc.active = false;
-                }
             }
             return true;
         }
@@ -117,6 +116,25 @@ namespace JoJoFanStands.NPCs
         {
             if (welded)
                 drawColor = Color.DarkGray;
+        }
+
+        public override void ModifyHitByProjectile(NPC npc, Projectile projectile, ref NPC.HitModifiers modifiers)
+        {
+            if (npc.HasBuff<RealityRewriteBuff>())
+                modifiers.FinalDamage *= 2f;
+        }
+
+        public override void ModifyHitByItem(NPC npc, Player player, Item item, ref NPC.HitModifiers modifiers)
+        {
+            if (npc.HasBuff<RealityRewriteBuff>())
+                modifiers.FinalDamage *= 2f;
+        }
+
+        public override bool CanHitPlayer(NPC npc, Player target, ref int cooldownSlot)
+        {
+            if (npc.HasBuff<RealityRewriteBuff>())
+                return false;
+            return true;
         }
     }
 }

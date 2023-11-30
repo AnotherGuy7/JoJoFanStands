@@ -11,7 +11,7 @@ using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Stands
 {
-    public class TheWorldOverHeavenFinal : FanStandItemClass
+    public class TheWorldOverHeavenT3 : FanStandItemClass
     {
         public override int StandSpeed => 6;
         public override int StandType => 1;
@@ -32,7 +32,7 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetDefaults()
         {
-            Item.damage = 342;
+            Item.damage = 298;
             Item.width = 38;
             Item.height = 46;
             Item.maxStack = 1;
@@ -43,13 +43,13 @@ namespace JoJoFanStands.Items.Stands
 
         public override bool ManualStandSpawning(Player player)
         {
-            Projectile.NewProjectile(Item.GetSource_FromThis(), player.position, player.velocity, ProjectileType<TheWorldOverHeavenStandFinal>(), 0, 0f, Main.myPlayer);
+            Projectile.NewProjectile(Item.GetSource_FromThis(), player.position, player.velocity, ProjectileType<TheWorldOverHeavenStandT3>(), 0, 0f, Main.myPlayer);
             return true;
         }
 
         public override void ModifyWeaponDamage(Player player, ref StatModifier damage)
         {
-            int highestDamage = 342;
+            int highestDamage = 298;
             for (int i = 0; i < player.inventory.Length; i++)
             {
                 if (player.inventory[i] != null)
@@ -64,23 +64,19 @@ namespace JoJoFanStands.Items.Stands
         public override void AddRecipes()
         {
             if (!ModLoader.TryGetMod("CalamityMod", out Mod calamityMod))
-            {
-                CreateRecipe()
-                    .AddIngredient(ItemType<TheWorldFinal>())
-                    .AddIngredient(ItemType<TaintedLifeforce>())
-                    .AddIngredient(ItemType<RequiemArrow>())
-                    .AddTile(ModContent.TileType<RemixTableTile>())
-                    .Register();
                 return;
-            }
 
             Recipe recipe = CreateRecipe()
-                .AddIngredient(ItemType<TheWorldOverHeavenT3>())
-                .AddIngredient(ItemType<TaintedLifeforce>())
+                .AddIngredient(ItemType<TheWorldOverHeavenT2>())
+                .AddIngredient(ItemType<WillToDestroy>(), 8)
                 .AddTile(ModContent.TileType<RemixTableTile>());
 
-            if (calamityMod.TryFind<ModItem>("AuricBar", out ModItem auricBar))
-                recipe.AddIngredient(auricBar.Type, 18);
+            if (calamityMod.TryFind<ModItem>("CosmiliteBar", out ModItem cosmiliteBar))
+            {
+                recipe.AddIngredient(cosmiliteBar.Type, 16);
+                if (calamityMod.TryFind<ModItem>("GalacticaSingularity", out ModItem galacticaSingularity))
+                    recipe.AddIngredient(galacticaSingularity.Type, 6);
+            }
             recipe.Register();
         }
     }

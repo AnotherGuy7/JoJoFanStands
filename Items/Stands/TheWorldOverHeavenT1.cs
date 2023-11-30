@@ -1,7 +1,6 @@
 using JoJoFanStands.Projectiles.PlayerStands.TheWorldOverHeaven;
 using JoJoStands;
 using JoJoStands.Items;
-using JoJoStands.Items.CraftingMaterials;
 using JoJoStands.Tiles;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -11,9 +10,9 @@ using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Stands
 {
-    public class TheWorldOverHeavenFinal : FanStandItemClass
+    public class TheWorldOverHeavenT1 : FanStandItemClass
     {
-        public override int StandSpeed => 6;
+        public override int StandSpeed => 7;
         public override int StandType => 1;
         public override string StandProjectileName => "TheWorldOverHeaven";
         public override int StandTier => 5;
@@ -32,7 +31,7 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetDefaults()
         {
-            Item.damage = 342;
+            Item.damage = 173;
             Item.width = 38;
             Item.height = 46;
             Item.maxStack = 1;
@@ -43,13 +42,13 @@ namespace JoJoFanStands.Items.Stands
 
         public override bool ManualStandSpawning(Player player)
         {
-            Projectile.NewProjectile(Item.GetSource_FromThis(), player.position, player.velocity, ProjectileType<TheWorldOverHeavenStandFinal>(), 0, 0f, Main.myPlayer);
+            Projectile.NewProjectile(Item.GetSource_FromThis(), player.position, player.velocity, ProjectileType<TheWorldOverHeavenStandT1>(), 0, 0f, Main.myPlayer);
             return true;
         }
 
         public override void ModifyWeaponDamage(Player player, ref StatModifier damage)
         {
-            int highestDamage = 342;
+            int highestDamage = 173;
             for (int i = 0; i < player.inventory.Length; i++)
             {
                 if (player.inventory[i] != null)
@@ -64,24 +63,13 @@ namespace JoJoFanStands.Items.Stands
         public override void AddRecipes()
         {
             if (!ModLoader.TryGetMod("CalamityMod", out Mod calamityMod))
-            {
-                CreateRecipe()
-                    .AddIngredient(ItemType<TheWorldFinal>())
-                    .AddIngredient(ItemType<TaintedLifeforce>())
-                    .AddIngredient(ItemType<RequiemArrow>())
-                    .AddTile(ModContent.TileType<RemixTableTile>())
-                    .Register();
                 return;
-            }
 
-            Recipe recipe = CreateRecipe()
-                .AddIngredient(ItemType<TheWorldOverHeavenT3>())
-                .AddIngredient(ItemType<TaintedLifeforce>())
-                .AddTile(ModContent.TileType<RemixTableTile>());
-
-            if (calamityMod.TryFind<ModItem>("AuricBar", out ModItem auricBar))
-                recipe.AddIngredient(auricBar.Type, 18);
-            recipe.Register();
+            CreateRecipe()
+                .AddIngredient(ItemType<TheWorldOverHeavenFinal>())
+                .AddIngredient(ItemType<RequiemArrow>())
+                .AddTile(ModContent.TileType<RemixTableTile>())
+                .Register();
         }
     }
 }

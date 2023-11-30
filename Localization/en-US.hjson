@@ -60,6 +60,11 @@ Mods: {
 				DisplayName: Vibration
 				Description: You're vibrating beyond physical contraints!
 			}
+
+			RealityRewriteBuff: {
+				DisplayName: Reality Rewrite
+				Description: Rewrite the enemies defensive and offensive capabilities temporarily!
+			}
 		}
 
 		Items: {
@@ -456,6 +461,60 @@ Mods: {
 					Reference: Emerson Lake and Palmer song, 'The Three Fates'
 					'''
 			}
+
+			TheWorldOverHeavenFinal: {
+				DisplayName: The World Over Heaven (Final Tier)
+				Tooltip:
+					'''
+					Left-click to punch enemies at a really fast rate and right click to strike enemies with lightning!
+					Special: Stop time for 18 seconds!
+					Special during timestop: Throw a Road Roller during timestop!
+					Second Special: Rewrite enemy realities!
+					Note: This Stand's damage scales with the left-most weapon in the hotbar.
+					Road Roller damage increases proportionally to Stand Damage.
+					User Name: DIO Over Heaven
+					'''
+			}
+
+			TheWorldOverHeavenT1: {
+				DisplayName: The World Over Heaven (Tier 1)
+				Tooltip:
+					'''
+					Left-click to punch enemies at a really fast rate and right click to strike enemies with lightning!
+					Special: Stop time for 11 seconds!
+					Special during timestop: Throw a Road Roller during timestop!
+					Note: This Stand's damage scales with the left-most weapon in the hotbar.
+					Road Roller damage increases proportionally to Stand Damage.
+					User Name: DIO Over Heaven
+					'''
+			}
+
+			TheWorldOverHeavenT2: {
+				DisplayName: The World Over Heaven (Tier 2)
+				Tooltip:
+					'''
+					Left-click to punch enemies at a really fast rate and right click to strike enemies with lightning!
+					Special: Stop time for 13 seconds!
+					Special during timestop: Throw a Road Roller during timestop!
+					Note: This Stand's damage scales with the left-most weapon in the hotbar.
+					Road Roller damage increases proportionally to Stand Damage.
+					User Name: DIO Over Heaven
+					'''
+			}
+
+			TheWorldOverHeavenT3: {
+				DisplayName: The World Over Heaven (Tier 3)
+				Tooltip:
+					'''
+					Left-click to punch enemies at a really fast rate and right click to strike enemies with lightning!
+					Special: Stop time for 15 seconds!
+					Special during timestop: Throw a Road Roller during timestop!
+					Second Special: Rewrite enemy realities!
+					Note: This Stand's damage scales with the left-most weapon in the hotbar.
+					Road Roller damage increases proportionally to Stand Damage.
+					User Name: DIO Over Heaven
+					'''
+			}
 		}
 
 		NPCs.Pao.DisplayName: Pao
@@ -508,6 +567,10 @@ Mods: {
 			BlurStandT2.DisplayName: Blur Stand T2
 			BlurStandT3.DisplayName: Blur Stand T3
 			SlavesOfFearT1.DisplayName: Slaves Of Fear T1
+			TheWorldOverHeavenStandFinal.DisplayName: The World Over Heaven Stand Final
+			TheWorldOverHeavenStandT1.DisplayName: The World Over Heaven Stand T1
+			TheWorldOverHeavenStandT2.DisplayName: The World Over Heaven Stand T2
+			TheWorldOverHeavenStandT3.DisplayName: The World Over Heaven Stand T3
 		}
 
 		Configs: {
