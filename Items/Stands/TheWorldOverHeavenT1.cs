@@ -66,7 +66,7 @@ namespace JoJoFanStands.Items.Stands
                 return;
 
             CreateRecipe()
-                .AddIngredient(ItemType<TheWorldOverHeavenFinal>())
+                .AddIngredient(ItemType<TheWorldFinal>())
                 .AddIngredient(ItemType<RequiemArrow>())
                 .AddTile(ModContent.TileType<RemixTableTile>())
                 .Register();
