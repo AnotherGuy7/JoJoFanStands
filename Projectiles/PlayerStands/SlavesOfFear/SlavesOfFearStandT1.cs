@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
 {
-    public class SlavesOfFearT1 : StandClass
+    public class SlavesOfFearStandT1 : StandClass
     {
         public override int PunchDamage => 23;
         public override int PunchTime => 13;

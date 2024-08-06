@@ -12,7 +12,7 @@ namespace JoJoFanStands.Items.Stands
     {
         public override int StandSpeed => 10;           //6 shots/s
         public override int StandType => 2;
-        public override string StandProjectileName => "Banks";
+        public override string StandIdentifierName => "Banks";
         public override int StandTier => 2;
         public override Color StandTierDisplayColor => Color.Gold;
         public override bool FanStandItem => true;

@@ -14,6 +14,7 @@ namespace JoJoFanStands.Items.Stands
         public override string Texture => Mod.Name + "/Items/Stands/FollowMeT1";
         public override int StandSpeed => 12;
         public override int StandType => 1;
+        public override string StandIdentifierName => "FollowMeBetween";
         public override Color StandTierDisplayColor => Color.Pink;
         public override bool FanStandItem => true;
 

@@ -1,3 +1,4 @@
+using JoJoStands;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -29,13 +30,12 @@ namespace JoJoFanStands.Projectiles
 
         public override void AI()
         {
-            Projectile ownerProj = Main.projectile[(int)Projectile.ai[0]];
-
+            MyPlayer mPlayer = Main.player[Projectile.owner].GetModPlayer<MyPlayer>();
             Projectile.direction = (int)Projectile.ai[1];
             Projectile.velocity.Y += 5f;
             Projectile.scale -= 0.025f;     //0.025f obtained by doing (max scale - max time left)
             DrawOriginOffsetY = 8 + (int)((1.5f - Projectile.scale) * 20f);
-            if (!ownerProj.active || Projectile.scale <= 0f)
+            if (!mPlayer.standOut || Projectile.scale <= 0f)
                 Projectile.Kill();
 
             /*if (Collision.SolidTiles((int)Projectile.position.X / 16, (int)(Projectile.position.X + moveDistanceX) / 16, (int)Projectile.position.Y / 16, (int)(Projectile.position.Y - Yaddition) / 16))
@@ -53,7 +53,7 @@ namespace JoJoFanStands.Projectiles
             {
                 spawnedAnother = true;
                 canSpawn = false;
-                int proj = Projectile.NewProjectile(Projectile.GetSource_FromAI(), Projectile.Center.X + (8f * Projectile.direction), Projectile.Center.Y - Yaddition, 0f, 0f, Mod.Find<ModProjectile>("IceSpike").Type, Projectile.damage, 2f, Main.myPlayer, ownerProj.whoAmI, Projectile.direction);
+                int proj = Projectile.NewProjectile(Projectile.GetSource_FromAI(), Projectile.Center.X + (8f * Projectile.direction), Projectile.Center.Y - Yaddition, 0f, 0f, ModContent.ProjectileType<IceSpike>(), Projectile.damage, 2f, Main.myPlayer, 0, Projectile.direction);
                 Main.projectile[proj].direction = Projectile.direction;
                 Main.projectile[proj].netUpdate = true;
             }

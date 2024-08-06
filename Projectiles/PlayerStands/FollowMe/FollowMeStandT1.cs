@@ -82,7 +82,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.FollowMe
 
                     shootVel.Normalize();
                     shootVel *= ProjectileSpeed;
-                    int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<Fists>(), (int)(newPunchDamage * windUpForce), 4f * windUpForce, Main.myPlayer);
+                    int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<FanStandFists>(), (int)(newPunchDamage * windUpForce), 4f * windUpForce, Main.myPlayer);
                     Main.projectile[proj].timeLeft = 6;
                     Main.projectile[proj].netUpdate = true;
                     Projectile.netUpdate = true;

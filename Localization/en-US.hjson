@@ -414,7 +414,7 @@ Mods: {
 				DisplayName: Slaves Of Fear (Final Tier)
 				Tooltip:
 					'''
-					Left-click to punch enemies at a really fast rate and right click to shunt into enemies!
+					Left-click to punch enemies at a really fast rate and right-click to shunt into enemies!
 					Special: Weld an enemy to tiles!
 					User Name: The Phantom One 
 					Reference: SLAVES OF FEAR by HEALTH
@@ -435,7 +435,7 @@ Mods: {
 				DisplayName: Slaves Of Fear (Tier 2)
 				Tooltip:
 					'''
-					Left-click to punch enemies at a really fast rate and right click to shunt into enemies!
+					Left-click to punch enemies at a really fast rate and right-click to shunt into enemies!
 					User Name: The Phantom One 
 					Reference: SLAVES OF FEAR by HEALTH
 					'''
@@ -445,7 +445,7 @@ Mods: {
 				DisplayName: Slaves Of Fear (Tier 3)
 				Tooltip:
 					'''
-					Left-click to punch enemies at a really fast rate and right click to shunt into enemies!
+					Left-click to punch enemies at a really fast rate and right-click to shunt into enemies!
 					Special: Weld an enemy to tiles!
 					User Name: The Phantom One 
 					Reference: SLAVES OF FEAR by HEALTH
@@ -466,7 +466,7 @@ Mods: {
 				DisplayName: The World Over Heaven (Final Tier)
 				Tooltip:
 					'''
-					Left-click to punch enemies at a really fast rate and right click to strike enemies with lightning!
+					Left-click to punch enemies at a really fast rate and right-click to strike enemies with lightning!
 					Special: Stop time for 18 seconds!
 					Special during timestop: Throw a Road Roller during timestop!
 					Second Special: Rewrite enemy realities!
@@ -480,7 +480,7 @@ Mods: {
 				DisplayName: The World Over Heaven (Tier 1)
 				Tooltip:
 					'''
-					Left-click to punch enemies at a really fast rate and right click to strike enemies with lightning!
+					Left-click to punch enemies at a really fast rate and right-click to strike enemies with lightning!
 					Special: Stop time for 11 seconds!
 					Special during timestop: Throw a Road Roller during timestop!
 					Note: This Stand's damage scales with the left-most weapon in the hotbar.
@@ -493,7 +493,7 @@ Mods: {
 				DisplayName: The World Over Heaven (Tier 2)
 				Tooltip:
 					'''
-					Left-click to punch enemies at a really fast rate and right click to strike enemies with lightning!
+					Left-click to punch enemies at a really fast rate and right-click to strike enemies with lightning!
 					Special: Stop time for 13 seconds!
 					Special during timestop: Throw a Road Roller during timestop!
 					Note: This Stand's damage scales with the left-most weapon in the hotbar.
@@ -506,13 +506,70 @@ Mods: {
 				DisplayName: The World Over Heaven (Tier 3)
 				Tooltip:
 					'''
-					Left-click to punch enemies at a really fast rate and right click to strike enemies with lightning!
+					Left-click to punch enemies at a really fast rate and right-click to strike enemies with lightning!
 					Special: Stop time for 15 seconds!
 					Special during timestop: Throw a Road Roller during timestop!
 					Second Special: Rewrite enemy realities!
 					Note: This Stand's damage scales with the left-most weapon in the hotbar.
 					Road Roller damage increases proportionally to Stand Damage.
 					User Name: DIO Over Heaven
+					'''
+			}
+
+			WaywardSonFinal: {
+				DisplayName: Wayward Son Final
+				Tooltip:
+					'''
+					Left-click to create a whirlwind using your schmitar and right-click to rush and stab toward any location!
+					Special: Copy the special attack of any Stand!
+					Second Special: Remote Mode
+					Passive: Perfect Imitation
+					Note: Perfect Imitation allows this Stand to incorporate other Stands abilities into its main attack.
+					Note: This Stand's damage scales with the left-most weapon in the hotbar.
+					Note: The Stand abilities copied are from the Stand in the left-most slot in the hotbar.
+					User Name: Anorak
+					Reference: Carry on Wayward Son by Kansas
+					'''
+			}
+
+			WaywardSonT1: {
+				DisplayName: Wayward Son T1
+				Tooltip:
+					'''
+					Left-click to create a whirlwind using your schmitar and right-click to rush and stab toward any location!
+					Note: This Stand's damage scales with the left-most weapon in the hotbar.
+					Note: The Stand abilities copied are from the Stand in the left-most slot in the hotbar.
+					User Name: Anorak
+					Reference: Carry on Wayward Son by Kansas
+					'''
+			}
+
+			WaywardSonT2: {
+				DisplayName: Wayward Son T2
+				Tooltip:
+					'''
+					Left-click to create a whirlwind using your schmitar and right-click to rush and stab toward any location!
+					Special: Copy the special attack of any Stand!
+					Note: This Stand's damage scales with the left-most weapon in the hotbar.
+					Note: The Stand abilities copied are from the Stand in the left-most slot in the hotbar.
+					User Name: Anorak
+					Reference: Carry on Wayward Son by Kansas
+					'''
+			}
+
+			WaywardSonT3: {
+				DisplayName: Wayward Son T3
+				Tooltip:
+					'''
+					Left-click to create a whirlwind using your schmitar and right-click to rush and stab toward any location!
+					Special: Copy the special attack of any Stand!
+					Second Special: Remote Mode
+					Passive: Perfect Imitation
+					Note: Perfect Imitation allows this Stand to incorporate other Stands abilities into its main attack.
+					Note: This Stand's damage scales with the left-most weapon in the hotbar.
+					Note: The Stand abilities copied are from the Stand in the left-most slot in the hotbar.
+					User Name: Anorak
+					Reference: Carry on Wayward Son by Kansas
 					'''
 			}
 		}
@@ -571,6 +628,13 @@ Mods: {
 			TheWorldOverHeavenStandT1.DisplayName: The World Over Heaven Stand T1
 			TheWorldOverHeavenStandT2.DisplayName: The World Over Heaven Stand T2
 			TheWorldOverHeavenStandT3.DisplayName: The World Over Heaven Stand T3
+			WaywardSonStandFinal.DisplayName: Wayward Son Stand Final
+			WaywardSonStandT1.DisplayName: Wayward Son Stand T1
+			WaywardSonStandT2.DisplayName: Wayward Son Stand T2
+			WaywardSonStandT3.DisplayName: Wayward Son Stand T3
+			WaywardSonAfterImage.DisplayName: Wayward Son After Image
+			WaywardSonVoid.DisplayName: Wayward Son Void
+			FanStandFists.DisplayName: Fan Stand Fists
 		}
 
 		Configs: {

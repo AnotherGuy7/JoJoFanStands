@@ -16,7 +16,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.CoolOut
         public override int ShootTime => 40;
         public override int AltDamage => 20;
         public override StandAttackType StandType => StandAttackType.Ranged;
-        public override Vector2 StandOffset => new Vector2(20, 0);
+        public override Vector2 StandOffset => new Vector2(4, 0);
         public override int HalfStandHeight => 32;
         public override float MaxDistance => 0f;
 

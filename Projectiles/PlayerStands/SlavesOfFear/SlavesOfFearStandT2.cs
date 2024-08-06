@@ -9,13 +9,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
 {
     public class SlavesOfFearStandT2 : StandClass
     {
-        public override float MaxDistance
-        {
-            get { return 98f; }
-        }
-
-        public override int HalfStandHeight => 37;          //a simpler version of doing the above
-
+        public override int HalfStandHeight => 37;
         public override int PunchDamage => 47;
         public override int AltDamage => 54;
         public override int PunchTime => 12;

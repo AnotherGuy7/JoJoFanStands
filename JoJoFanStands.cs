@@ -2,6 +2,7 @@ using JoJoFanStands.Items.Armor;
 using JoJoFanStands.Items.Stands;
 using JoJoFanStands.Projectiles.PlayerStands.Blur;
 using JoJoFanStands.Projectiles.PlayerStands.TheWorldOverHeaven;
+using JoJoFanStands.Projectiles.PlayerStands.WaywardSon;
 using JoJoStands.UI;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -39,11 +40,14 @@ namespace JoJoFanStands
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<BrianEnoAct1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<ExpansesT1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<BlurT1>());
+            JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<WaywardSonT1>());
 
             JoJoStands.JoJoStands.timestopImmune.Add(ModContent.ProjectileType<TheWorldOverHeavenStandT1>());
             JoJoStands.JoJoStands.timestopImmune.Add(ModContent.ProjectileType<TheWorldOverHeavenStandT2>());
             JoJoStands.JoJoStands.timestopImmune.Add(ModContent.ProjectileType<TheWorldOverHeavenStandT3>());
             JoJoStands.JoJoStands.timestopImmune.Add(ModContent.ProjectileType<TheWorldOverHeavenStandFinal>());
+            JoJoStands.JoJoStands.timestopImmune.Add(ModContent.ProjectileType<WaywardSonStandT3>());
+            JoJoStands.JoJoStands.timestopImmune.Add(ModContent.ProjectileType<WaywardSonStandFinal>());
         }
 
         public override void Unload()

@@ -3,6 +3,7 @@ using JoJoFanStands.Items.Stands;
 using JoJoFanStands.Mounts;
 using JoJoStands;
 using JoJoStands.Items.Hamon;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameInput;
@@ -31,11 +32,13 @@ namespace JoJoFanStands
         public bool blurLightningFastReflexes = false;
         public bool blurInfiniteVelocity = false;
         public bool realityRewriteActive = false;
+        public bool customCameraOverride = false;
 
         public int banksDefenseReduction = 0;
         public int lucySelectedMarkerWhoAmI;
         public int amountOfBlurEnergy = 0;
         public int blurStage = 0;
+        public Vector2 customCameraPosition;
 
         public override void ResetEffects()
         {
@@ -43,6 +46,7 @@ namespace JoJoFanStands
             roseColoredSunActive = false;
             blurLightningFastReflexes = false;
             blurInfiniteVelocity = false;
+            customCameraOverride = false;
         }
 
         public override void ProcessTriggers(TriggersSet triggersSet)
@@ -166,12 +170,19 @@ namespace JoJoFanStands
             Item inputItem = mPlayer.StandSlot.SlotItem;
 
             FanStandItemClass standItem = inputItem.ModItem as FanStandItemClass;
-            string standClassName = standItem.StandProjectileName + "StandT" + standItem.StandTier;
+            string standClassName = standItem.StandIdentifierName + "StandT" + standItem.StandTier;
             if (standClassName.Contains("T4"))
-                standClassName = standItem.StandProjectileName + "StandFinal";
+                standClassName = standItem.StandIdentifierName + "StandFinal";
 
             int standProjectileType = Mod.Find<ModProjectile>(standClassName).Type;
             Projectile.NewProjectile(inputItem.GetSource_FromThis(), Player.position, Player.velocity, standProjectileType, 0, 0f, Player.whoAmI);
+        }
+
+        public override void ModifyScreenPosition()     //used HERO's Mods FlyCam as a reference for this
+        {
+            MyPlayer mPlayer = Player.GetModPlayer<MyPlayer>();
+            if (mPlayer.standOut && customCameraOverride)
+                Main.screenPosition = customCameraPosition;
         }
 
         public override void ModifyHitByNPC(NPC npc, ref Player.HurtModifiers modifiers)

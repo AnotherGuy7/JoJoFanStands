@@ -1,3 +1,4 @@
+using JoJoFanStands.Buffs;
 using JoJoStands;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -95,7 +96,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.TheFates
 
                     shootVel.Normalize();
                     shootVel *= ProjectileSpeed;
-                    int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y - 20f, shootVel.X, shootVel.Y, ModContent.ProjectileType<Fists>(), 7, 2f, Main.myPlayer, 0f, 0f);
+                    int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X, Projectile.Center.Y - 20f, shootVel.X, shootVel.Y, ModContent.ProjectileType<FanStandFists>(), 7, 2f, Main.myPlayer, 0f, 0f);
                     Main.projectile[proj].netUpdate = true;
                     Projectile.netUpdate = true;
                 }
@@ -112,10 +113,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.TheFates
                 Projectile.direction = (Projectile.spriteDirection = player.direction);
                 Projectile.rotation = 0;
             }
-            if (Main.mouseRight && !player.HasBuff(Mod.Find<ModBuff>("SoreEye").Type))
+            if (Main.mouseRight && !player.HasBuff(ModContent.BuffType<SoreEye>()))
             {
                 Main.mouseLeft = false;
-                player.AddBuff(Mod.Find<ModBuff>("Forewarned").Type, 180);
+                player.AddBuff(ModContent.BuffType<Forewarned>(), 180);
             }
             Vector2 direction = player.Center - Projectile.Center;
             float distanceTo = direction.Length();

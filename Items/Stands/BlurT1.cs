@@ -13,7 +13,7 @@ namespace JoJoFanStands.Items.Stands
     {
         public override int StandSpeed => 8;
         public override int StandType => 1;
-        public override string StandProjectileName => "Blur";
+        public override string StandIdentifierName => "Blur";
         public override int StandTier => 1;
         public override Color StandTierDisplayColor => BlurFinal.BlurStandTierColor;
         public override bool FanStandItem => true;
