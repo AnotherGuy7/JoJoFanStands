@@ -7,10 +7,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Buffs\RealityRewriteBuff.png" />
-    <None Remove="Projectiles\PlayerStands\WaywardSon\WaywardSonVoid.png" />
-    <None Remove="Projectiles\PlayerStands\WaywardSon\WaywardSon_Attack.png" />
-    <None Remove="Projectiles\PlayerStands\WaywardSon\WaywardSon_Idle.png" />
-    <None Remove="Projectiles\PlayerStands\WaywardSon\WaywardSon_Secondary.png" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
