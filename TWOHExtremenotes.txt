@@ -1,0 +1,6 @@
+-added TWOHExtreme to TS resistant stands list
+
+-got no new textures since I suck at textures
+
+-also added a new set of armor (using the same textures as Requiem armors) for testing
+if it works, I will hopefully make Calamity progression armors and equipments
