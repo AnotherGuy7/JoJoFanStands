@@ -572,6 +572,21 @@ Mods: {
 					Reference: Carry on Wayward Son by Kansas
 					'''
 			}
+
+			DIOOHBoots: {
+				DisplayName: D I O O H Boots
+				Tooltip: ""
+			}
+
+			DIOOHHair: {
+				DisplayName: D I O O H Hair
+				Tooltip: ""
+			}
+
+			DIOOHShirt: {
+				DisplayName: D I O O H Shirt
+				Tooltip: ""
+			}
 		}
 
 		NPCs.Pao.DisplayName: Pao
@@ -635,6 +650,7 @@ Mods: {
 			WaywardSonAfterImage.DisplayName: Wayward Son After Image
 			WaywardSonVoid.DisplayName: Wayward Son Void
 			FanStandFists.DisplayName: Fan Stand Fists
+			WaywardSonTiny.DisplayName: Wayward Son Tiny
 		}
 
 		Configs: {

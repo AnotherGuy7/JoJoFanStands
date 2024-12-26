@@ -1,7 +1,9 @@
+using JoJoFanStands.Projectiles.PlayerStands.WaywardSon;
 using JoJoStands;
 using JoJoStands.Buffs.Debuffs;
 using Terraria;
 using Terraria.ModLoader;
+using Terraria.WorldBuilding;
 
 namespace JoJoFanStands.Projectiles
 {
@@ -12,6 +14,7 @@ namespace JoJoFanStands.Projectiles
 
         private int standType = 0;
         private int standTier = 0;
+        public ModProjectile standInstance;
 
         public override void SetDefaults()
         {
@@ -30,6 +33,12 @@ namespace JoJoFanStands.Projectiles
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             standType = mPlayer.standFistsType;
             standTier = mPlayer.standTier;
+
+            if (standType == WaywardSonFists)
+            {
+                if (standInstance != null && standTier == 3)
+                    (standInstance as WaywardSonStandT3).standAbilities.AttackEffects(Projectile);
+            }
         }
 
         public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
@@ -47,10 +56,13 @@ namespace JoJoFanStands.Projectiles
 
             if (standType == WaywardSonFists)
             {
-                if (standTier == 3)
-                    target.AddBuff(ModContent.BuffType<LifePunch>(), 4 * 60);
-                else if (standTier == 4)
-                    target.AddBuff(ModContent.BuffType<LifePunch>(), 6 * 60);
+                if (standInstance != null)
+                {
+                    if (standTier == 3)
+                        (standInstance as WaywardSonStandT3).standAbilities.AttackModifiers(target, ref modifiers);
+                    //else if (standTier == 4)
+                        //(standInstance as WaywardSonStandFinal).standAbilities.AttackModifiers(target, ref modifiers);
+                }
             }
         }
 

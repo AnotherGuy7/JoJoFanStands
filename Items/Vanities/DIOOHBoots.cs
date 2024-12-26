@@ -2,7 +2,7 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace JoJoStands.Items.Vanities
+namespace JoJoFanStands.Items.Vanities
 {
     [AutoloadEquip(EquipType.Legs)]
     public class DIOOHBoots : ModItem

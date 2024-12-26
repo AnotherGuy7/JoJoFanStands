@@ -98,6 +98,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
                         shotgunChargeTimer++;
                         if (shotgunChargeTimer >= 60)
                         {
+                            shotgunChargeTimer = 0;
                             shootCount += newShootTime;
                             Vector2 shootVel = target.Center - Projectile.Center;
                             shootVel.Normalize();
@@ -112,7 +113,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Banks
                                 int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, perturbedSpeed, ProjectileID.Bullet, newProjectileDamage * 2, 1f, player.whoAmI);
                                 Main.projectile[proj].netUpdate = true;
                             }
-                            shotgunChargeTimer = 0;
                             SoundEngine.PlaySound(SoundID.Item36, Projectile.position);
                         }
                         target.GetGlobalNPC<FanGlobalNPC>().banksCoinMultiplier = coinMultiplier;

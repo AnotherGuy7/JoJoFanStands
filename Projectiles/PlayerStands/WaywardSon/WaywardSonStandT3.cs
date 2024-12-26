@@ -21,11 +21,18 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
         public override int PunchTime => 11;
         public override int TierNumber => 3;
         public override int FistID => FanStandFists.WaywardSonFists;
+        public override Vector2 StandOffset => new Vector2(-24, 0f);
         public override bool CanUseAfterImagePunches => false;
         public override StandAttackType StandType => StandAttackType.Melee;
         public new AnimationState currentAnimationState;
         public new AnimationState oldAnimationState;
-        private WaywardSonAbilities standAbilities;
+        public WaywardSonAbilities standAbilities;
+        public bool canAttack = true;
+        public bool canDraw = true;
+
+        //private readonly Point HeadParticlePoint = new Point(37 - 6, 11 - 4);
+        //private readonly Point ArmParticlePoint = new Point(18, 42);
+        //private readonly Point LegParticlePoint = new Point(40, 67);
 
         public new enum AnimationState
         {
@@ -78,6 +85,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
         private const byte TheFates = 38;
         private const byte TheWorldOverHeaven = 39;
         private const byte WaywardSon = 40;
+        private const byte GoldExperienceRequiem = 41;
 
         private Dictionary<string, byte> StandTypes = new Dictionary<string, byte>()
         {
@@ -89,6 +97,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             { "DollyDagger", DollyDagger },
             { "Echoes", Echoes },
             { "GoldExperience", GoldExperience },
+            { "GoldExperienceRequiem", GoldExperienceRequiem },
             { "GratefulDead", GratefulDead },
             { "HermitPurple", HermitPurple },
             { "HierophantGreen", HierophantGreen },
@@ -173,6 +182,20 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                 return;
             }
 
+            canAttack = true;
+            canDraw = true;
+            if (standAbilities == null)
+            {
+                standAbilities = new WaywardSonAbilities(mPlayer.standTier);
+                standAbilities.UpdateInformation(firstStandType, player);
+            }
+            else
+            {
+                standAbilities.UpdateInformation(firstStandType, player);
+                canAttack = standAbilities.canAttack;
+                canDraw = standAbilities.canDraw;
+            }
+
             int highestDamage = PunchDamage;
             for (int i = 0; i < player.inventory.Length; i++)
             {
@@ -186,41 +209,39 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
 
             if (Projectile.owner == Main.myPlayer)
             {
-                if (Main.mouseLeft)
+                if (Main.mouseLeft && canAttack)
                 {
-                    Punch(ModContent.ProjectileType<FanStandFists>(), afterImages: false);
-                    currentAnimationState = AnimationState.Attack;
-                    for (int n = 0; n < Main.maxNPCs; n++)
+                    int curAnimationState = (int)currentAnimationState;
+                    if (!standAbilities.OverrideMainAttack(ref curAnimationState))
                     {
-                        if (Main.npc[n].active)
+                        int punchIndex = Punch(ModContent.ProjectileType<FanStandFists>(), new Vector2(mouseX, mouseY), afterImages: false);
+                        if (punchIndex != -1)
                         {
-                            NPC npc = Main.npc[n];
-                            bool directionCheck = Projectile.direction == 1 ? npc.Center.X > Projectile.Center.X : npc.Center.X < Projectile.Center.X;
-                            float npcDistance = Vector2.Distance(npc.Center, Projectile.Center);
-                            if (directionCheck && npcDistance < AttackVacuumRange)
+                            (Main.projectile[punchIndex].ModProjectile as FanStandFists).standInstance = Projectile.ModProjectile;
+                            shootCount = standAbilities.CloneSpeedChanges(firstStandType, standCompletion);
+                        }
+
+                        currentAnimationState = AnimationState.Attack;
+                        for (int n = 0; n < Main.maxNPCs; n++)
+                        {
+                            if (Main.npc[n].active)
                             {
-                                Vector2 direction = Projectile.Center - npc.Center;
-                                direction.Normalize();
-                                direction *= AttackVacuumForce;
-                                npc.velocity += direction;
+                                NPC npc = Main.npc[n];
+                                bool directionCheck = Projectile.direction == 1 ? npc.Center.X > Projectile.Center.X : npc.Center.X < Projectile.Center.X;
+                                float npcDistance = Vector2.Distance(npc.Center, Projectile.Center);
+                                if (directionCheck && npcDistance < AttackVacuumRange)
+                                {
+                                    Vector2 direction = Projectile.Center - npc.Center;
+                                    direction.Normalize();
+                                    direction *= AttackVacuumForce;
+                                    npc.velocity += direction;
+                                }
                             }
                         }
+                        standAbilities.WhirlwindAttackEffects(Projectile, AttackVacuumRange);
+                        AttackClone(firstStandType, standCompletion);
                     }
-
-                    int amountOfDusts = Main.rand.Next(1, 2 + 1);
-                    for (int i = 0; i < amountOfDusts; i++)
-                    {
-                        float xOffset = Main.rand.Next(0, (int)AttackVacuumRange + 1) * Projectile.direction;
-                        float yOffset = (Main.rand.Next(-100, 100 + 1) / 100f) * (xOffset / AttackVacuumRange) * (AttackVacuumRange * 3f / 4f);       //Cone-like shape
-                        Vector2 dustPosition = Projectile.Center + new Vector2(xOffset, yOffset);
-                        Vector2 dustVelocity = -new Vector2(xOffset, yOffset);
-                        dustVelocity.Normalize();
-                        dustVelocity *= 3f * (Main.rand.Next(80, 120 + 1) / 100f);
-                        int dustIndex = Dust.NewDust(dustPosition, 2, 2, DustID.Cloud);
-                        Main.dust[dustIndex].velocity = dustVelocity;
-                        Main.dust[dustIndex].noGravity = true;
-                    }
-                    AttackClone(firstStandType, standCompletion);
+                    currentAnimationState = (AnimationState)curAnimationState;
                 }
                 else
                 {
@@ -240,10 +261,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                     secondaryDirection.Normalize();
                     secondaryDirection *= 12f;
                 }
-                if (standAbilities == null)
-                    standAbilities = new WaywardSonAbilities(mPlayer.standTier);
-                else
-                    standAbilities.ManageAbilities(firstStandType, player, Projectile);
+                standAbilities.ManageAbilities(Projectile);
             }
 
             float playerDistance = (player.Center - Projectile.Center).Length();
@@ -275,6 +293,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                     {
                         secondaryAbility = false;
                         player.AddBuff(ModContent.BuffType<AbilityCooldown>(), mPlayer.AbilityCooldownTime(10));
+                        standAbilities.OnSecondaryUse(Projectile);
                     }
                 }
                 else
@@ -310,6 +329,62 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             else
             {
                 LimitDistance();
+            }
+
+            /*int amountOfParticles = Main.rand.Next(1, 2 + 1);
+            for (int i = 0; i < amountOfParticles; i++)
+            {
+                Vector2 spawnPosition = Projectile.Center - (new Vector2(84, 86) / 2f) + HeadParticlePoint.ToVector2() + StandOffset;
+                float angle = Main.rand.Next(115, 155 + 1) + 90;
+                Vector2 dustVelocity = MathHelper.ToRadians(angle).ToRotationVector2() * 1.4f;
+                int dustIndex = Dust.NewDust(spawnPosition, 4, 4, DustID.Platinum, dustVelocity.X, dustVelocity.Y, Scale: 0.7f);
+                Main.dust[dustIndex].noGravity = true;
+            }
+
+            amountOfParticles = Main.rand.Next(1, 2 + 1);
+            for (int i = 0; i < amountOfParticles; i++)
+            {
+                Vector2 spawnPosition = Projectile.Center - (new Vector2(84, 86) / 2f) + ArmParticlePoint.ToVector2() + StandOffset;
+                float angle = Main.rand.Next(133, 137 + 1);
+                Vector2 dustVelocity = MathHelper.ToRadians(angle).ToRotationVector2() * 1.4f;
+                int dustIndex = Dust.NewDust(spawnPosition, 4, 4, DustID.Copper, dustVelocity.X, dustVelocity.Y, Scale: 0.7f);
+                Main.dust[dustIndex].noGravity = true;
+            }
+
+            amountOfParticles = Main.rand.Next(1, 2 + 1);
+            for (int i = 0; i < amountOfParticles; i++)
+            {
+                Vector2 spawnPosition = Projectile.Center - (new Vector2(84, 86) / 2f) + LegParticlePoint.ToVector2() + StandOffset;
+                float angle = Main.rand.Next(133, 137 + 1);
+                Vector2 dustVelocity = MathHelper.ToRadians(angle).ToRotationVector2() * 1.4f;
+                int dustIndex = Dust.NewDust(spawnPosition, 4, 4, DustID.Platinum, dustVelocity.X, dustVelocity.Y, Scale: 0.7f);
+                Main.dust[dustIndex].noGravity = true;
+            }*/
+        }
+
+        public override bool CustomStandDrawing => true;
+
+        public override void CustomDrawStand(Color drawColor)
+        {
+            if (!canDraw)
+                return;
+
+            if (UseProjectileAlpha)
+                drawColor *= Projectile.alpha / 255f;
+
+            effects = SpriteEffects.None;
+            if (Projectile.spriteDirection == -1)
+                effects = SpriteEffects.FlipHorizontally;
+
+            if (standTexture != null && Main.netMode != NetmodeID.Server)
+            {
+                int frameHeight = standTexture.Height / amountOfFrames;
+                Vector2 drawOffset = StandOffset;
+                drawOffset.X *= Projectile.spriteDirection;
+                Vector2 drawPosition = Projectile.Center - Main.screenPosition + drawOffset;
+                Rectangle animRect = new Rectangle(0, frameHeight * Projectile.frame, standTexture.Width, frameHeight);
+                Vector2 standOrigin = new Vector2(standTexture.Width / 2f, frameHeight / 2f);
+                Main.EntitySpriteDraw(standTexture, drawPosition, animRect, drawColor, Projectile.rotation, standOrigin, Projectile.scale, effects, 0);
             }
         }
 
@@ -370,46 +445,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                     LimitDistance();
                 }
             }
-        }
-
-        private int CloneDamageChanges(int firstStandType, float standCompletion)
-        {
-            if (firstStandType == -1)
-                return newPunchDamage;
-
-            Player player = Main.player[Projectile.owner];
-            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-
-            float newDamage = newPunchDamage;
-            if (firstStandType == StarPlatinum)
-                newDamage *= 2 * (standCompletion + 1f);
-            else if (firstStandType == TheWorld)
-                newDamage *= 2 * (standCompletion + 1f);
-            else if (firstStandType == CrazyDiamond)
-                newDamage *= 1.5f * (standCompletion + 1f);
-            else if (firstStandType == Echoes && standCompletion == 0.25f)
-                newDamage *= 0.5f;
-            else if (firstStandType == KingCrimson)
-                newDamage *= 2f * (standCompletion + 1f);
-            else if (firstStandType == StoneFree)
-                newDamage *= 1.5f * (standCompletion + 1f);
-            return (int)newDamage;
-        }
-
-        private int CloneSpeedChanges(int firstStandType, float standCompletion)
-        {
-            if (firstStandType == -1)
-                return newPunchTime;
-
-            Player player = Main.player[Projectile.owner];
-            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-
-            float punchTime = newPunchDamage;
-            if (firstStandType == SilverChariot)
-                punchTime *= 0.5f * (standCompletion + 1f);
-            else if (firstStandType == MortalReminder)
-                punchTime *= 0.5f * (standCompletion + 1f);
-            return (int)punchTime;
         }
 
         /*private void SpecialClone(int firstStandType, float standCompletion)

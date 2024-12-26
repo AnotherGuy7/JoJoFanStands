@@ -2,7 +2,7 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace JoJoStands.Items.Vanities
+namespace JoJoFanStands.Items.Vanities
 {
     [AutoloadEquip(EquipType.Body)]
     public class DIOOHShirt : ModItem

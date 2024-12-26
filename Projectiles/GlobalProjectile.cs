@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles
 {
-    public class JoJoGlobalProjectile : GlobalProjectile
+    public class JoJoFanGlobalProjectile : GlobalProjectile
     {
         public bool slowedByBlur = false;
         public Vector2 slowedVelocity;

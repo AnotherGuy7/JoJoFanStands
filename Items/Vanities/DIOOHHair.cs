@@ -1,7 +1,7 @@
 ﻿using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace JoJoStands.Items.Vanities
+namespace JoJoFanStands.Items.Vanities
 {
     [AutoloadEquip(EquipType.Head)]
     public class DIOOHHair : ModItem
