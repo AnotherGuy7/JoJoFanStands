@@ -37,6 +37,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
         public Player standOwner;
         public bool canAttack = true;
         public bool canDraw = true;
+        public bool limitDistance = true;
 
         private const byte Aerosmith = 0;
         private const byte BadCompany = 1;
@@ -164,6 +165,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
 
         private bool IsCrystallized;
 
+        private int attacksLeftBeforeProjectile;
 
         public static readonly SoundStyle ScrapeSoundEffect = new SoundStyle("JoJoStands/Sounds/GameSounds/BRRR")
         {
@@ -187,6 +189,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             standOwner = owner;
             canAttack = true;
             canDraw = true;
+            limitDistance = true;
             StandEffects();
         }
 
@@ -206,12 +209,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                 helpTipCooldown--;
             if (nailShootCooldown > 0)
                 nailShootCooldown--;
+            if (generalAbilityTimer > 0)
+                generalAbilityTimer--;
 
             if ((currentStandType == Tusk || currentStandType == Echoes) && standInstance.SecondSpecialKeyPressed(false))
             {
                 currentAct++;
                 if (currentAct >= standTier)
                     currentAct = 0;
+                Main.NewText("Current Act: " + currentAct);
             }
 
             if (currentStandType == Aerosmith)
@@ -780,7 +786,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                     {
                         int yPos = (((int)Main.MouseWorld.Y / 16) - 3) * 16;
                         Projectile.NewProjectile(projectile.GetSource_FromThis(), Main.MouseWorld.X, yPos, 0f, 0f, ModContent.ProjectileType<GETree>(), 1, 0f, projectile.owner, standTier);
-                        player.AddBuff(ModContent.BuffType<AbilityCooldown>(), mPlayer.AbilityCooldownTime(12));
+                        player.AddBuff(ModContent.BuffType<AbilityCooldown>(), mPlayer.AbilityCooldownTime((int)(4 / standCompletionProgress)));
                     }
                 }
             }
@@ -859,7 +865,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                     spawningField = true;
                     formPosition = projectile.position;
                 }
-                if (spawningField && owner == Main.myPlayer)
+                if (spawningField)
                 {
                     float randomAngle = MathHelper.ToRadians(Main.rand.Next(0, 360 + 1));
                     Vector2 pointPosition = formPosition + (randomAngle.ToRotationVector2() * EmeraldSplashRadius);
@@ -1312,29 +1318,26 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             else if (currentStandType == TowerOfGray)
             {
                 if (standInstance.SpecialKeyPressed())
-                {
                     mimicTowerOfGraySize = !mimicTowerOfGraySize;
-                }
                 if (mimicTowerOfGraySize)
-                {
                     projectile.scale = 0.4f;
-                }
             }
             else if (currentStandType == Tusk)
             {
-                if (standInstance.SpecialKeyPressed() && standOwner.ownedProjectileCounts[ModContent.ProjectileType<WormholeNail>()] <= 0 && standOwner.ownedProjectileCounts[ModContent.ProjectileType<ArmWormholeNail>()] <= 0 && !standOwner.HasBuff(ModContent.BuffType<AbilityCooldown>()))
+                if (standInstance.SpecialKeyPressed() && standOwner.ownedProjectileCounts[ModContent.ProjectileType<WaywardSonTuskWormhole>()] <= 0 && !standOwner.HasBuff(ModContent.BuffType<AbilityCooldown>()))
                 {
                     SoundEngine.PlaySound(SoundID.Item78, player.Center);
                     Vector2 shootVelocity = Main.MouseWorld - standOwner.Center;
                     shootVelocity.Normalize();
                     shootVelocity *= 5f;
-                    Projectile.NewProjectile(projectile.GetSource_FromThis(), standOwner.Center, shootVelocity, ModContent.ProjectileType<WormholeNail>(), 124, 8f, projectile.whoAmI);
+                    Projectile.NewProjectile(projectile.GetSource_FromThis(), standOwner.Center, shootVelocity, ModContent.ProjectileType<WaywardSonTuskWormhole>(), 124, 8f, projectile.whoAmI);
                 }
             }
             else if (currentStandType == Whitesnake)
             {
                 if (standInstance.SpecialKeyCurrent() && standInstance.shootCount <= 0 && !stealingDisc)
                 {
+                    limitDistance = false;
                     projectile.velocity = Main.MouseWorld - projectile.position;
                     projectile.velocity.Normalize();
                     projectile.velocity *= 5f;
@@ -1346,8 +1349,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                         projectile.velocity = Vector2.Zero;
 
                     waitingForStealEnemy = true;
-                    projectile.frame = 0;
-                    projectile.frameCounter = 0;
                     for (int n = 0; n < Main.maxNPCs; n++)
                     {
                         NPC npc = Main.npc[n];
@@ -1378,24 +1379,18 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                 }
                 if (stealingDisc && projectile.ai[0] != -1f)
                 {
+                    limitDistance = false;
                     projectile.velocity = Vector2.Zero;
                     NPC npc = Main.npc[(int)projectile.ai[0]];
                     npc.direction = -projectile.direction;
                     npc.position = projectile.position + new Vector2(-6f * projectile.direction, -2f - npc.height / 3f);
                     npc.velocity = Vector2.Zero;
-                    if (projectile.frame == 4)
-                    {
-                        npc.AddBuff(ModContent.BuffType<Stolen>(), 30 * 60);
-                        npc.GetGlobalNPC<JoJoGlobalNPC>().whitesnakeDISCImmune += 1;
-                        SyncCall.SyncStandEffectInfo(player.whoAmI, npc.whoAmI, 9);
-                        projectile.frame += 1;
-                    }
-                    if (projectile.frame == 6)
-                    {
-                        stealingDisc = false;
-                        projectile.ai[0] = -1f;
-                        standInstance.shootCount += 60;
-                    }
+                    npc.AddBuff(ModContent.BuffType<Stolen>(), 30 * 60);
+                    npc.GetGlobalNPC<JoJoGlobalNPC>().whitesnakeDISCImmune += 1;
+                    SyncCall.SyncStandEffectInfo(player.whoAmI, npc.whoAmI, 9);
+                    stealingDisc = false;
+                    projectile.ai[0] = -1f;
+                    standInstance.shootCount += 60;
                     if (!npc.active)
                     {
                         stealingDisc = false;
@@ -1405,22 +1400,17 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                 }
                 if (stealingDisc && projectile.ai[1] != -1f)
                 {
+                    limitDistance = false;
                     projectile.velocity = Vector2.Zero;
                     Player otherPlayer = Main.player[(int)projectile.ai[1]];
                     otherPlayer.direction = -projectile.direction;
                     otherPlayer.position = projectile.position + new Vector2(-6f * projectile.direction, -2f - otherPlayer.height / 3f);
                     otherPlayer.velocity = Vector2.Zero;
-                    if (projectile.frame == 4)      //this is the frame where the disc has just been stolen
-                    {
-                        otherPlayer.AddBuff(ModContent.BuffType<Stolen>(), 30 * 60);
-                        SyncCall.SyncOtherPlayerDebuff(player.whoAmI, otherPlayer.whoAmI, ModContent.BuffType<Stolen>(), 30 * 60);
-                    }
-                    if (projectile.frame == 6)      //anim ended
-                    {
-                        stealingDisc = false;
-                        projectile.ai[1] = -1f;
-                        standInstance.shootCount += 60;
-                    }
+                    otherPlayer.AddBuff(ModContent.BuffType<Stolen>(), 30 * 60);
+                    SyncCall.SyncOtherPlayerDebuff(player.whoAmI, otherPlayer.whoAmI, ModContent.BuffType<Stolen>(), 30 * 60);
+                    stealingDisc = false;
+                    projectile.ai[1] = -1f;
+                    standInstance.shootCount += 60;
                     if (!otherPlayer.active)
                     {
                         stealingDisc = false;
@@ -1464,14 +1454,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                 if (standInstance.SpecialKeyPressed() && !player.HasBuff(ModContent.BuffType<Intangible>()))
                     player.AddBuff(ModContent.BuffType<Intangible>(), 7200);
             }
-            else if (currentStandType == LucyInTheSky)
-            {
-                Vector3 lightLevel = Lighting.GetColor((int)Main.MouseWorld.X / 16, (int)Main.MouseWorld.Y / 16).ToVector3();       //1.703 is max light
-                if (lightLevel.Length() > 1.3f && Main.tile[(int)Main.MouseWorld.X / 16, (int)Main.MouseWorld.Y / 16].TileType == TileID.Torches)
-                {
-                    standOwner.statDefense += (int)(standOwner.statDefense * 0.5f);
-                }
-            }
             else if (currentStandType == TheWorldOverHeaven)
             {
                 if (standInstance.SpecialKeyPressed())
@@ -1483,6 +1465,17 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
         {
             if (currentStandType == BadCompany)
                 canAttack = canDraw = false;
+            else if (currentStandType == Whitesnake)
+            {
+                if (standInstance != null && standInstance.SpecialKeyCurrent() && standInstance.shootCount <= 0 && !stealingDisc)
+                    limitDistance = false;
+            }
+            else if (currentStandType == LucyInTheSky)
+            {
+                Vector3 lightLevel = Lighting.GetColor((int)standOwner.Center.X / 16, (int)standOwner.Center.Y / 16).ToVector3();       //1.703 is max light
+                if (lightLevel.Length() > 1.3f)
+                    standOwner.statDefense += (int)(standOwner.statDefense * 0.5f);
+            }
         }
 
         public bool OverrideMainAttack(ref int currentAnimationState)
@@ -1492,42 +1485,44 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             {
                 if (standInstance.shootCount <= 0)
                 {
-                    standInstance.shootCount += standInstance.newShootTime * 2;
-                    int direction = Main.MouseWorld.X > standOwner.Center.X ? 1 : -1;
-                    Vector2 shootVel = Main.MouseWorld - standInstance.Projectile.Center;
-                    if (shootVel == Vector2.Zero)
-                        shootVel = new Vector2(0f, 1f);
-
-                    shootVel.Normalize();
-                    shootVel *= 16f;
-                    float numberProjectiles = 6;
-                    float rotation = MathHelper.ToRadians(30);
-                    float randomSpeedOffset = (100f + Main.rand.NextFloat(-6f, 6f)) / 100f;
-                    for (int i = 0; i < numberProjectiles; i++)
+                    if (attacksLeftBeforeProjectile <= 0)
                     {
-                        Vector2 perturbedSpeed = shootVel.RotatedBy(MathHelper.Lerp(-rotation, rotation, i / (numberProjectiles - 1))) * .2f;
-                        perturbedSpeed *= randomSpeedOffset;
-                        int projIndex = Projectile.NewProjectile(standInstance.Projectile.GetSource_FromThis(), standInstance.Projectile.Center, perturbedSpeed, ModContent.ProjectileType<Emerald>(), (int)(standInstance.newProjectileDamage * 0.85f), 3f, standOwner.whoAmI);
-                        Main.projectile[projIndex].netUpdate = true;
+                        attacksLeftBeforeProjectile = (int)(2 / standCompletionProgress);
+                        int direction = Main.MouseWorld.X > standOwner.Center.X ? 1 : -1;
+                        Vector2 shootVel = Main.MouseWorld - standInstance.Projectile.Center;
+                        if (shootVel == Vector2.Zero)
+                            shootVel = new Vector2(0f, 1f);
+
+                        shootVel.Normalize();
+                        shootVel *= 16f;
+                        float numberProjectiles = standTier + 1;
+                        float rotation = MathHelper.ToRadians(30);
+                        float randomSpeedOffset = (100f + Main.rand.NextFloat(-6f, 6f)) / 100f;
+                        for (int i = 0; i < numberProjectiles; i++)
+                        {
+                            Vector2 perturbedSpeed = shootVel.RotatedBy(MathHelper.Lerp(-rotation, rotation, i / (numberProjectiles - 1))) * .2f;
+                            perturbedSpeed *= randomSpeedOffset;
+                            int projIndex = Projectile.NewProjectile(standInstance.Projectile.GetSource_FromThis(), standInstance.Projectile.Center, perturbedSpeed, ModContent.ProjectileType<Emerald>(), (int)(standInstance.newPunchDamage / 4 * standCompletionProgress), 3f, standOwner.whoAmI);
+                            Main.projectile[projIndex].netUpdate = true;
+                        }
+                        SoundEngine.PlaySound(SoundID.Item21, standInstance.Projectile.position);
+                        standInstance.Projectile.netUpdate = true;
+                        if (standOwner.velocity.X == 0f)
+                            standOwner.ChangeDir(direction);
                     }
-                    SoundEngine.PlaySound(SoundID.Item21, standInstance.Projectile.position);
-                    standInstance.Projectile.netUpdate = true;
-                    if (standOwner.velocity.X == 0f)
-                        standOwner.ChangeDir(direction);
+                    else
+                        attacksLeftBeforeProjectile--;
                 }
-                return true;
             }
             else if (currentStandType == KillerQueenBTD)
             {
-                if (standInstance.attacking)
-                    standInstance.GoInFront();
-
-                if (Main.mouseLeft && standInstance.Projectile.ai[0] == 0f)
+                if (attacksLeftBeforeProjectile <= 0)
                 {
+                    attacksLeftBeforeProjectile = (int)(4 / standCompletionProgress);
                     standInstance.attacking = true;
                     currentAnimationState = 1;
                     standInstance.Projectile.netUpdate = true;
-                    if (standInstance.Projectile.frame == 4 && standOwner.GetModPlayer<MyPlayer>().standControlStyle == MyPlayer.StandControlStyle.Manual)
+                    if (standOwner.GetModPlayer<MyPlayer>().standControlStyle == MyPlayer.StandControlStyle.Manual)
                     {
                         if (standInstance.shootCount <= 0)
                         {
@@ -1538,13 +1533,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
 
                             shootVel.Normalize();
                             shootVel *= 4f;
-                            int projIndex = Projectile.NewProjectile(standInstance.Projectile.GetSource_FromThis(), standInstance.Projectile.Center, shootVel, ModContent.ProjectileType<ExplosiveBubble>(), (int)(456 * standOwner.GetModPlayer<MyPlayer>().standDamageBoosts), 6f, standInstance.Projectile.owner, 1f, standOwner.whoAmI);
+                            int projIndex = Projectile.NewProjectile(standInstance.Projectile.GetSource_FromThis(), standInstance.Projectile.Center, shootVel, ModContent.ProjectileType<ExplosiveBubble>(), standInstance.newPunchDamage * 2, 6f, standInstance.Projectile.owner, 1f, standOwner.whoAmI);
                             Main.projectile[projIndex].netUpdate = true;
                             standInstance.Projectile.netUpdate = true;
                         }
                     }
                     return true;
                 }
+                else
+                    attacksLeftBeforeProjectile--;
             }
             else if (currentStandType == SexPistols)
             {
@@ -1575,36 +1572,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                 }
                 return false;
             }
-            else if (currentStandType == HierophantGreen)
-            {
-                if (standInstance.shootCount <= 0)
-                {
-                    int direction = Main.MouseWorld.X > standOwner.Center.X ? 1 : -1;
-                    Vector2 shootVel = Main.MouseWorld - standInstance.Projectile.Center;
-                    if (shootVel == Vector2.Zero)
-                        shootVel = new Vector2(0f, 1f);
-
-                    shootVel.Normalize();
-                    shootVel *= 16f;
-                    float numberProjectiles = standTier + 1;
-                    float rotation = MathHelper.ToRadians(30);
-                    float randomSpeedOffset = (100f + Main.rand.NextFloat(-6f, 6f)) / 100f;
-                    for (int i = 0; i < numberProjectiles; i++)
-                    {
-                        Vector2 perturbedSpeed = shootVel.RotatedBy(MathHelper.Lerp(-rotation, rotation, i / (numberProjectiles - 1))) * .2f;
-                        perturbedSpeed *= randomSpeedOffset;
-                        int projIndex = Projectile.NewProjectile(standInstance.Projectile.GetSource_FromThis(), standInstance.Projectile.Center, perturbedSpeed, ModContent.ProjectileType<Emerald>(), (int)(standInstance.newProjectileDamage / 2 * (standTier / 4f)), 3f, standOwner.whoAmI);
-                        Main.projectile[projIndex].netUpdate = true;
-                    }
-                    SoundEngine.PlaySound(SoundID.Item21, standInstance.Projectile.position);
-                    standInstance.Projectile.netUpdate = true;
-                    if (standOwner.velocity.X == 0f)
-                        standOwner.ChangeDir(direction);
-                }
-            }
             else if (currentStandType == SoftAndWet)
             {
-                if (Main.rand.NextBool(9))
+                if (Main.rand.NextBool((int)(18 / standCompletionProgress)))
                 {
                     Vector2 shootVel = Main.MouseWorld - projectile.Center;
                     if (shootVel == Vector2.Zero)
@@ -1616,7 +1586,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                     Projectile.NewProjectile(projectile.GetSource_FromThis(), bubbleSpawnPosition, shootVel, ModContent.ProjectileType<TinyBubble>(), 8 * standTier, 2f, projectile.owner, projectile.whoAmI);
                     SoundEngine.PlaySound(SoundID.Drip, projectile.Center);
                 }
-                if (Main.rand.NextBool(6))
+                if (Main.rand.NextBool((int)(12 / standCompletionProgress)))
                 {
                     if (projectile.owner == Main.myPlayer)
                     {
@@ -1649,7 +1619,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             {
                 if (nailShootCooldown <= 0)
                 {
-                    nailShootCooldown += 300 / standTier;
+                    nailShootCooldown += 5 * 60 / standTier;
                     if (Main.MouseWorld.X > projectile.position.X)
                         projectile.direction = 1;
                     else
@@ -1660,12 +1630,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                     Vector2 shootVelocity = Main.MouseWorld - projectile.Center;
                     shootVelocity.Normalize();
                     shootVelocity *= 4f;
-                    Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center, shootVelocity, ModContent.ProjectileType<ControllableNail>(), (int)(49 * (standTier / 4f)), 5f, projectile.whoAmI);
+                    Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center, shootVelocity, ModContent.ProjectileType<WaywardSonControllableNail>(), (int)(49 * (standTier / 4f)), 5f, standOwner.whoAmI);
                 }
             }
             else if (currentStandType == BackInBlack)
             {
-                if (Main.rand.NextBool((int)(8 + (2 * (4f / standTier)))))
+                if (Main.rand.NextBool((int)(8 + (2 * standCompletionProgress))))
                 {
                     SoundEngine.PlaySound(SoundID.Item78, projectile.position);
                     Vector2 shootVel = Main.MouseWorld - projectile.Center;
@@ -1703,8 +1673,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             }
             else if (currentStandType == CoolOut)
             {
-                int projIndex = Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center.X, projectile.Center.Y - 10f, 0f, 0f, ModContent.ProjectileType<IceSpear>(), standInstance.newPunchDamage / 2, 10f, Main.myPlayer, projectile.whoAmI);
-                Main.projectile[projIndex].netUpdate = true;
+                if (attacksLeftBeforeProjectile <= 0)
+                {
+                    attacksLeftBeforeProjectile = (int)(6 / standCompletionProgress);
+                    int projIndex = Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center.X, projectile.Center.Y - 10f, 0f, 0f, ModContent.ProjectileType<IceSpear>(), standInstance.newPunchDamage / 2, 10f, Main.myPlayer, projectile.whoAmI);
+                    Main.projectile[projIndex].netUpdate = true;
+                }
+                else
+                    attacksLeftBeforeProjectile--;
             }
             else if (currentStandType == RoseColoredBoy)
             {

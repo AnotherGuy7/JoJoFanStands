@@ -5,7 +5,9 @@ using JoJoStands.Items;
 using JoJoStands.Projectiles.PlayerStands;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -21,14 +23,20 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
         public override int PunchTime => 11;
         public override int TierNumber => 3;
         public override int FistID => FanStandFists.WaywardSonFists;
-        public override Vector2 StandOffset => new Vector2(-24, 0f);
+        public override Vector2 StandOffset => new Vector2(-12, 0f);
         public override bool CanUseAfterImagePunches => false;
         public override StandAttackType StandType => StandAttackType.Melee;
         public new AnimationState currentAnimationState;
         public new AnimationState oldAnimationState;
         public WaywardSonAbilities standAbilities;
+
+        private const float RemoteControlMaxDistance = 60f * 16f;
+        private const float AttackVacuumRange = 12f * 16f;
+        private const float AttackVacuumForce = 0.25f;
+
         public bool canAttack = true;
         public bool canDraw = true;
+        public bool limitDistance = true;
 
         //private readonly Point HeadParticlePoint = new Point(37 - 6, 11 - 4);
         //private readonly Point ArmParticlePoint = new Point(18, 42);
@@ -136,12 +144,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             { "WaywardSon", WaywardSon }
         };
 
-        private const float AttackVacuumRange = 12f * 16f;
-        private const float AttackVacuumForce = 0.25f;
-
         private Vector2 secondaryDirection;
         private bool secondaryAbilityStab = false;
         private int stabNPCTarget = -1;
+        private float floatTimer = 0;
 
         public override void AI()
         {
@@ -194,125 +200,127 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                 standAbilities.UpdateInformation(firstStandType, player);
                 canAttack = standAbilities.canAttack;
                 canDraw = standAbilities.canDraw;
+                limitDistance = standAbilities.limitDistance;
             }
 
-            int highestDamage = PunchDamage;
-            for (int i = 0; i < player.inventory.Length; i++)
+            if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
             {
-                if (player.inventory[i] != null)
+                if (Projectile.owner == Main.myPlayer)
                 {
-                    if (player.inventory[i].damage > highestDamage)
-                        highestDamage = player.inventory[i].damage;
-                }
-            }
-            newPunchDamage = (int)(highestDamage * player.GetModPlayer<MyPlayer>().standDamageBoosts);
-
-            if (Projectile.owner == Main.myPlayer)
-            {
-                if (Main.mouseLeft && canAttack)
-                {
-                    int curAnimationState = (int)currentAnimationState;
-                    if (!standAbilities.OverrideMainAttack(ref curAnimationState))
+                    if (Main.mouseLeft && canAttack)
                     {
-                        int punchIndex = Punch(ModContent.ProjectileType<FanStandFists>(), new Vector2(mouseX, mouseY), afterImages: false);
-                        if (punchIndex != -1)
+                        int curAnimationState = (int)currentAnimationState;
+                        if (standAbilities.OverrideMainAttack(ref curAnimationState))
                         {
-                            (Main.projectile[punchIndex].ModProjectile as FanStandFists).standInstance = Projectile.ModProjectile;
-                            shootCount = standAbilities.CloneSpeedChanges(firstStandType, standCompletion);
+                            int punchIndex = Punch(ModContent.ProjectileType<FanStandFists>(), new Vector2(mouseX, mouseY), afterImages: false);
+                            if (punchIndex != -1)
+                            {
+                                (Main.projectile[punchIndex].ModProjectile as FanStandFists).standInstance = Projectile.ModProjectile;
+                                shootCount = standAbilities.CloneSpeedChanges(firstStandType, standCompletion);
+                            }
+
+                            currentAnimationState = AnimationState.Attack;
+                            for (int n = 0; n < Main.maxNPCs; n++)
+                            {
+                                if (Main.npc[n].active)
+                                {
+                                    NPC npc = Main.npc[n];
+                                    bool directionCheck = Projectile.direction == 1 ? npc.Center.X > Projectile.Center.X : npc.Center.X < Projectile.Center.X;
+                                    float npcDistance = Vector2.Distance(npc.Center, Projectile.Center);
+                                    if (directionCheck && npcDistance < AttackVacuumRange)
+                                    {
+                                        Vector2 direction = Projectile.Center - npc.Center;
+                                        direction.Normalize();
+                                        direction *= AttackVacuumForce;
+                                        npc.velocity += direction;
+                                    }
+                                }
+                            }
+                            standAbilities.WhirlwindAttackEffects(Projectile, AttackVacuumRange);
+                            AttackClone(firstStandType, standCompletion);
+                        }
+                        else
+                            currentAnimationState = (AnimationState)curAnimationState;
+                    }
+                    else
+                    {
+                        attacking = false;
+                        if (!secondaryAbility)
+                        {
+                            if (limitDistance)
+                                StayBehind();
+                            currentAnimationState = AnimationState.Idle;
+                        }
+                    }
+                    if (Main.mouseRight && !playerHasAbilityCooldown && !secondaryAbility)
+                    {
+                        stabNPCTarget = -1;
+                        secondaryAbility = true;
+                        secondaryAbilityStab = false;
+                        secondaryDirection = Main.MouseWorld - Projectile.Center;
+                        secondaryDirection.Normalize();
+                        secondaryDirection *= 12f;
+                        Projectile.netUpdate = true;
+                    }
+                    standAbilities.ManageAbilities(Projectile);
+                }
+
+                float playerDistance = (player.Center - Projectile.Center).Length();
+                if (secondaryAbility)
+                {
+                    if (!secondaryAbilityStab)
+                    {
+                        currentAnimationState = AnimationState.SecondaryAbility;
+                        if (Projectile.owner == Main.myPlayer)
+                        {
+                            Projectile.velocity = secondaryDirection;
+                            Projectile.direction = 1;
+                            if (Projectile.velocity.X < 0)
+                                Projectile.direction = -1;
                         }
 
-                        currentAnimationState = AnimationState.Attack;
                         for (int n = 0; n < Main.maxNPCs; n++)
                         {
-                            if (Main.npc[n].active)
+                            NPC npc = Main.npc[n];
+                            if (npc.active && Projectile.Distance(npc.Center) <= 3f * 16f)
                             {
-                                NPC npc = Main.npc[n];
-                                bool directionCheck = Projectile.direction == 1 ? npc.Center.X > Projectile.Center.X : npc.Center.X < Projectile.Center.X;
-                                float npcDistance = Vector2.Distance(npc.Center, Projectile.Center);
-                                if (directionCheck && npcDistance < AttackVacuumRange)
+                                if (Projectile.owner == Main.myPlayer)
                                 {
-                                    Vector2 direction = Projectile.Center - npc.Center;
-                                    direction.Normalize();
-                                    direction *= AttackVacuumForce;
-                                    npc.velocity += direction;
+                                    stabNPCTarget = n;
+                                    secondaryAbilityStab = true;
+                                    Projectile.frame = 0;
+                                    Projectile.frameCounter = 0;
+                                    Projectile.netUpdate = true;
+                                    break;
                                 }
                             }
                         }
-                        standAbilities.WhirlwindAttackEffects(Projectile, AttackVacuumRange);
-                        AttackClone(firstStandType, standCompletion);
-                    }
-                    currentAnimationState = (AnimationState)curAnimationState;
-                }
-                else
-                {
-                    if (!secondaryAbility)
-                    {
-                        StayBehind();
-                        currentAnimationState = AnimationState.Idle;
-                    }
-                }
-                if (Main.mouseRight)
-                {
-                    stabNPCTarget = -1;
-                    secondaryAbility = true;
-                    secondaryAbilityStab = false;
-                    currentAnimationState = AnimationState.SecondaryAbility;
-                    secondaryDirection = Main.MouseWorld - Projectile.Center;
-                    secondaryDirection.Normalize();
-                    secondaryDirection *= 12f;
-                }
-                standAbilities.ManageAbilities(Projectile);
-            }
-
-            float playerDistance = (player.Center - Projectile.Center).Length();
-            if (secondaryAbility)
-            {
-                if (!secondaryAbilityStab)
-                {
-                    currentAnimationState = AnimationState.SecondaryAbility;
-                    Projectile.velocity = secondaryDirection;
-                    Projectile.direction = 1;
-                    if (Projectile.velocity.X < 0)
-                        Projectile.direction = -1;
-                    Projectile.rotation = secondaryDirection.ToRotation();
-
-                    for (int n = 0; n < Main.maxNPCs; n++)
-                    {
-                        NPC npc = Main.npc[n];
-                        if (npc.active && Projectile.Distance(npc.Center) <= 15f)
+                        if (playerDistance > newMaxDistance * 3)
                         {
-                            if (Projectile.owner == Main.myPlayer)
-                            {
-                                stabNPCTarget = n;
-                                secondaryAbilityStab = true;
-                                break;
-                            }
+                            secondaryAbility = false;
+                            standAbilities.OnSecondaryUse(Projectile);
+                            Projectile.netUpdate = true;
                         }
                     }
-                    if (playerDistance > newMaxDistance * 2)
+                    else
                     {
-                        secondaryAbility = false;
-                        player.AddBuff(ModContent.BuffType<AbilityCooldown>(), mPlayer.AbilityCooldownTime(10));
-                        standAbilities.OnSecondaryUse(Projectile);
-                    }
-                }
-                else
-                {
-                    currentAnimationState = AnimationState.SecondaryAbilityStab;
-                    NPC npc = Main.npc[stabNPCTarget];
-                    if (!npc.active || npc.life <= 0)
-                    {
-                        stabNPCTarget = -1;
-                        secondaryAbility = false;
-                        secondaryAbilityStab = false;
-                        player.AddBuff(ModContent.BuffType<AbilityCooldown>(), mPlayer.AbilityCooldownTime(15));
-                        return;
-                    }
-
-                    if (npc.active && (Projectile.frame == 2 || Projectile.frame == 5))     //hit frames
-                    {
-                        if (Projectile.owner == Main.myPlayer)
+                        Projectile.velocity = Vector2.Zero;
+                        currentAnimationState = AnimationState.SecondaryAbilityStab;
+                        NPC npc = Main.npc[stabNPCTarget];
+                        if (!npc.active || npc.life <= 0 || Projectile.frame >= 3)
                         {
+                            stabNPCTarget = -1;
+                            secondaryAbility = false;
+                            secondaryAbilityStab = false;
+                            player.AddBuff(ModContent.BuffType<AbilityCooldown>(), mPlayer.AbilityCooldownTime(5));
+                            standAbilities.OnSecondaryUse(Projectile);
+                            Projectile.netUpdate = true;
+                            return;
+                        }
+
+                        if (Projectile.owner == Main.myPlayer && npc.active && (Projectile.frame == 0 || Projectile.frame == 2) && shootCount <= 0)     //hit frames
+                        {
+                            shootCount += 4;
                             NPC.HitInfo hitInfo = new NPC.HitInfo()
                             {
                                 Damage = AltDamage,
@@ -321,15 +329,160 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                                 Crit = true
                             };
                             npc.StrikeNPC(hitInfo);
-                            NetMessage.SendStrikeNPC(npc, hitInfo, Main.myPlayer);
+                            NetMessage.SendStrikeNPC(npc, hitInfo, Projectile.owner);
+                            SoundEngine.PlaySound(SoundID.Item2);
                         }
                     }
                 }
+                else
+                {
+                    LimitDistance();
+                }
             }
-            else
+            else if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Auto)
             {
-                LimitDistance();
+                BasicPunchAI();
+                if (!attacking)
+                    currentAnimationState = AnimationState.Idle;
+                else
+                    currentAnimationState = AnimationState.Attack;
             }
+            else if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Remote)
+            {
+                float halfScreenWidth = (float)Main.screenWidth / 2f;
+                float halfScreenHeight = (float)Main.screenHeight / 2f;
+                mPlayer.standRemoteModeCameraPosition = Projectile.Center - new Vector2(halfScreenWidth, halfScreenHeight);
+                if (mouseX > Projectile.Center.X)
+                    Projectile.direction = 1;
+                else
+                    Projectile.direction = -1;
+                Projectile.spriteDirection = Projectile.direction;
+                floatTimer += 0.06f;
+                currentAnimationState = AnimationState.Idle;
+
+                bool aboveTile = false;
+                if (firstStandType != Aerosmith)
+                {
+                    aboveTile = Collision.SolidTiles((int)Projectile.Center.X / 16, (int)Projectile.Center.X / 16, (int)Projectile.Center.Y / 16, (int)(Projectile.Center.Y / 16) + 4);
+                    if (aboveTile)
+                    {
+                        Projectile.velocity.Y = (float)Math.Sin(floatTimer) / 5f;
+                    }
+                    else
+                    {
+                        if (Projectile.velocity.Y < 6f)
+                            Projectile.velocity.Y += 0.2f;
+                        if (Vector2.Distance(Projectile.Center, player.Center) >= RemoteControlMaxDistance)
+                        {
+                            Projectile.velocity = player.Center - Projectile.Center;
+                            Projectile.velocity.Normalize();
+                            Projectile.velocity *= 0.8f;
+                        }
+                    }
+                }
+
+                if (Projectile.owner == Main.myPlayer)
+                {
+                    if (Main.mouseLeft)
+                    {
+                        Vector2 moveVelocity = Main.MouseWorld - Projectile.Center;
+                        moveVelocity.Normalize();
+                        Projectile.velocity.X = moveVelocity.X * 5f;
+                        if (aboveTile)
+                            Projectile.velocity.Y += moveVelocity.Y * 2f;
+
+                        if (Vector2.Distance(Projectile.Center, player.Center) >= RemoteControlMaxDistance)
+                        {
+                            Projectile.velocity = player.Center - Projectile.Center;
+                            Projectile.velocity.Normalize();
+                            Projectile.velocity *= 0.8f;
+                        }
+                        Projectile.netUpdate = true;
+                    }
+                    else
+                    {
+                        Projectile.velocity.X *= 0.78f;
+                        Projectile.netUpdate = true;
+                    }
+
+                    if (Main.mouseRight)
+                    {
+                        int curAnimationState = (int)currentAnimationState;
+                        if (standAbilities.OverrideMainAttack(ref curAnimationState))
+                        {
+                            int punchIndex = -1;
+                            Vector2 targetPosition = Projectile.Center + new Vector2(5 * Projectile.direction, 0f);
+                            float movementSpeed = 5f;
+
+                            attacking = true;
+                            currentAnimationState = AnimationState.Attack;
+                            float rotaY = targetPosition.Y - Projectile.Center.Y;
+                            Projectile.rotation = MathHelper.ToRadians((rotaY * Projectile.spriteDirection) / 6f);
+                            Vector2 velocityAddition = targetPosition - Projectile.Center;
+                            velocityAddition.Normalize();
+                            velocityAddition *= movementSpeed + mPlayer.standTier;
+
+                            Projectile.spriteDirection = Projectile.direction = targetPosition.X > Projectile.Center.X ? 1 : -1;
+                            float targetDistance = Vector2.Distance(targetPosition, Projectile.Center);
+                            if (targetDistance > 16f)
+                                Projectile.velocity = player.velocity + velocityAddition;
+                            else
+                                Projectile.velocity = Vector2.Zero;
+
+                            PlayPunchSound();
+                            if (shootCount <= 0)
+                            {
+                                shootCount += newPunchTime;
+                                Vector2 shootVel = targetPosition - Projectile.Center;
+                                if (shootVel == Vector2.Zero)
+                                    shootVel = new Vector2(0f, 1f);
+
+                                shootVel.Normalize();
+                                shootVel *= ProjectileSpeed;
+                                int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, ModContent.ProjectileType<FanStandFists>(), newPunchDamage, PunchKnockback, Projectile.owner, FistID, TierNumber);
+                                Main.projectile[projIndex].timeLeft = (int)(Main.projectile[projIndex].timeLeft);
+                                Main.projectile[projIndex].netUpdate = true;
+                                punchIndex = projIndex;
+                            }
+                            Projectile.netUpdate = true;
+                            if (punchIndex != -1)
+                            {
+                                (Main.projectile[punchIndex].ModProjectile as FanStandFists).standInstance = Projectile.ModProjectile;
+                                shootCount = standAbilities.CloneSpeedChanges(firstStandType, standCompletion);
+                            }
+
+                            currentAnimationState = AnimationState.Attack;
+                            for (int n = 0; n < Main.maxNPCs; n++)
+                            {
+                                if (Main.npc[n].active)
+                                {
+                                    NPC npc = Main.npc[n];
+                                    bool directionCheck = Projectile.direction == 1 ? npc.Center.X > Projectile.Center.X : npc.Center.X < Projectile.Center.X;
+                                    float npcDistance = Vector2.Distance(npc.Center, Projectile.Center);
+                                    if (directionCheck && npcDistance < AttackVacuumRange)
+                                    {
+                                        Vector2 direction = Projectile.Center - npc.Center;
+                                        direction.Normalize();
+                                        direction *= AttackVacuumForce;
+                                        npc.velocity += direction;
+                                    }
+                                }
+                            }
+                            standAbilities.WhirlwindAttackEffects(Projectile, AttackVacuumRange);
+                            AttackClone(firstStandType, standCompletion);
+                        }
+                        else
+                            currentAnimationState = (AnimationState)curAnimationState;
+                    }
+                }
+
+                if (SecondSpecialKeyPressed(false) && shootCount <= 0)
+                {
+                    shootCount += 30;
+                    mPlayer.standControlStyle = MyPlayer.StandControlStyle.Manual;
+                }
+            }
+
 
             /*int amountOfParticles = Main.rand.Next(1, 2 + 1);
             for (int i = 0; i < amountOfParticles; i++)
@@ -360,6 +513,16 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                 int dustIndex = Dust.NewDust(spawnPosition, 4, 4, DustID.Platinum, dustVelocity.X, dustVelocity.Y, Scale: 0.7f);
                 Main.dust[dustIndex].noGravity = true;
             }*/
+        }
+
+        public override void SendExtraStates(BinaryWriter writer)
+        {
+            writer.Write(secondaryAbilityStab);
+        }
+
+        public override void ReceiveExtraStates(BinaryReader reader)
+        {
+            secondaryAbilityStab = reader.ReadBoolean();
         }
 
         public override bool CustomStandDrawing => true;

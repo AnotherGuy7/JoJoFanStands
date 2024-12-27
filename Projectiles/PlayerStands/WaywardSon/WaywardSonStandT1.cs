@@ -33,32 +33,37 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             if (mPlayer.standOut)
                 Projectile.timeLeft = 2;
 
-            if (Projectile.owner == Main.myPlayer)
+            if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
             {
-                if (Main.mouseLeft)
+                if (Projectile.owner == Main.myPlayer)
                 {
-                    Punch(afterImages: false);
-                    for (int n = 0; n < Main.maxNPCs; n++)
+                    if (Main.mouseLeft)
                     {
-                        if (Main.npc[n].active)
+                        Punch(afterImages: false);
+                        for (int n = 0; n < Main.maxNPCs; n++)
                         {
-                            NPC npc = Main.npc[n];
-                            bool directionCheck = Projectile.direction == 1 ? npc.Center.X > Projectile.Center.X : npc.Center.X < Projectile.Center.X;
-                            float npcDistance = Vector2.Distance(npc.Center, Projectile.Center);
-                            if (directionCheck && npcDistance < AttackVacuumRange)
+                            if (Main.npc[n].active)
                             {
-                                Vector2 direction = Projectile.Center - npc.Center;
-                                direction.Normalize();
-                                direction *= AttackVacuumForce;
-                                npc.velocity += direction;
+                                NPC npc = Main.npc[n];
+                                bool directionCheck = Projectile.direction == 1 ? npc.Center.X > Projectile.Center.X : npc.Center.X < Projectile.Center.X;
+                                float npcDistance = Vector2.Distance(npc.Center, Projectile.Center);
+                                if (directionCheck && npcDistance < AttackVacuumRange)
+                                {
+                                    Vector2 direction = Projectile.Center - npc.Center;
+                                    direction.Normalize();
+                                    direction *= AttackVacuumForce;
+                                    npc.velocity += direction;
+                                }
                             }
                         }
                     }
+                    else
+                        StayBehind();
                 }
-                else
-                    StayBehind();
+                LimitDistance();
             }
-            LimitDistance();
+            else if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Auto)
+                BasicPunchAI();
         }
 
         public override void SelectAnimation()

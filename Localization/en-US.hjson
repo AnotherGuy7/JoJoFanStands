@@ -520,13 +520,13 @@ Mods: {
 				DisplayName: Wayward Son Final
 				Tooltip:
 					'''
-					Left-click to create a whirlwind using your schmitar and right-click to rush and stab toward any location!
+					Left-click to create a whirlwind using your scimitar and right-click to rush and stab toward any location!
 					Special: Copy the special attack of any Stand!
 					Second Special: Remote Mode
 					Passive: Perfect Imitation
 					Note: Perfect Imitation allows this Stand to incorporate other Stands abilities into its main attack.
 					Note: This Stand's damage scales with the left-most weapon in the hotbar.
-					Note: The Stand abilities copied are from the Stand in the left-most slot in the hotbar.
+					Note: The Stand abilities copied are from the Stand in the left-most slot in the inventory.
 					User Name: Anorak
 					Reference: Carry on Wayward Son by Kansas
 					'''
@@ -536,9 +536,7 @@ Mods: {
 				DisplayName: Wayward Son T1
 				Tooltip:
 					'''
-					Left-click to create a whirlwind using your schmitar and right-click to rush and stab toward any location!
-					Note: This Stand's damage scales with the left-most weapon in the hotbar.
-					Note: The Stand abilities copied are from the Stand in the left-most slot in the hotbar.
+					Left-click to create a whirlwind using your scimitar!
 					User Name: Anorak
 					Reference: Carry on Wayward Son by Kansas
 					'''
@@ -548,10 +546,7 @@ Mods: {
 				DisplayName: Wayward Son T2
 				Tooltip:
 					'''
-					Left-click to create a whirlwind using your schmitar and right-click to rush and stab toward any location!
-					Special: Copy the special attack of any Stand!
-					Note: This Stand's damage scales with the left-most weapon in the hotbar.
-					Note: The Stand abilities copied are from the Stand in the left-most slot in the hotbar.
+					Left-click to create a whirlwind using your scimitar and right-click to rush and stab toward any location!
 					User Name: Anorak
 					Reference: Carry on Wayward Son by Kansas
 					'''
@@ -561,31 +556,30 @@ Mods: {
 				DisplayName: Wayward Son T3
 				Tooltip:
 					'''
-					Left-click to create a whirlwind using your schmitar and right-click to rush and stab toward any location!
+					Left-click to create a whirlwind using your scimitar and right-click to rush and stab toward any location!
 					Special: Copy the special attack of any Stand!
 					Second Special: Remote Mode
 					Passive: Perfect Imitation
 					Note: Perfect Imitation allows this Stand to incorporate other Stands abilities into its main attack.
-					Note: This Stand's damage scales with the left-most weapon in the hotbar.
-					Note: The Stand abilities copied are from the Stand in the left-most slot in the hotbar.
+					Note: The Stand abilities copied are from the Stand in the left-most slot in the inventory.
 					User Name: Anorak
 					Reference: Carry on Wayward Son by Kansas
 					'''
 			}
 
 			DIOOHBoots: {
-				DisplayName: D I O O H Boots
-				Tooltip: ""
+				DisplayName: Heavenly Boots
+				Tooltip: Boots made for conquering multiple realities.
 			}
 
 			DIOOHHair: {
-				DisplayName: D I O O H Hair
-				Tooltip: ""
+				DisplayName: Heavenly Hair
+				Tooltip: Hair that doesn't need to be rewritten to look heavenly.
 			}
 
 			DIOOHShirt: {
-				DisplayName: D I O O H Shirt
-				Tooltip: ""
+				DisplayName: Heavenly Shirt
+				Tooltip: A top that showcases the heavenly body underneath
 			}
 		}
 
@@ -651,6 +645,8 @@ Mods: {
 			WaywardSonVoid.DisplayName: Wayward Son Void
 			FanStandFists.DisplayName: Fan Stand Fists
 			WaywardSonTiny.DisplayName: Wayward Son Tiny
+			WaywardSonTuskWormhole.DisplayName: Wayward Son Tusk Wormhole
+			WaywardSonControllableNail.DisplayName: Wayward Son Controllable Nail
 		}
 
 		Configs: {
