@@ -39,7 +39,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.TheWorldOverHeaven
             bonusAfterimageAmount = 0
         };
 
-        public override bool CanUseSaladDye => true;
         public override StandAttackType StandType => StandAttackType.Melee;
         public new AnimationState currentAnimationState;
         public new AnimationState oldAnimationState;
