@@ -152,6 +152,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
         private PlayerData[] savedPlayerDatas;
         private WorldData savedWorldData;
         private bool saveDataCreated = false;       //For use with all clients that aren't 
+        private float btdStartTime;
 
         private int timeskipStartDelay = 0;
         private bool preparingTimeskip = false;
@@ -999,7 +1000,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                     mPlayer.standChangingLocked = true;
 
                     savedWorldData = new WorldData();
-                    savedWorldData.worldTime = Main.time;
+                    savedWorldData.worldTime = Utils.GetDayTimeAs24FloatStartingFromMidnight();
                     savedWorldData.npcData = new NPCData[Main.maxNPCs];
                     for (int i = 0; i < Main.maxNPCs; i++)
                     {
@@ -1080,8 +1081,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                     mPlayer.biteTheDustEffectProgress = (float)currentRewindTime / (float)totalRewindTime;
                     if (Main.netMode == NetmodeID.MultiplayerClient && projectile.owner != Main.myPlayer)
                         Main.player[Main.myPlayer].GetModPlayer<MyPlayer>().biteTheDustEffectProgress = (float)currentRewindTime / (float)totalRewindTime;
-                    Main.time = MathHelper.Lerp((float)Main.time, (float)savedWorldData.worldTime, mPlayer.biteTheDustEffectProgress);
-                    if (btdRevertTimer >= btdRevertTime)
+
+                    mPlayer.bitesTheDustNewTime = (MathHelper.Lerp(btdStartTime, savedWorldData.worldTime, mPlayer.biteTheDustEffectProgress)) % 24f;        //range from 0 - 24                    if (btdRevertTimer >= btdRevertTime)
                     {
                         btdRevertTime = (int)(btdRevertTime * 0.8f);
                         if (btdRevertTime < 2)
@@ -1148,7 +1149,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                                 }
                             }
 
-                            Main.time = savedWorldData.worldTime;
                             player.ClearBuff(ModContent.BuffType<BitesTheDust>());
                             SoundEngine.PlaySound(KillerQueenStandFinal.KillerQueenClickSound, projectile.Center);
                             if (projectile.owner == Main.myPlayer)
