@@ -1,5 +1,4 @@
 using JoJoFanStands.Buffs;
-using JoJoStands.Buffs.EffectBuff;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria;
@@ -53,7 +52,7 @@ namespace JoJoFanStands.NPCs
                 {
                     npc.frameCounter--;
                     frameCounterDelayTimer = 0;
-                }    
+                }
             }
             if (fPlayer.blurInfiniteVelocity)
             {

@@ -15,8 +15,6 @@ namespace JoJoFanStands
 {
     public class FanPlayer : ModPlayer
     {
-        public static bool NaturalPaoSpawns = false;
-
         public const int MaxBlur = 100;
 
         private int standKeyPressTimer = 0;
