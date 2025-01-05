@@ -1,3 +1,4 @@
+using JoJoStands;
 using JoJoStands.Tiles;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -38,6 +39,23 @@ namespace JoJoFanStands.Items.Stands
         {
             player.GetModPlayer<FanPlayer>().SpawnFanStand();
             return true;
+        }
+
+        public override void ModifyWeaponDamage(Player player, ref StatModifier damage)
+        {
+            if (!Main.mouseItem.IsAir)
+                return;
+
+            int highestDamage = 98;
+            for (int i = 0; i < player.inventory.Length; i++)
+            {
+                if (player.inventory[i] != null && player.inventory[i].type != Item.type)
+                {
+                    if (player.inventory[i].damage > highestDamage)
+                        highestDamage = player.inventory[i].damage;
+                }
+            }
+            damage.Base = (int)(highestDamage * player.GetModPlayer<MyPlayer>().standDamageBoosts);
         }
 
         public override void AddRecipes()

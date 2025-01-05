@@ -1,6 +1,5 @@
 using JoJoFanStands.Projectiles.PlayerStands.TheWorldOverHeaven;
 using JoJoStands;
-using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
 using JoJoStands.Tiles;
 using Microsoft.Xna.Framework;
@@ -49,10 +48,13 @@ namespace JoJoFanStands.Items.Stands
 
         public override void ModifyWeaponDamage(Player player, ref StatModifier damage)
         {
+            if (!Main.mouseItem.IsAir)
+                return;
+
             int highestDamage = 298;
             for (int i = 0; i < player.inventory.Length; i++)
             {
-                if (player.inventory[i] != null)
+                if (player.inventory[i] != null && player.inventory[i].type != Item.type)
                 {
                     if (player.inventory[i].damage > highestDamage)
                         highestDamage = player.inventory[i].damage;
