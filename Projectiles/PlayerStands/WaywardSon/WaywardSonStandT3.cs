@@ -18,8 +18,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
     public class WaywardSonStandT3 : StandClass
     {
         public override int HalfStandHeight => 37;
-        public override int PunchDamage => 68;
-        public override int AltDamage => 76;
+        public override int PunchDamage => 64;
+        public override int AltDamage => 72;
         public override int PunchTime => 11;
         public override int TierNumber => 3;
         public override int FistID => FanStandFists.WaywardSonFists;

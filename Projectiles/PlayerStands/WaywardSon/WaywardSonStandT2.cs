@@ -15,8 +15,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
     {
         public override int HalfStandHeight => 37;          //a simpler version of doing the above
 
-        public override int PunchDamage => 47;
-        public override int AltDamage => 54;
+        public override int PunchDamage => 41;
+        public override int AltDamage => 50;
         public override int PunchTime => 12;
         public override int TierNumber => 2;
         public override bool CanUseAfterImagePunches => false;
@@ -178,9 +178,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                     }
                 }
                 else
-                {
                     LimitDistance();
-                }
             }
             else if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Auto)
             {

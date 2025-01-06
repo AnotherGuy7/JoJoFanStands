@@ -581,6 +581,26 @@ Mods: {
 				DisplayName: Heavenly Shirt
 				Tooltip: A top that showcases the heavenly body underneath
 			}
+
+			MetempsychosisFinal: {
+				DisplayName: Metempsychosis Final
+				Tooltip: ""
+			}
+
+			MetempsychosisT1: {
+				DisplayName: Metempsychosis T1
+				Tooltip: ""
+			}
+
+			MetempsychosisT2: {
+				DisplayName: Metempsychosis T2
+				Tooltip: ""
+			}
+
+			MetempsychosisT3: {
+				DisplayName: Metempsychosis T3
+				Tooltip: ""
+			}
 		}
 
 		NPCs.Pao.DisplayName: Pao
@@ -647,6 +667,7 @@ Mods: {
 			WaywardSonTiny.DisplayName: Wayward Son Tiny
 			WaywardSonTuskWormhole.DisplayName: Wayward Son Tusk Wormhole
 			WaywardSonControllableNail.DisplayName: Wayward Son Controllable Nail
+			MetempsychosisStandFinal.DisplayName: Metempsychosis Stand Final
 		}
 
 		Configs: {

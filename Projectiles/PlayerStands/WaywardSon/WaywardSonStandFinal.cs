@@ -2,7 +2,6 @@ using JoJoFanStands.Items.Stands;
 using JoJoStands;
 using JoJoStands.Buffs.Debuffs;
 using JoJoStands.Items;
-using JoJoStands.Projectiles;
 using JoJoStands.Projectiles.PlayerStands;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -19,8 +18,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
     public class WaywardSonStandFinal : StandClass
     {
         public override int HalfStandHeight => 37;
-        public override int PunchDamage => 98;
-        public override int AltDamage => 112;
+        public override int PunchDamage => 85;
+        public override int AltDamage => 99;
         public override int PunchTime => 10;
         public override int TierNumber => 4;
         public override bool CanUseAfterImagePunches => false;

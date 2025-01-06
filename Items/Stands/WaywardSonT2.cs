@@ -10,14 +10,13 @@ namespace JoJoFanStands.Items.Stands
 {
     public class WaywardSonT2 : FanStandItemClass
     {
-        public override int StandSpeed => 13;
+        public override int StandSpeed => 12;
         public override int StandType => 1;
         public override string StandIdentifierName => "WaywardSon";
         public override int StandTier => 2;
         public override Color StandTierDisplayColor => Color.RosyBrown;
         public override bool FanStandItem => true;
         public override string Texture => Mod.Name + "/Items/Stands/WaywardSonT1";
-
 
         public override void SetStaticDefaults()
         {
@@ -27,7 +26,7 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetDefaults()
         {
-            Item.damage = 18;
+            Item.damage = 41;
             Item.width = 38;
             Item.height = 48;
             Item.maxStack = 1;

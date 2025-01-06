@@ -9,14 +9,15 @@ using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Stands
 {
-    public class WaywardSonT1 : FanStandItemClass
+    public class MetempsychosisT2 : FanStandItemClass
     {
-        public override int StandSpeed => 13;
+        public override int StandSpeed => 11;
         public override int StandType => 1;
         public override string StandIdentifierName => "WaywardSon";
-        public override int StandTier => 1;
-        public override Color StandTierDisplayColor => Color.RosyBrown;
+        public override int StandTier => 2;
+        public override Color StandTierDisplayColor => Color.Magenta;
         public override bool FanStandItem => true;
+        public override string Texture => Mod.Name + "/Items/Stands/MetempsychosisT1";
 
         public override void SetStaticDefaults()
         {
@@ -26,9 +27,9 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetDefaults()
         {
-            Item.damage = 19;
-            Item.width = 38;
-            Item.height = 48;
+            Item.damage = 43;
+            Item.width = 50;
+            Item.height = 50;
             Item.maxStack = 1;
             Item.value = 0;
             Item.noUseGraphic = true;

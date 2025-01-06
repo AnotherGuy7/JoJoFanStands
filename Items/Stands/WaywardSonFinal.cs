@@ -10,7 +10,7 @@ namespace JoJoFanStands.Items.Stands
 {
     public class WaywardSonFinal : FanStandItemClass
     {
-        public override int StandSpeed => 13;
+        public override int StandSpeed => 10;
         public override int StandType => 1;
         public override string StandIdentifierName => "WaywardSon";
         public override int StandTier => 4;
@@ -26,7 +26,7 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetDefaults()
         {
-            Item.damage = 18;
+            Item.damage = 85;
             Item.width = 38;
             Item.height = 48;
             Item.maxStack = 1;
