@@ -601,6 +601,11 @@ Mods: {
 				DisplayName: Metempsychosis T3
 				Tooltip: ""
 			}
+
+			MetempsychosisRequiem: {
+				DisplayName: Metempsychosis Requiem
+				Tooltip: ""
+			}
 		}
 
 		NPCs.Pao.DisplayName: Pao
@@ -668,6 +673,7 @@ Mods: {
 			WaywardSonTuskWormhole.DisplayName: Wayward Son Tusk Wormhole
 			WaywardSonControllableNail.DisplayName: Wayward Son Controllable Nail
 			MetempsychosisStandFinal.DisplayName: Metempsychosis Stand Final
+			MetempsychosisRequiemStand.DisplayName: Metempsychosis Requiem Stand
 		}
 
 		Configs: {

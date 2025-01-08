@@ -13,20 +13,25 @@ namespace JoJoFanStands
         public const string MonotoneRealityEffect = "MonotoneRealityEffect";
         public const string CircularGreyscale = "CircularGreyscale";
         public const string BackInBlackDistortion = "BackInBlackDistortion";
+        public const string AuraShader = "AuraShader";
 
         public static void LoadShaders()
         {
             //Shader stuff
-            Ref<Effect> distortedReality = new Ref<Effect>(ModContent.Request<Effect>("JoJoFanStands/Effects/MonotoneRealityShader", AssetRequestMode.ImmediateLoad).Value);
+            Asset<Effect> distortedReality = ModContent.Request<Effect>("JoJoFanStands/Effects/MonotoneRealityShader", AssetRequestMode.ImmediateLoad);
             Filters.Scene[MonotoneRealityEffect] = new Filter(new ScreenShaderData(distortedReality, "MonotoneRealityEffect"), EffectPriority.VeryHigh);
             Filters.Scene[MonotoneRealityEffect].Load();
 
-            Ref<Effect> circularGreyscale = new Ref<Effect>(ModContent.Request<Effect>("JoJoFanStands/Effects/CircularGreyscale", AssetRequestMode.ImmediateLoad).Value);
+            Asset<Effect> circularGreyscale = ModContent.Request<Effect>("JoJoFanStands/Effects/CircularGreyscale", AssetRequestMode.ImmediateLoad);
             Filters.Scene[CircularGreyscale] = new Filter(new ScreenShaderData(circularGreyscale, "CircularGreyscale"), EffectPriority.VeryHigh);
             Filters.Scene[CircularGreyscale].Load();
 
-            Ref<Effect> backInBlackDistortion = new Ref<Effect>((Effect)ModContent.Request<Effect>("JoJoFanStands/Effects/BackInBlackDistortion", AssetRequestMode.ImmediateLoad));
+            Asset<Effect> backInBlackDistortion = ModContent.Request<Effect>("JoJoFanStands/Effects/BackInBlackDistortion", AssetRequestMode.ImmediateLoad);
             GameShaders.Misc[BackInBlackDistortion] = new MiscShaderData(backInBlackDistortion, "BackInBlackDistortionEffect");
+
+            Asset<Effect> auraShader = ModContent.Request<Effect>("JoJoFanStands/Effects/AuraShader", AssetRequestMode.ImmediateLoad);
+            GameShaders.Misc[AuraShader] = new MiscShaderData(auraShader, "AuraShaderEffect");
+            GameShaders.Misc[AuraShader].UseImage1(ModContent.Request<Texture2D>("JoJoFanStands/Extras/Noise", AssetRequestMode.ImmediateLoad));
         }
     }
 }

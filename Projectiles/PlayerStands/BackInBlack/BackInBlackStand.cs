@@ -17,7 +17,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
         public override int ProjectileDamage => 52;
         public override StandAttackType StandType => StandAttackType.Ranged;
         public override int HalfStandHeight => 33;
-        public override Vector2 StandOffset => Vector2.Zero;
+        public override Vector2 StandOffset => new Vector2(-24f * 2, 0f);
         public override bool CanUseRangeIndicators => false;
 
         private int blackHoleWhoAmI = -1;
@@ -140,7 +140,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
         public override bool PreDraw(ref Color drawColor)      //from ExampleMod ExampleDeathShader
         {
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, GameShaders.Misc["BackInBlackDistortion"].Shader, Main.GameViewMatrix.ZoomMatrix);        //starting a draw with dyes that work
+            GameShaders.Misc["AuraShader"].UseImage1(ModContent.Request<Texture2D>("JoJoFanStands/Extras/Noise", ReLogic.Content.AssetRequestMode.ImmediateLoad));
+            GameShaders.Misc["AuraShader"].UseSecondaryColor(new Vector3(63f, 205f, 189f) / 255f);
+            GameShaders.Misc["AuraShader"].Apply();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, GameShaders.Misc["AuraShader"].Shader, Main.GameViewMatrix.ZoomMatrix);        //starting a draw with dyes that work
 
             if (UseProjectileAlpha)
                 drawColor *= Projectile.alpha / 255f;
