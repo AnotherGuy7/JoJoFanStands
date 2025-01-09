@@ -20,6 +20,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
         public override int PunchTime => 12;
         public override int TierNumber => 2;
         public override bool CanUseAfterImagePunches => false;
+        public override int FistID => FanStandFists.WaywardSonFists;
+        public override Vector2 StandOffset => new Vector2(-12, 0f);
         public override StandAttackType StandType => StandAttackType.Melee;
         public new AnimationState currentAnimationState;
         public new AnimationState oldAnimationState;
@@ -127,7 +129,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                         for (int n = 0; n < Main.maxNPCs; n++)
                         {
                             NPC npc = Main.npc[n];
-                            if (npc.active && Projectile.Distance(npc.Center) <= 3f * 16f)
+                            if (npc.CanBeChasedBy(this) && Projectile.Distance(npc.Center) <= 3f * 16f)
                             {
                                 if (Projectile.owner == Main.myPlayer)
                                 {
@@ -166,7 +168,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                             shootCount += 4;
                             NPC.HitInfo hitInfo = new NPC.HitInfo()
                             {
-                                Damage = AltDamage,
+                                Damage = newAltDamage,
                                 Knockback = 1f,
                                 HitDirection = Projectile.direction,
                                 Crit = true

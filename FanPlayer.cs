@@ -1,6 +1,7 @@
 using JoJoFanStands.Buffs;
 using JoJoFanStands.Items.Stands;
 using JoJoFanStands.Mounts;
+using JoJoFanStands.Projectiles;
 using JoJoStands;
 using JoJoStands.Items.Hamon;
 using Microsoft.Xna.Framework;
@@ -37,6 +38,7 @@ namespace JoJoFanStands
         public int amountOfBlurEnergy = 0;
         public int blurStage = 0;
         public Vector2 customCameraPosition;
+        public int metempsychosisPoints = 0;
 
         public override void ResetEffects()
         {
@@ -193,6 +195,27 @@ namespace JoJoFanStands
                     Player.velocity.X -= 5f * Player.direction;
                 }
             }
+        }
+
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            MyPlayer mPlayer = Player.GetModPlayer<MyPlayer>();
+            if (mPlayer.standOut && mPlayer.standName == "Metempsychosis")
+                metempsychosisPoints += damageDone / 8;
+        }
+
+        public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            MyPlayer mPlayer = Player.GetModPlayer<MyPlayer>();
+            if (mPlayer.standOut && mPlayer.standName == "Metempsychosis")
+                metempsychosisPoints += damageDone / 8;
+        }
+
+        public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            MyPlayer mPlayer = Player.GetModPlayer<MyPlayer>();
+            if (mPlayer.standOut && mPlayer.standName == "Metempsychosis" && proj.ModProjectile is not FanStandFists)
+                metempsychosisPoints += damageDone / 8;
         }
 
         public override void HideDrawLayers(PlayerDrawSet drawInfo)

@@ -10,16 +10,17 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static JoJoFanStands.Projectiles.PlayerStands.Metempsychosis.MetempsychosisStandFinal;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
 {
-    public class MetempsychosisStandFinal : StandClass
+    public class MetempsychosisStandT3 : StandClass
     {
         public override int HalfStandHeight => 43;
-        public override int PunchDamage => 94;
-        public override int AltDamage => 108;
-        public override int PunchTime => 9;
-        public override int TierNumber => 4;
+        public override int PunchDamage => 69;
+        public override int AltDamage => 81;
+        public override int PunchTime => 10;
+        public override int TierNumber => 3;
         public override int FistID => FanStandFists.MetempsychosisFists;
         public override bool CanUseAfterImagePunches => false;
         public override Vector2 StandOffset => new Vector2(-12f, 0f);
@@ -34,63 +35,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
         private bool usingRend = false;
         private Vector2 rendMousePosition;
         private bool playedDeathLine = false;
-
-        public static readonly SoundStyle Summon_1 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Summon_1")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Summon_2 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Summon_2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Claim_1 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Claim_1")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Claim_2 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Claim_2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Death_1 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Death_1")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Death_2 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Death_2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle GirdSoul_1 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/GirdSoul_1")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle GirdSoul_2 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/GirdSoul_2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle NoneCanEscapeDeath_1 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/NoneCanEscapeDeath_1")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle NoneCanEscapeDeath_2 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/NoneCanEscapeDeath_2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Rend_1 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Rend_1")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Rend_2 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Rend_2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Revival_1 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Revival_1")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Revival_2 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Revival_2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
 
         public new enum AnimationState
         {
@@ -227,6 +171,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
                         }
                     }
                 }
+
 
                 if (usingRend)      //Special 2
                 {

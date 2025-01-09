@@ -45,8 +45,10 @@ namespace JoJoFanStands.Items.Stands
         public override void AddRecipes()
         {
             CreateRecipe()
-                .AddIngredient(ItemType<StandArrow>())
-                .AddIngredient(ItemType<WillToChange>())
+                .AddIngredient(ItemType<WillToProtect>(), 4)
+                .AddIngredient(ItemType<WillToFight>(), 4)
+                .AddIngredient(ItemID.SpectreBar, 12)
+                .AddIngredient(ItemType<CaringLifeforce>())
                 .AddTile(ModContent.TileType<RemixTableTile>())
                 .Register();
         }

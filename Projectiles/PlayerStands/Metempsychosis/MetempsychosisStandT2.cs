@@ -10,16 +10,17 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static JoJoFanStands.Projectiles.PlayerStands.Metempsychosis.MetempsychosisStandFinal;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
 {
-    public class MetempsychosisStandFinal : StandClass
+    public class MetempsychosisStandT2 : StandClass
     {
         public override int HalfStandHeight => 43;
-        public override int PunchDamage => 94;
-        public override int AltDamage => 108;
-        public override int PunchTime => 9;
-        public override int TierNumber => 4;
+        public override int PunchDamage => 43;
+        public override int AltDamage => 50;
+        public override int PunchTime => 11;
+        public override int TierNumber => 2;
         public override int FistID => FanStandFists.MetempsychosisFists;
         public override bool CanUseAfterImagePunches => false;
         public override Vector2 StandOffset => new Vector2(-12f, 0f);
@@ -31,66 +32,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
         private int weaponGlowmaskTimer = 0;
         private bool claimingSouls = false;
         private bool soulsClaimed = false;
-        private bool usingRend = false;
-        private Vector2 rendMousePosition;
         private bool playedDeathLine = false;
-
-        public static readonly SoundStyle Summon_1 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Summon_1")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Summon_2 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Summon_2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Claim_1 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Claim_1")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Claim_2 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Claim_2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Death_1 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Death_1")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Death_2 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Death_2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle GirdSoul_1 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/GirdSoul_1")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle GirdSoul_2 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/GirdSoul_2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle NoneCanEscapeDeath_1 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/NoneCanEscapeDeath_1")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle NoneCanEscapeDeath_2 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/NoneCanEscapeDeath_2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Rend_1 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Rend_1")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Rend_2 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Rend_2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Revival_1 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Revival_1")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle Revival_2 = new SoundStyle("JoJoFanStands/Sounds/StandLines/Metempsychosis/Revival_2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
 
         public new enum AnimationState
         {
@@ -98,7 +40,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
             Attack,
             SecondaryAbility,
             Special1,
-            Special2,
             Pose
         }
 
@@ -157,16 +98,16 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
                     {
                         attacking = false;
                         currentAnimationState = AnimationState.Idle;
-                        if (!secondaryAbility && !usingRend && !claimingSouls)
+                        if (!secondaryAbility && !claimingSouls)
                             StayBehind();
                     }
-                    if (Main.mouseRight && !playerHasAbilityCooldown && !attacking && !claimingSouls && !usingRend)
+                    if (Main.mouseRight && !playerHasAbilityCooldown && !attacking && !claimingSouls)
                     {
                         secondaryAbility = true;
                         currentAnimationState = AnimationState.SecondaryAbility;
                         SoundEngine.PlaySound(Main.rand.NextBool() ? Claim_1 : Claim_2, Projectile.Center);
                     }
-                    if (SpecialKeyPressed() && fPlayer.metempsychosisPoints >= 25 && !attacking && !secondaryAbility && !claimingSouls && !usingRend)
+                    if (SpecialKeyPressed() && fPlayer.metempsychosisPoints >= 25 && !attacking && !secondaryAbility && !claimingSouls)
                     {
                         claimingSouls = true;
                         soulsClaimed = false;
@@ -176,14 +117,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
                         fPlayer.metempsychosisPoints -= 25;
                         SoundEngine.PlaySound(SoundID.Item8.WithPitchOffset(-0.8f), Projectile.Center);
                         SoundEngine.PlaySound(Main.rand.NextBool() ? Claim_1 : Claim_2, Projectile.Center);
-                    }
-                    if (SecondSpecialKeyPressed() && fPlayer.metempsychosisPoints >= 10 && !claimingSouls && !usingRend)
-                    {
-                        usingRend = true;
-                        rendMousePosition = Main.MouseWorld;
-                        Projectile.netUpdate = true;
-                        fPlayer.metempsychosisPoints -= 10;
-                        SoundEngine.PlaySound(Main.rand.NextBool() ? Rend_1 : Rend_2, Projectile.Center);
                     }
                 }
 
@@ -228,53 +161,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
                     }
                 }
 
-                if (usingRend)      //Special 2
-                {
-                    currentAnimationState = AnimationState.Special2;
-                    if (Main.myPlayer == Projectile.owner)
-                    {
-                        Vector2 rendVelocity = rendMousePosition - Projectile.Center;
-                        rendVelocity.Normalize();
-                        rendVelocity *= 12f;
-                        Projectile.velocity = rendVelocity;
-                        Projectile.spriteDirection = Projectile.direction = rendVelocity.X > 0f ? 1 : -1;
-                        for (int n = 0; n < Main.maxNPCs; n++)
-                        {
-                            NPC npc = Main.npc[n];
-                            if (npc.CanBeChasedBy(this) && Projectile.Distance(npc.Center) <= HalfStandHeight * 2)
-                            {
-                                int newHealth = (int)(npc.life * (1f - (0.08f * TierNumber)));
-                                if (npc.boss || newHealth / npc.lifeMax > 0.5f)
-                                {
-                                    int damage = npc.life - newHealth + npc.defense;
-                                    NPC.HitInfo hitInfo = new NPC.HitInfo()
-                                    {
-                                        Damage = damage,
-                                        Knockback = 0f,
-                                        HitDirection = -Projectile.direction,
-                                    };
-                                    npc.StrikeNPC(hitInfo);
-                                    NetMessage.SendStrikeNPC(npc, hitInfo, Projectile.owner);
-                                }
-                                else
-                                {
-                                    npc.StrikeInstantKill();
-                                    player.Heal(npc.lifeMax);
-                                }
-                                usingRend = false;
-                                player.AddBuff(ModContent.BuffType<AbilityCooldown>(), mPlayer.AbilityCooldownTime(30 / TierNumber));
-                                break;
-                            }
-                        }
-                    }
-
-                    if (Vector2.Distance(rendMousePosition, Projectile.Center) < 8f)
-                    {
-                        usingRend = false;
-                        player.AddBuff(ModContent.BuffType<AbilityCooldown>(), mPlayer.AbilityCooldownTime(5 / TierNumber));
-                    }
-                }
-
                 Vector2 direction = player.Center - Projectile.Center;
                 float distanceTo = direction.Length();
                 if (secondaryAbility)
@@ -310,7 +196,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
                     }
                 }
                 
-                if (!secondaryAbility && !usingRend)
+                if (!secondaryAbility)
                     LimitDistance();
 
                 if (mPlayer.posing)
@@ -342,13 +228,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
         public override void SendExtraStates(BinaryWriter writer)
         {
             writer.Write(claimingSouls);
-            writer.Write(usingRend);
         }
 
         public override void ReceiveExtraStates(BinaryReader reader)
         {
             claimingSouls = reader.ReadBoolean();
-            usingRend = reader.ReadBoolean();
         }
 
         public override void PostDrawExtras()
@@ -362,8 +246,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
                 animationName = "Reave";
             else if (currentAnimationState == AnimationState.Special1)
                 animationName = "Claim";
-            else if (currentAnimationState == AnimationState.Special2)
-                animationName = "Rend";
             else if (currentAnimationState == AnimationState.Pose)
                 animationName = "Pose";
 
@@ -419,8 +301,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
                 PlayAnimation("Reave");
             else if (currentAnimationState == AnimationState.Special1)
                 PlayAnimation("Claim");
-            else if (currentAnimationState == AnimationState.Special2)
-                PlayAnimation("Rend");
             else if (currentAnimationState == AnimationState.Pose)
                 PlayAnimation("Pose");
         }
@@ -436,8 +316,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
                 AnimateStand(animationName, 2, 15, true);
             else if (animationName == "Claim")
                 AnimateStand(animationName, 4, 15, false);
-            else if (animationName == "Rend")
-                AnimateStand(animationName, 2, 15, true);
             else if (animationName == "Pose")
                 AnimateStand(animationName, 1, 500, true);
         }

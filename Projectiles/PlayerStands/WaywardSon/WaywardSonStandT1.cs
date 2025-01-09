@@ -14,8 +14,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
         public override int AltDamage => 24;
         public override int HalfStandHeight => 37;
         public override int TierNumber => 1;
-        public override int FistID => 1;
         public override bool CanUseAfterImagePunches => false;
+        public override int FistID => FanStandFists.WaywardSonFists;
+        public override Vector2 StandOffset => new Vector2(-12, 0f);
         public override StandAttackType StandType => StandAttackType.Melee;
 
         private const float AttackVacuumRange = 8f * 16f;

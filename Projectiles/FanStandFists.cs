@@ -2,8 +2,9 @@ using JoJoFanStands.Projectiles.PlayerStands.WaywardSon;
 using JoJoStands;
 using JoJoStands.Buffs.Debuffs;
 using Terraria;
+using Terraria.Audio;
+using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.WorldBuilding;
 
 namespace JoJoFanStands.Projectiles
 {
@@ -11,10 +12,12 @@ namespace JoJoFanStands.Projectiles
     {
         public const int TheWorldOverHeavenFists = 0;
         public const int WaywardSonFists = 1;
+        public const int MetempsychosisFists = 2;
 
         private int standType = 0;
         private int standTier = 0;
         public ModProjectile standInstance;
+        private bool playedSound = false;
 
         public override void SetDefaults()
         {
@@ -33,6 +36,12 @@ namespace JoJoFanStands.Projectiles
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             standType = mPlayer.standFistsType;
             standTier = mPlayer.standTier;
+
+            if (!playedSound)
+            {
+                SoundEngine.PlaySound(SoundID.Item1, Projectile.Center);
+                playedSound = true;
+            }
 
             if (standType == WaywardSonFists)
             {
@@ -60,9 +69,13 @@ namespace JoJoFanStands.Projectiles
                 {
                     if (standTier == 3)
                         (standInstance as WaywardSonStandT3).standAbilities.AttackModifiers(target, ref modifiers);
-                    //else if (standTier == 4)
-                        //(standInstance as WaywardSonStandFinal).standAbilities.AttackModifiers(target, ref modifiers);
+                    else if (standTier == 4)
+                        (standInstance as WaywardSonStandFinal).standAbilities.AttackModifiers(target, ref modifiers);
                 }
+            }
+            else if (standType == MetempsychosisFists)
+            {
+                modifiers.FinalDamage *= 1f + (0.025f * standTier);
             }
         }
 

@@ -65,6 +65,11 @@ Mods: {
 				DisplayName: Reality Rewrite
 				Description: Rewrite the enemies defensive and offensive capabilities temporarily!
 			}
+
+			GirdSoul: {
+				DisplayName: Gird Soul
+				Description: Mods.JoJoFanStands.Buffs.GirdSoul.Description
+			}
 		}
 
 		Items: {
@@ -517,7 +522,7 @@ Mods: {
 			}
 
 			WaywardSonFinal: {
-				DisplayName: Wayward Son Final
+				DisplayName: Wayward Son (Final Tier)
 				Tooltip:
 					'''
 					Left-click to create a whirlwind using your scimitar and right-click to rush and stab toward any location!
@@ -533,7 +538,7 @@ Mods: {
 			}
 
 			WaywardSonT1: {
-				DisplayName: Wayward Son T1
+				DisplayName: Wayward Son (Tier 1)
 				Tooltip:
 					'''
 					Left-click to create a whirlwind using your scimitar!
@@ -543,7 +548,7 @@ Mods: {
 			}
 
 			WaywardSonT2: {
-				DisplayName: Wayward Son T2
+				DisplayName: Wayward Son (Tier 2)
 				Tooltip:
 					'''
 					Left-click to create a whirlwind using your scimitar and right-click to rush and stab toward any location!
@@ -553,7 +558,7 @@ Mods: {
 			}
 
 			WaywardSonT3: {
-				DisplayName: Wayward Son T3
+				DisplayName: Wayward Son (Tier 3)
 				Tooltip:
 					'''
 					Left-click to create a whirlwind using your scimitar and right-click to rush and stab toward any location!
@@ -583,23 +588,58 @@ Mods: {
 			}
 
 			MetempsychosisFinal: {
-				DisplayName: Metempsychosis Final
-				Tooltip: ""
+				DisplayName: Metempsychosis (Final Tier)
+				Tooltip:
+					'''
+					Left-click to slash using your dual kamas and right-click to rush into all enemies in your path!
+					Special: Take 20% of nearby enemies health! Claims the souls of enemies whose health falls below 25%. Requires 25 Soul Accumulation.
+					Second Special: Rush toward the target area and take 32% of the colliding enemy's health! Claims the soul of that enemy if their health falls below 50%. Requires 10 Soul Accumulation.
+					Passive: Protector of the Cycle
+					Note: Protector of the Cycle allows this Stand to boost player attack and defense the more Soul Accumulation there is.
+					Note: The left and right-click attacks apply a 20% flat damage bonus.
+					User Name: Samsara
+					Reference: Metempsychosis by Andromida
+					'''
 			}
 
 			MetempsychosisT1: {
-				DisplayName: Metempsychosis T1
-				Tooltip: ""
+				DisplayName: Metempsychosis (Tier 1)
+				Tooltip:
+					'''
+					Left-click to slash using your dual kamas and right-click to rush into all enemies in your path!
+					Note: The left and right-click attacks apply a 5% flat damage bonus.
+					User Name: Samsara
+					Reference: Metempsychosis by Andromida
+					'''
 			}
 
 			MetempsychosisT2: {
-				DisplayName: Metempsychosis T2
-				Tooltip: ""
+				DisplayName: Metempsychosis (Tier 2)
+				Tooltip:
+					'''
+					Left-click to slash using your dual kamas and right-click to rush into all enemies in your path!
+					Special: Take 10% of nearby enemies health! Claims the souls of enemies whose health falls below 25%. Requires 25 Soul Accumulation.
+					Passive: Protector of the Cycle
+					Note: Protector of the Cycle allows this Stand to boost player attack and defense the more Soul Accumulation there is.
+					Note: The left and right-click attacks apply a 20% flat damage bonus.
+					User Name: Samsara
+					Reference: Metempsychosis by Andromida
+					'''
 			}
 
 			MetempsychosisT3: {
-				DisplayName: Metempsychosis T3
-				Tooltip: ""
+				DisplayName: Metempsychosis (Tier 3)
+				Tooltip:
+					'''
+					Left-click to slash using your dual kamas and right-click to rush into all enemies in your path!
+					Special: Take 15% of nearby enemies health! Claims the souls of enemies whose health falls below 25%. Requires 25 Soul Accumulation.
+					Second Special: Rush toward the target area and take 24% of the colliding enemy's health! Claims the soul of that enemy if their health falls below 50%. Requires 10 Soul Accumulation.
+					Passive: Protector of the Cycle
+					Note: Protector of the Cycle allows this Stand to boost player attack and defense the more Soul Accumulation there is.
+					Note: The left and right-click attacks apply a 15% flat damage bonus.
+					User Name: Samsara
+					Reference: Metempsychosis by Andromida
+					'''
 			}
 
 			MetempsychosisRequiem: {
@@ -674,6 +714,7 @@ Mods: {
 			WaywardSonControllableNail.DisplayName: Wayward Son Controllable Nail
 			MetempsychosisStandFinal.DisplayName: Metempsychosis Stand Final
 			MetempsychosisRequiemStand.DisplayName: Metempsychosis Requiem Stand
+			SoulEffect.DisplayName: Soul Effect
 		}
 
 		Configs: {
