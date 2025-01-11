@@ -28,7 +28,7 @@ float4 PixelShaderFunction(float2 coords : TEXCOORD0) : COLOR0
 		return color;
 	
 	if (coords.y < uOpacity)
-		color.a = 1.0;
+        return float4(0.0, 0.0, 0.0, 0.0);
 	else
         return color;
 	

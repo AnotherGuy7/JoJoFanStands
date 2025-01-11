@@ -34,6 +34,8 @@ float4 PixelShaderFunction(float2 coords : TEXCOORD0) : COLOR0
     float4 color = tex2D(uImage0, uv);
     if (!isBlack(color.rgb))
         return color;
+    if (uv.y * 66 * 4 > uSourceRect.y)
+        return float4(1.0, 0.0, 0.0, 1.0);
 
     float noiseOffset = sin(3.14 * ((uTime % NoiseTravelRate) / NoiseTravelRate)); //only goes up
     

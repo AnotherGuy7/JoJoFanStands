@@ -46,8 +46,8 @@ namespace JoJoStands.UI
             soulBar = new DragableUIPanel();
             soulBar.Left.Set(Main.screenWidth * 0.95f, 0f);
             soulBar.Top.Set(Main.screenHeight * 0.95f, 0f);
-            soulBar.Width.Set(42, 0f);
-            soulBar.Height.Set(72, 0f);
+            soulBar.Width.Set(42 * 2, 0f);
+            soulBar.Height.Set(72 * 2, 0f);
             soulBar.BackgroundColor = new Color(0, 0, 0, 0);       //make it invisible so that the image is there itself
             soulBar.BorderColor = new Color(0, 0, 0, 0);
 
@@ -70,7 +70,7 @@ namespace JoJoStands.UI
 
             Rectangle mainUIDestinationRect = UITools.ReformatRectangle(soulBar.GetClippingRectangle(spriteBatch));
             MiscShaderData soulBarShader = JoJoStandsShaders.GetShaderInstance(JoJoFanStandsShaders.SoulBarShader);
-            float gradientValue = ((60f / 72f) * (fanPlayer.metempsychosisPoints / 100)) + (12f / 72f);
+            float gradientValue = ((60f / 72f) * (fanPlayer.metempsychosisPoints / 100f)) + (12f / 72f);
             soulBarShader.UseOpacity(gradientValue);
             UITools.DrawUIWithShader(spriteBatch, soulBarShader, soulBarBarTexture, mainUIDestinationRect);
         }
