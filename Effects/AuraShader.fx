@@ -40,7 +40,7 @@ float4 PixelShaderFunction(float2 coords : TEXCOORD0) : COLOR0
     float noise = tex2D(uImage1, uv + float2(0.0, noiseOffset)).r;
     float pixelSizeWidth = 1.0 / 62.0;
     float pixelSizeHeight = 1.0 / 66.0;
-    int surroundVal = -1;
+    int surroundVal = 0;
     for (int i = 1; i < 4; i++)
     {
         if (!isBlack(tex2D(uImage0, uv + float2(-pixelSizeWidth * i, 0)).rgb) || !isBlack(tex2D(uImage0, uv + float2(pixelSizeWidth * i, 0)).rgb) || !isBlack(tex2D(uImage0, uv + float2(0, -pixelSizeHeight * i)).rgb) || !isBlack(tex2D(uImage0, uv + float2(0, pixelSizeHeight  * i)).rgb))
@@ -50,9 +50,13 @@ float4 PixelShaderFunction(float2 coords : TEXCOORD0) : COLOR0
         }
 
     }
-    if (surroundVal >= 0)
+    if (surroundVal >= 1)
     {
-        return float4(uSecondaryColor * noise, noise * (surroundVal / 4.0));
+        if (surroundVal == 3)
+            return float4(uSecondaryColor, 1.0);
+        else
+            return float4(uSecondaryColor * noise, noise * (surroundVal / 4.0));
+        
         float3 noiseCol = tex2D(uImage1, uv + float2(0.0, noiseOffset));
         return float4(noiseCol.rgb * uSecondaryColor, 1.0);
     }

@@ -141,7 +141,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
         {
             Main.spriteBatch.End();
             GameShaders.Misc["AuraShader"].UseImage1(ModContent.Request<Texture2D>("JoJoFanStands/Extras/Noise", ReLogic.Content.AssetRequestMode.ImmediateLoad));
-            GameShaders.Misc["AuraShader"].UseSecondaryColor(new Vector3(63f, 205f, 189f) / 255f);
+            GameShaders.Misc["AuraShader"].UseSecondaryColor(new Color(63, 205, 189));
             GameShaders.Misc["AuraShader"].Apply();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, GameShaders.Misc["AuraShader"].Shader, Main.GameViewMatrix.ZoomMatrix);        //starting a draw with dyes that work
 
