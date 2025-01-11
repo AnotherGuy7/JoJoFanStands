@@ -217,9 +217,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             else if (currentAnimationState == AnimationState.Attack)
                 PlayAnimation("Attack");
             else if (currentAnimationState == AnimationState.SecondaryAbility)
-                PlayAnimation("Secondary");
+                PlayAnimation("Dash");
             else if (currentAnimationState == AnimationState.SecondaryAbilityStab)
-                PlayAnimation("SecondaryStab");
+                PlayAnimation("Slash");
+            else if (currentAnimationState == AnimationState.Pose)
+                PlayAnimation("Pose");
         }
 
         public override void PlayAnimation(string animationName)
@@ -229,10 +231,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                 AnimateStand(animationName, 4, 15, true);
             else if (animationName == "Attack")
                 AnimateStand(animationName, 4, newPunchTime, true);
-            else if (animationName == "Secondary")
-                AnimateStand(animationName, 1, 15, true);
-            else if (animationName == "SecondaryStab")
-                AnimateStand(animationName, 4, 10, true);
+            else if (animationName == "Dash")
+                AnimateStand(animationName, 2, 15, true);
+            else if (animationName == "Slash")
+                AnimateStand(animationName, 4, 6, false);
+            else if (animationName == "Pose")
+                AnimateStand(animationName, 2, 8, true);
         }
     }
 }

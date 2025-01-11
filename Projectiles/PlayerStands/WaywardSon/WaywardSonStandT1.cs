@@ -81,6 +81,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                 PlayAnimation("Idle");
             else if (currentAnimationState == AnimationState.Attack)
                 PlayAnimation("Attack");
+            else if (currentAnimationState == AnimationState.Pose)
+                PlayAnimation("Pose");
         }
 
         public override void PlayAnimation(string animationName)
@@ -90,6 +92,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                 AnimateStand(animationName, 4, 15, true);
             else if (animationName == "Attack")
                 AnimateStand(animationName, 4, newPunchTime, true);
+            else if (animationName == "Pose")
+                AnimateStand(animationName, 2, 8, true);
         }
     }
 }

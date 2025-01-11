@@ -1,4 +1,5 @@
 using JoJoFanStands.Buffs;
+using JoJoFanStands.Projectiles.PlayerStands.Metempsychosis;
 using JoJoStands;
 using JoJoStands.Buffs.AccessoryBuff;
 using JoJoStands.Buffs.Debuffs;
@@ -81,6 +82,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
         private const byte TheWorldOverHeaven = 39;
         private const byte WaywardSon = 40;
         private const byte GoldExperienceRequiem = 41;
+        private const byte Metempsychosis = 42;
 
         public WaywardSonAbilities(int standTier)
         {
@@ -1458,6 +1460,38 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             {
                 if (standInstance.SpecialKeyPressed())
                     standInstance.Timestop((int)(18 * standCompletionProgress));
+            }
+            else if (currentStandType == Metempsychosis)
+            {
+                player.AddBuff(ModContent.BuffType<AbilityCooldown>(), mPlayer.AbilityCooldownTime(30 / standTier));
+                if (Main.myPlayer == projectile.owner)
+                {
+                    for (int n = 0; n < Main.maxNPCs; n++)
+                    {
+                        NPC npc = Main.npc[n];
+                        if (npc.CanBeChasedBy(this) && projectile.Distance(npc.Center) <= standInstance.newMaxDistance * 4)
+                        {
+                            int newHealth = (int)(npc.life * (1f - (0.05f * standTier))) - npc.defense;
+                            if (npc.boss || newHealth > 0.25f * npc.lifeMax)
+                            {
+                                int damage = npc.life - newHealth;
+                                NPC.HitInfo hitInfo = new NPC.HitInfo()
+                                {
+                                    Damage = damage,
+                                    Knockback = 0f,
+                                    HitDirection = -projectile.direction,
+                                };
+                                npc.StrikeNPC(hitInfo);
+                                NetMessage.SendStrikeNPC(npc, hitInfo, projectile.owner);
+                            }
+                            else
+                            {
+                                npc.StrikeInstantKill();
+                                Projectile.NewProjectile(projectile.GetSource_FromThis(), npc.Center, Vector2.Zero, ModContent.ProjectileType<SoulEffect>(), 0, 0f, projectile.owner, player.statLifeMax2 * 0.05f);
+                            }
+                        }
+                    }
+                }
             }
         }
 

@@ -12,6 +12,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static JoJoFanStands.Projectiles.PlayerStands.WaywardSon.WaywardSonStandFinal;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
 {
@@ -52,98 +53,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             Pose
         }
 
-        private const byte Aerosmith = 0;
-        private const byte BadCompany = 1;
-        private const byte CenturyBoy = 2;
-        private const byte CrazyDiamond = 3;
-        private const byte Cream = 4;
-        private const byte DollyDagger = 5;
-        private const byte Echoes = 6;
-        private const byte GoldExperience = 7;
-        private const byte GratefulDead = 8;
-        private const byte HermitPurple = 9;
-        private const byte HierophantGreen = 10;
-        private const byte KillerQueen = 11;
-        private const byte KillerQueenBTD = 12;
-        private const byte KingCrimson = 13;
-        private const byte Lock = 14;
-        private const byte MagiciansRed = 15;
-        private const byte SexPistols = 16;
-        private const byte SilverChariot = 17;
-        private const byte SoftAndWet = 18;
-        private const byte StarPlatinum = 19;
-        private const byte StickyFingers = 20;
-        private const byte StoneFree = 21;
-        private const byte TheHand = 22;
-        private const byte TheWorld = 23;
-        private const byte TowerOfGray = 24;
-        private const byte Tusk = 25;
-        private const byte Whitesnake = 26;
-        private const byte BackInBlack = 27;
-        private const byte Banks = 28;
-        private const byte Blur = 29;
-        private const byte CoolOut = 30;
-        private const byte Expanses = 31;
-        private const byte FollowMe = 32;
-        private const byte LucyInTheSky = 33;
-        private const byte Megalovania = 34;
-        private const byte MortalReminder = 35;
-        private const byte RoseColoredBoy = 36;
-        private const byte SlavesOfFear = 37;
-        private const byte TheFates = 38;
-        private const byte TheWorldOverHeaven = 39;
-        private const byte WaywardSon = 40;
-        private const byte GoldExperienceRequiem = 41;
-
-        private Dictionary<string, byte> StandTypes = new Dictionary<string, byte>()
-        {
-            { "Aerosmith", Aerosmith },
-            { "BadCompany", BadCompany },
-            { "CenturyBoy", CenturyBoy },
-            { "CrazyDiamond", CrazyDiamond },
-            { "Cream", Cream },
-            { "DollyDagger", DollyDagger },
-            { "Echoes", Echoes },
-            { "GoldExperience", GoldExperience },
-            { "GoldExperienceRequiem", GoldExperienceRequiem },
-            { "GratefulDead", GratefulDead },
-            { "HermitPurple", HermitPurple },
-            { "HierophantGreen", HierophantGreen },
-            { "KillerQueen", KillerQueen },
-            { "KillerQueenBTD", KillerQueenBTD },
-            { "KingCrimson", KingCrimson },
-            { "Lock", Lock },
-            { "MagiciansRed", MagiciansRed },
-            { "SexPistols", SexPistols },
-            { "SilverChariot", SilverChariot },
-            { "SoftAndWet", SoftAndWet },
-            { "StarPlatinum", StarPlatinum },
-            { "StickyFingers", StickyFingers },
-            { "StoneFree", StoneFree },
-            { "TheHand", TheHand },
-            { "TheWorld", TheWorld },
-            { "TowerOfGray", TowerOfGray },
-            { "TuskAct1", Tusk },
-            { "TuskAct2", Tusk },
-            { "TuskAct3", Tusk },
-            { "TuskAct4", Tusk },
-            { "Whitesnake", Whitesnake },
-            { "BackInBlack", BackInBlack },
-            { "Banks", Banks },
-            { "Blur", Blur },
-            { "CoolOut", CoolOut },
-            { "Expanses", Expanses },
-            { "FollowMe", FollowMe },
-            { "LucyInTheSky", LucyInTheSky },
-            { "Megalovania", Megalovania },
-            { "MortalReminder", MortalReminder },
-            { "RoseColoredBoy", RoseColoredBoy },
-            { "SlavesOfFear", SlavesOfFear },
-            { "TheFates", TheFates },
-            { "TheWorldOverHeaven", TheWorldOverHeaven },
-            { "WaywardSon", WaywardSon }
-        };
-
         private Vector2 secondaryDirection;
         private bool secondaryAbilityStab = false;
         private int stabNPCTarget = -1;
@@ -182,7 +91,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                     }
                 }
             }
-            if (firstStandType == Megalovania)
+            if (firstStandType == WaywardSonStandFinal.Megalovania)
             {
                 StayBehind();
                 return;
@@ -636,9 +545,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             else if (currentAnimationState == AnimationState.Attack)
                 PlayAnimation("Attack");
             else if (currentAnimationState == AnimationState.SecondaryAbility)
-                PlayAnimation("Secondary");
-            else if (currentAnimationState == AnimationState.Special)
-                PlayAnimation("Weld");
+                PlayAnimation("Dash");
+            else if (currentAnimationState == AnimationState.SecondaryAbilityStab)
+                PlayAnimation("Slash");
+            else if (currentAnimationState == AnimationState.Pose)
+                PlayAnimation("Pose");
         }
 
         public override void PlayAnimation(string animationName)
@@ -648,10 +559,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                 AnimateStand(animationName, 4, 15, true);
             else if (animationName == "Attack")
                 AnimateStand(animationName, 4, newPunchTime, true);
-            else if (animationName == "Secondary")
-                AnimateStand(animationName, 1, 15, true);
-            else if (animationName == "Weld")
-                AnimateStand(animationName, 1, 15, true);
+            else if (animationName == "Dash")
+                AnimateStand(animationName, 2, 15, true);
+            else if (animationName == "Slash")
+                AnimateStand(animationName, 4, 6, false);
+            else if (animationName == "Pose")
+                AnimateStand(animationName, 2, 8, true);
         }
     }
 }

@@ -52,50 +52,51 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             Pose
         }
 
-        private const byte Aerosmith = 0;
-        private const byte BadCompany = 1;
-        private const byte CenturyBoy = 2;
-        private const byte CrazyDiamond = 3;
-        private const byte Cream = 4;
-        private const byte DollyDagger = 5;
-        private const byte Echoes = 6;
-        private const byte GoldExperience = 7;
-        private const byte GratefulDead = 8;
-        private const byte HermitPurple = 9;
-        private const byte HierophantGreen = 10;
-        private const byte KillerQueen = 11;
-        private const byte KillerQueenBTD = 12;
-        private const byte KingCrimson = 13;
-        private const byte Lock = 14;
-        private const byte MagiciansRed = 15;
-        private const byte SexPistols = 16;
-        private const byte SilverChariot = 17;
-        private const byte SoftAndWet = 18;
-        private const byte StarPlatinum = 19;
-        private const byte StickyFingers = 20;
-        private const byte StoneFree = 21;
-        private const byte TheHand = 22;
-        private const byte TheWorld = 23;
-        private const byte TowerOfGray = 24;
-        private const byte Tusk = 25;
-        private const byte Whitesnake = 26;
-        private const byte BackInBlack = 27;
-        private const byte Banks = 28;
-        private const byte Blur = 29;
-        private const byte CoolOut = 30;
-        private const byte Expanses = 31;
-        private const byte FollowMe = 32;
-        private const byte LucyInTheSky = 33;
-        private const byte Megalovania = 34;
-        private const byte MortalReminder = 35;
-        private const byte RoseColoredBoy = 36;
-        private const byte SlavesOfFear = 37;
-        private const byte TheFates = 38;
-        private const byte TheWorldOverHeaven = 39;
-        private const byte WaywardSon = 40;
-        private const byte GoldExperienceRequiem = 41;
+        public const byte Aerosmith = 0;
+        public const byte BadCompany = 1;
+        public const byte CenturyBoy = 2;
+        public const byte CrazyDiamond = 3;
+        public const byte Cream = 4;
+        public const byte DollyDagger = 5;
+        public const byte Echoes = 6;
+        public const byte GoldExperience = 7;
+        public const byte GratefulDead = 8;
+        public const byte HermitPurple = 9;
+        public const byte HierophantGreen = 10;
+        public const byte KillerQueen = 11;
+        public const byte KillerQueenBTD = 12;
+        public const byte KingCrimson = 13;
+        public const byte Lock = 14;
+        public const byte MagiciansRed = 15;
+        public const byte SexPistols = 16;
+        public const byte SilverChariot = 17;
+        public const byte SoftAndWet = 18;
+        public const byte StarPlatinum = 19;
+        public const byte StickyFingers = 20;
+        public const byte StoneFree = 21;
+        public const byte TheHand = 22;
+        public const byte TheWorld = 23;
+        public const byte TowerOfGray = 24;
+        public const byte Tusk = 25;
+        public const byte Whitesnake = 26;
+        public const byte BackInBlack = 27;
+        public const byte Banks = 28;
+        public const byte Blur = 29;
+        public const byte CoolOut = 30;
+        public const byte Expanses = 31;
+        public const byte FollowMe = 32;
+        public const byte LucyInTheSky = 33;
+        public const byte Megalovania = 34;
+        public const byte MortalReminder = 35;
+        public const byte RoseColoredBoy = 36;
+        public const byte SlavesOfFear = 37;
+        public const byte TheFates = 38;
+        public const byte TheWorldOverHeaven = 39;
+        public const byte WaywardSon = 40;
+        public const byte GoldExperienceRequiem = 41;
+        public const byte Metempsychosis = 42;
 
-        private Dictionary<string, byte> StandTypes = new Dictionary<string, byte>()
+        public static Dictionary<string, byte> StandTypes = new Dictionary<string, byte>()
         {
             { "Aerosmith", Aerosmith },
             { "BadCompany", BadCompany },
@@ -141,7 +142,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             { "SlavesOfFear", SlavesOfFear },
             { "TheFates", TheFates },
             { "TheWorldOverHeaven", TheWorldOverHeaven },
-            { "WaywardSon", WaywardSon }
+            { "WaywardSon", WaywardSon },
+            { "Metempsychosis", Metempsychosis }
         };
 
         private Vector2 secondaryDirection;

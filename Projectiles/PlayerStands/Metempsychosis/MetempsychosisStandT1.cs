@@ -81,7 +81,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
                 weaponGlowmaskTimer = 270;
             }
 
-            fPlayer.metempsychosisPoints = 100;
             if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
             {
                 if (Projectile.owner == Main.myPlayer)

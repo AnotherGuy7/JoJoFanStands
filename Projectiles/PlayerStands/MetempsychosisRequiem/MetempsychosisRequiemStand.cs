@@ -88,7 +88,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MetempsychosisRequiem
                 weaponGlowmaskTimer = 270;
             }
 
-            fPlayer.metempsychosisPoints = 100;
             if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
             {
                 if (Projectile.owner == Main.myPlayer)
@@ -188,8 +187,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MetempsychosisRequiem
                             NPC npc = Main.npc[n];
                             if (npc.CanBeChasedBy(this) && Projectile.Distance(npc.Center) <= HalfStandHeight * 2)
                             {
-                                int newHealth = (int)(npc.life * (1f - (0.08f * TierNumber)));
-                                if (npc.boss || newHealth / npc.lifeMax > 0.5f)
+                                int newHealth = (int)(npc.life * 0.5f);
+                                if (newHealth / npc.lifeMax > 0.35f)
                                 {
                                     int damage = npc.life - newHealth + npc.defense;
                                     NPC.HitInfo hitInfo = new NPC.HitInfo()

@@ -1,6 +1,9 @@
-- Added Wayward Son (Commissioned by Anorak)
-- Added the Heavenly Vanity set
-- Fixed Cool Out being really close to the player
-- Fixed a bug where an insufferable enemy may spawn sometimes
-- Fixed The World: Over Heaven not being able to be summoned while the Salad Dye is equipped
+- Added Metempsychosis (Commissioned by Samsara)
+- Adjusted damage values for Wayward Son to keep it in line with other Stands
+- Fixed many fan Stands targetting animals or NPCs with special moves
+- Fixed many fan Stands alternate abilities not adjusting to damage percentage changes
+- Fixed Wayward Son turning into Slaves of Fear when using the right-click ability
+- Fixed The World Over Heaven being able to reach infinite damage through duplication
+- Fixed Wayward Son's dynamic damage not updating
+- Minor consistency sprite updates
 - 
