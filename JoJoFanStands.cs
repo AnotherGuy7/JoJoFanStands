@@ -27,6 +27,8 @@ namespace JoJoFanStands
             BlurStandT1.punchTextures[1] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Blur/Blur_Punch_2", AssetRequestMode.ImmediateLoad).Value;
 
             BlurBar.blurBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/BlurEnergyBar", AssetRequestMode.ImmediateLoad).Value;
+            SoulBar.soulBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/SoulBar", AssetRequestMode.ImmediateLoad).Value;
+            SoulBar.soulBarBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/SoulBar_Bar", AssetRequestMode.ImmediateLoad).Value;
 
             if (!Main.dedServ)
                 JoJoFanStandsShaders.LoadShaders();
@@ -41,6 +43,7 @@ namespace JoJoFanStands
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<ExpansesT1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<BlurT1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<WaywardSonT1>());
+            JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<MetempsychosisRequiem>());
 
             JoJoStands.JoJoStands.timestopImmune.Add(ModContent.ProjectileType<TheWorldOverHeavenStandT1>());
             JoJoStands.JoJoStands.timestopImmune.Add(ModContent.ProjectileType<TheWorldOverHeavenStandT2>());

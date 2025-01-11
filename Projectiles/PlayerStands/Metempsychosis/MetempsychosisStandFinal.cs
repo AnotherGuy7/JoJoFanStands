@@ -2,6 +2,7 @@ using JoJoFanStands.Buffs;
 using JoJoStands;
 using JoJoStands.Buffs.Debuffs;
 using JoJoStands.Projectiles.PlayerStands;
+using JoJoStands.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -336,7 +337,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
 
         public override void ExtraSpawnEffects()
         {
+            SoulBar.ShowSoulBar();
             SoundEngine.PlaySound(Main.rand.NextBool() ? Summon_1 : Summon_2, Projectile.Center);
+        }
+
+        public override void StandKillEffects()
+        {
+            SoulBar.HideSoulBar();
         }
 
         public override void SendExtraStates(BinaryWriter writer)

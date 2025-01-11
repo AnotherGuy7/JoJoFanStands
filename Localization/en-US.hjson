@@ -644,7 +644,17 @@ Mods: {
 
 			MetempsychosisRequiem: {
 				DisplayName: Metempsychosis Requiem
-				Tooltip: ""
+				Tooltip:
+					'''
+					Left-click to slash using your dual kamas and right-click to rush into all enemies in your path!
+					Special: Take 15% of nearby enemies health! Claims the souls of enemies whose health falls below 25%. Requires 25 Soul Accumulation.
+					Second Special: Rush toward the target area and take 24% of the colliding enemy's health! Claims the soul of that enemy if their health falls below 50%. Requires 10 Soul Accumulation.
+					Passive: Protector of the Cycle
+					Note: Protector of the Cycle allows this Stand to boost player attack and defense the more Soul Accumulation there is.
+					Note: The left and right-click attacks apply a 15% flat damage bonus.
+					User Name: Samsara
+					Reference: Metempsychosis by Andromida
+					'''
 			}
 		}
 
@@ -715,6 +725,9 @@ Mods: {
 			MetempsychosisStandFinal.DisplayName: Metempsychosis Stand Final
 			MetempsychosisRequiemStand.DisplayName: Metempsychosis Requiem Stand
 			SoulEffect.DisplayName: Soul Effect
+			MetempsychosisStandT1.DisplayName: Metempsychosis Stand T1
+			MetempsychosisStandT2.DisplayName: Metempsychosis Stand T2
+			MetempsychosisStandT3.DisplayName: Metempsychosis Stand T3
 		}
 
 		Configs: {

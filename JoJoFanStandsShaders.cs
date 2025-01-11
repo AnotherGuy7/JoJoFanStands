@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using Terraria;
 using Terraria.Graphics.Effects;
 using Terraria.Graphics.Shaders;
 using Terraria.ModLoader;
@@ -14,6 +13,7 @@ namespace JoJoFanStands
         public const string CircularGreyscale = "CircularGreyscale";
         public const string BackInBlackDistortion = "BackInBlackDistortion";
         public const string AuraShader = "AuraShader";
+        public const string SoulBarShader = "SoulBarShader";
 
         public static void LoadShaders()
         {
@@ -32,6 +32,9 @@ namespace JoJoFanStands
             Asset<Effect> auraShader = ModContent.Request<Effect>("JoJoFanStands/Effects/AuraShader", AssetRequestMode.ImmediateLoad);
             GameShaders.Misc[AuraShader] = new MiscShaderData(auraShader, "AuraShaderEffect");
             GameShaders.Misc[AuraShader].UseImage1(ModContent.Request<Texture2D>("JoJoFanStands/Extras/Noise", AssetRequestMode.ImmediateLoad));
+
+            Asset<Effect> soulBarShader = ModContent.Request<Effect>("JoJoFanStands/Effects/SoulBarShader", AssetRequestMode.ImmediateLoad);
+            GameShaders.Misc[SoulBarShader] = new MiscShaderData(soulBarShader, "SoulBarEffect");
         }
     }
 }

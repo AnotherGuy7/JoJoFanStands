@@ -15,11 +15,13 @@ namespace JoJoFanStands
         private UserInterface _lightBridgeUI;
         private UserInterface _blurBarUI;
         private UserInterface _blurAbilityWheelUI;
+        private UserInterface _soulBarUI;
 
         internal AbilityChooserUI AbilityUI;
         public static LightBridgeUI LightBridgeUI;
         public static BlurBar BlurBarUI;
         public static BlurAbilityWheel BlurAbilityWheelUI;
+        public static SoulBar SoulBarUI;
 
         public override void Load()
         {
@@ -44,6 +46,11 @@ namespace JoJoFanStands
                 BlurAbilityWheelUI.Activate();
                 _blurAbilityWheelUI = new UserInterface();
                 _blurAbilityWheelUI.SetState(BlurAbilityWheelUI);
+
+                SoulBarUI = new SoulBar();
+                SoulBarUI.Activate();
+                _soulBarUI = new UserInterface();
+                _soulBarUI.SetState(SoulBarUI);
             }
         }
 
@@ -60,6 +67,9 @@ namespace JoJoFanStands
 
             if (BlurAbilityWheel.Visible)
                 _blurAbilityWheelUI.Update(gameTime);
+
+            if (SoulBar.Visible)
+                _soulBarUI.Update(gameTime);
         }
 
         public override void Unload()
@@ -96,6 +106,9 @@ namespace JoJoFanStands
 
             if (BlurAbilityWheel.Visible)
                 _blurAbilityWheelUI.Draw(Main.spriteBatch, new GameTime());
+
+            if (SoulBar.Visible)
+                _soulBarUI.Draw(Main.spriteBatch, new GameTime());
             return true;
         }
     }
