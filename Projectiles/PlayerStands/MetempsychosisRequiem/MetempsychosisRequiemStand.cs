@@ -10,6 +10,8 @@ using System;
 using System.IO;
 using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
+using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
 using static JoJoFanStands.Projectiles.PlayerStands.Metempsychosis.MetempsychosisStandFinal;
@@ -88,6 +90,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MetempsychosisRequiem
                 weaponGlowmaskTimer = 270;
             }
 
+            Projectile.tileCollide = !usingRend && !secondaryAbility;
             if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
             {
                 if (Projectile.owner == Main.myPlayer)
@@ -104,7 +107,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MetempsychosisRequiem
                         if (!secondaryAbility && !usingRend && !claimingSouls)
                             StayBehind();
                     }
-                    if (Main.mouseRight && !playerHasAbilityCooldown && !attacking && !claimingSouls && !usingRend)
+                    if (Main.mouseRight && !playerHasAbilityCooldown && !secondaryAbility && !attacking && !claimingSouls && !usingRend)
                     {
                         secondaryAbility = true;
                         currentAnimationState = AnimationState.SecondaryAbility;
@@ -299,6 +302,61 @@ namespace JoJoFanStands.Projectiles.PlayerStands.MetempsychosisRequiem
         {
             claimingSouls = reader.ReadBoolean();
             usingRend = reader.ReadBoolean();
+        }
+
+        public override bool PreDraw(ref Color drawColor)
+        {
+            string animationName = string.Empty;
+            if (currentAnimationState == AnimationState.Idle)
+                animationName = "Idle";
+            else if (currentAnimationState == AnimationState.Attack)
+                animationName = "Attack";
+            else if (currentAnimationState == AnimationState.SecondaryAbility)
+                animationName = "Reave";
+            else if (currentAnimationState == AnimationState.Special1)
+                animationName = "Claim";
+            else if (currentAnimationState == AnimationState.Special2)
+                animationName = "Rend";
+            else if (currentAnimationState == AnimationState.Pose)
+                animationName = "Pose";
+
+            Main.spriteBatch.End();
+
+            GameShaders.Misc["AuraShader"].UseImage1(ModContent.Request<Texture2D>("JoJoFanStands/Extras/Noise", ReLogic.Content.AssetRequestMode.ImmediateLoad));
+            GameShaders.Misc["AuraShader"].UseImage2(ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Metempsychosis/Metempsychosis_" + animationName));
+            GameShaders.Misc["AuraShader"].UseSecondaryColor(new Color(63, 205, 189));
+            GameShaders.Misc["AuraShader"].UseShaderSpecificData(new Vector4((Projectile.frame * (HalfStandHeight * 2)) / (HalfStandHeight * 2 * amountOfFrames), ((Projectile.frame + 1) * (HalfStandHeight * 2)) / (HalfStandHeight * 2 * amountOfFrames), 0f, 0f));
+            Vector2 drawOffset2 = StandOffset;
+            drawOffset2.X *= Projectile.spriteDirection;
+            Vector2 drawPosition2 = Projectile.Center - Main.screenPosition + drawOffset2 + new Vector2(0f, -26f);
+            Vector2 standOrigin2 = new Vector2(standTexture.Width / 2f, (standTexture.Height / amountOfFrames) / 2f);
+            DrawData data = new DrawData(ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Metempsychosis/Metempsychosis_AuraBubble", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value, drawPosition2, null, drawColor, Projectile.rotation, standOrigin2, 1f, effects, 0);
+            GameShaders.Misc["AuraShader"].Apply(data);
+
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, GameShaders.Misc["AuraShader"].Shader, Main.GameViewMatrix.ZoomMatrix);        //starting a draw with dyes that work
+            Main.EntitySpriteDraw(data);
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.ZoomMatrix);        //starting a draw with dyes that work
+
+            if (UseProjectileAlpha)
+                drawColor *= Projectile.alpha / 255f;
+
+            effects = SpriteEffects.None;
+            if (Projectile.spriteDirection == -1)
+                effects = SpriteEffects.FlipHorizontally;
+
+            if (standTexture != null && Main.netMode != NetmodeID.Server)
+            {
+                int frameHeight = standTexture.Height / amountOfFrames;
+                Vector2 drawOffset = StandOffset;
+                drawOffset.X *= Projectile.spriteDirection;
+                Vector2 drawPosition = Projectile.Center - Main.screenPosition + drawOffset;
+                Rectangle animRect = new Rectangle(0, frameHeight * Projectile.frame, standTexture.Width, frameHeight);
+                Vector2 standOrigin = new Vector2(standTexture.Width / 2f, frameHeight / 2f);
+                Main.EntitySpriteDraw(standTexture, drawPosition, animRect, drawColor, Projectile.rotation, standOrigin, 1f, effects, 0);
+            }
+            return true;
         }
 
         public override void PostDrawExtras()

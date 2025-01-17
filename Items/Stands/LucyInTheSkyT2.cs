@@ -11,7 +11,7 @@ namespace JoJoFanStands.Items.Stands
     public class LucyInTheSkyT2 : FanStandItemClass
     {
         public override int StandSpeed => 11;
-        public override int StandType => 2;
+        public override int StandType => 1;
         public override string StandIdentifierName => "LucyInTheSky";
         public override int StandTier => 2;
         public override Color StandTierDisplayColor => Color.LightGreen;

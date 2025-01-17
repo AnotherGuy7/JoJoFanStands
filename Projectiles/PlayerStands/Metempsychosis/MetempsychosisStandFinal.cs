@@ -9,6 +9,8 @@ using System;
 using System.IO;
 using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
+using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -25,6 +27,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
         public override bool CanUseAfterImagePunches => false;
         public override Vector2 StandOffset => new Vector2(-12f, 0f);
         public override StandAttackType StandType => StandAttackType.Melee;
+        public override string PoseSoundName => "Metempsychosis";
         public new AnimationState currentAnimationState;
         public new AnimationState oldAnimationState;
 
@@ -144,6 +147,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
                 weaponGlowmaskTimer = 270;
             }
 
+            Projectile.tileCollide = !usingRend && !secondaryAbility;
             if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
             {
                 if (Projectile.owner == Main.myPlayer)
@@ -160,7 +164,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
                         if (!secondaryAbility && !usingRend && !claimingSouls)
                             StayBehind();
                     }
-                    if (Main.mouseRight && !playerHasAbilityCooldown && !attacking && !claimingSouls && !usingRend)
+                    if (Main.mouseRight && !playerHasAbilityCooldown && !secondaryAbility && !attacking && !claimingSouls && !usingRend)
                     {
                         secondaryAbility = true;
                         currentAnimationState = AnimationState.SecondaryAbility;
@@ -355,6 +359,31 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
         {
             claimingSouls = reader.ReadBoolean();
             usingRend = reader.ReadBoolean();
+        }
+
+        public override bool PreDraw(ref Color drawColor)      //from ExampleMod ExampleDeathShader
+        {
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.ZoomMatrix);        //starting a draw with dyes that work
+
+            if (UseProjectileAlpha)
+                drawColor *= Projectile.alpha / 255f;
+
+            effects = SpriteEffects.None;
+            if (Projectile.spriteDirection == -1)
+                effects = SpriteEffects.FlipHorizontally;
+
+            if (standTexture != null && Main.netMode != NetmodeID.Server)
+            {
+                int frameHeight = standTexture.Height / amountOfFrames;
+                Vector2 drawOffset = StandOffset;
+                drawOffset.X *= Projectile.spriteDirection;
+                Vector2 drawPosition = Projectile.Center - Main.screenPosition + drawOffset;
+                Rectangle animRect = new Rectangle(0, frameHeight * Projectile.frame, standTexture.Width, frameHeight);
+                Vector2 standOrigin = new Vector2(standTexture.Width / 2f, frameHeight / 2f);
+                Main.EntitySpriteDraw(standTexture, drawPosition, animRect, drawColor, Projectile.rotation, standOrigin, 1f, effects, 0);
+            }
+            return true;
         }
 
         public override void PostDrawExtras()

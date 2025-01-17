@@ -53,7 +53,7 @@ namespace JoJoStands.UI
 
             soulPointsText = new UIText(0 + " / 100");
             soulPointsText.HAlign = 0.5f;
-            soulPointsText.VAlign = 1.4f;
+            soulPointsText.VAlign = 0.5f;
             soulPointsText.Width.Set(12f * 4f, 0f);
             soulPointsText.Height.Set(20, 0f);
             soulBar.Append(soulPointsText);
@@ -70,8 +70,8 @@ namespace JoJoStands.UI
 
             Rectangle mainUIDestinationRect = UITools.ReformatRectangle(soulBar.GetClippingRectangle(spriteBatch));
             MiscShaderData soulBarShader = JoJoStandsShaders.GetShaderInstance(JoJoFanStandsShaders.SoulBarShader);
-            float gradientValue = ((60f / 72f) * (fanPlayer.metempsychosisPoints / 100f)) + (12f / 72f);
-            soulBarShader.UseOpacity(gradientValue);
+            float gradientValue = ((48f / 72f) * (fanPlayer.metempsychosisPoints / 100f)) + (12f / 72f);
+            soulBarShader.UseOpacity(1f - gradientValue);
             UITools.DrawUIWithShader(spriteBatch, soulBarShader, soulBarBarTexture, mainUIDestinationRect);
         }
     }

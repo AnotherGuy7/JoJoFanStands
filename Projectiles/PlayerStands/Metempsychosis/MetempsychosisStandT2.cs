@@ -26,6 +26,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
         public override bool CanUseAfterImagePunches => false;
         public override Vector2 StandOffset => new Vector2(-12f, 0f);
         public override StandAttackType StandType => StandAttackType.Melee;
+        public override string PoseSoundName => "Metempsychosis";
         public new AnimationState currentAnimationState;
         public new AnimationState oldAnimationState;
 
@@ -85,6 +86,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
                 weaponGlowmaskTimer = 270;
             }
 
+            Projectile.tileCollide = !secondaryAbility;
             if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
             {
                 if (Projectile.owner == Main.myPlayer)
@@ -101,7 +103,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Metempsychosis
                         if (!secondaryAbility && !claimingSouls)
                             StayBehind();
                     }
-                    if (Main.mouseRight && !playerHasAbilityCooldown && !attacking && !claimingSouls)
+                    if (Main.mouseRight && !playerHasAbilityCooldown && !secondaryAbility && !attacking && !claimingSouls)
                     {
                         secondaryAbility = true;
                         currentAnimationState = AnimationState.SecondaryAbility;

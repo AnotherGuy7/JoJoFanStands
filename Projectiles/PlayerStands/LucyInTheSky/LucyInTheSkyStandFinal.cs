@@ -22,6 +22,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.LucyInTheSky
         public override bool CanUseAfterImagePunches => false;
         public override StandAttackType StandType => StandAttackType.Melee;
         public override bool UseProjectileAlpha => true;
+        public override string PoseSoundName => "LucyInTheSky";
 
         private const int MaxAmountOfMarkers = 12;
 

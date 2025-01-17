@@ -25,7 +25,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             Projectile.shouldFallThrough = false;
         }
 
-        public override string PoseSoundName => "StandReadyFire";
         public override StandAttackType StandType => StandAttackType.Ranged;
         public override Vector2 StandOffset => new Vector2(8f, 0f);
         public override float ProjectileSpeed => 12f;
@@ -59,7 +58,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
 
             Player player = Main.player[Projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-            mPlayer.poseSoundName = PoseSoundName;
             if (mPlayer.standOut && mPlayer.standTier != 0)
                 Projectile.timeLeft = 2;
 

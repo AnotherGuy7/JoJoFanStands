@@ -2,6 +2,7 @@ using JoJoStands;
 using JoJoStands.Projectiles.PlayerStands;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Graphics.Shaders;
@@ -140,9 +141,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.BackInBlack
         public override bool PreDraw(ref Color drawColor)      //from ExampleMod ExampleDeathShader
         {
             Main.spriteBatch.End();
-            /*GameShaders.Misc["AuraShader"].UseImage1(ModContent.Request<Texture2D>("JoJoFanStands/Extras/Noise", ReLogic.Content.AssetRequestMode.ImmediateLoad));
-            GameShaders.Misc["AuraShader"].UseSecondaryColor(new Color(63, 205, 189));
-            GameShaders.Misc["AuraShader"].Apply();*/
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, GameShaders.Misc["BackInBlackDistortion"].Shader, Main.GameViewMatrix.ZoomMatrix);        //starting a draw with dyes that work
 
             if (UseProjectileAlpha)

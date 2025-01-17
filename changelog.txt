@@ -1,9 +1,9 @@
-- Added Metempsychosis (Commissioned by Samsara)
-- Adjusted damage values for Wayward Son to keep it in line with other Stands
-- Fixed many fan Stands targetting animals or NPCs with special moves
-- Fixed many fan Stands alternate abilities not adjusting to damage percentage changes
-- Fixed Wayward Son turning into Slaves of Fear when using the right-click ability
-- Fixed The World Over Heaven being able to reach infinite damage through duplication
-- Fixed Wayward Son's dynamic damage not updating
-- Minor consistency sprite updates
-- 
+- Metempsychosis Requiem now has an Aura
+- Metempsychosis now properly modified defense with soul points
+- Increased the amount of damagen needed per soul point when using Metempsychosis
+- Lucy in the Sky now properly boosts defense based on the tier of the Stand
+- Lucy in the Sky now plays its pose sounds properly
+- Fixed Metempsychosis Requiem not spawning properly
+- Fixed Metempsychosis playing the secondary ability lines at the same time
+- Fixed Metempsychosis getting stuck when using some abilities
+- Fixed the Soul Bar visually going out of bounds

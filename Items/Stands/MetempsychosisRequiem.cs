@@ -1,5 +1,7 @@
+using JoJoFanStands.Projectiles.PlayerStands.MetempsychosisRequiem;
 using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
+using JoJoStands.Projectiles.PlayerStands.GoldExperienceRequiem;
 using JoJoStands.Tiles;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -37,7 +39,7 @@ namespace JoJoFanStands.Items.Stands
 
         public override bool ManualStandSpawning(Player player)
         {
-            player.GetModPlayer<FanPlayer>().SpawnFanStand();
+            Projectile.NewProjectile(player.GetSource_FromThis(), player.position, player.velocity, ProjectileType<MetempsychosisRequiemStand>(), 0, 0f, Main.myPlayer);
             return true;
         }
 

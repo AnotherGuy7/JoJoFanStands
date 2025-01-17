@@ -608,7 +608,10 @@ Mods: {
 					'''
 					Left-click to slash using your dual kamas and right-click to rush into all enemies in your path!
 					Note: The left and right-click attacks apply a 5% flat damage bonus.
-					User Name: Samsara
+					Among its various offensive abilities, the user of this Stand will remember every single life they have had and will have,
+					and will always awaken to this power in their lives.
+					Fate is not so much an obstacle when you have all the time in the world...
+					User Name: Sulphuros
 					Reference: Metempsychosis by Andromida
 					'''
 			}
@@ -622,7 +625,7 @@ Mods: {
 					Passive: Protector of the Cycle
 					Note: Protector of the Cycle allows this Stand to boost player attack and defense the more Soul Accumulation there is.
 					Note: The left and right-click attacks apply a 20% flat damage bonus.
-					User Name: Samsara
+					User Name: Sulphuros
 					Reference: Metempsychosis by Andromida
 					'''
 			}
@@ -637,22 +640,22 @@ Mods: {
 					Passive: Protector of the Cycle
 					Note: Protector of the Cycle allows this Stand to boost player attack and defense the more Soul Accumulation there is.
 					Note: The left and right-click attacks apply a 15% flat damage bonus.
-					User Name: Samsara
+					User Name: Sulphuros
 					Reference: Metempsychosis by Andromida
 					'''
 			}
 
 			MetempsychosisRequiem: {
-				DisplayName: Metempsychosis Requiem
+				DisplayName: Metempsychosis: Paean &  Requiem
 				Tooltip:
 					'''
 					Left-click to slash using your dual kamas and right-click to rush into all enemies in your path!
-					Special: Take 15% of nearby enemies health! Claims the souls of enemies whose health falls below 25%. Requires 25 Soul Accumulation.
+					Special: Take 25% of nearby enemies health! Claims the souls of enemies whose health falls below 25%. Requires 25 Soul Accumulation.
 					Second Special: Rush toward the target area and take 50% of the colliding enemy's health! Claims the soul of that enemy if their health falls below 35%. Requires 10 Soul Accumulation.
 					Passive: Protector of the Cycle
 					Note: Protector of the Cycle allows this Stand to boost player attack and defense the more Soul Accumulation there is.
 					Note: The left and right-click attacks apply a 15% flat damage bonus.
-					User Name: Samsara
+					User Name: Sulphuros
 					Reference: Metempsychosis by Andromida
 					'''
 			}

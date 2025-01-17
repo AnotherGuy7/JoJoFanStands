@@ -4,7 +4,9 @@ using JoJoFanStands.Mounts;
 using JoJoFanStands.Projectiles;
 using JoJoStands;
 using JoJoStands.Items.Hamon;
+using JoJoStands.Projectiles;
 using Microsoft.Xna.Framework;
+using System.Security.Cryptography.X509Certificates;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameInput;
@@ -99,7 +101,7 @@ namespace JoJoFanStands
 
         public override void PreUpdate()
         {
-            Player player = Main.player[Main.myPlayer];
+            Player player = Player;
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
 
             mPlayer.hideAllPlayerLayers = mPlayer.hideAllPlayerLayers || hidingInLucyMarker;
@@ -156,6 +158,14 @@ namespace JoJoFanStands
             }
         }
 
+        public override void UpdateEquips()
+        {
+            Player player = Player;
+            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
+            if (mPlayer.standOut && mPlayer.standName == "Metempsychosis" && Player.whoAmI == Main.myPlayer)
+                player.statDefense += (int)(metempsychosisPoints * (4 * mPlayer.standTier) / 100f);
+        }
+
         public override bool FreeDodge(Player.HurtInfo info)
         {
             if (Player.HasBuff<Vibration>())
@@ -201,21 +211,33 @@ namespace JoJoFanStands
         {
             MyPlayer mPlayer = Player.GetModPlayer<MyPlayer>();
             if (mPlayer.standOut && mPlayer.standName == "Metempsychosis")
-                metempsychosisPoints += damageDone / 8;
+            {
+                metempsychosisPoints += damageDone / (18 * mPlayer.standTier);
+                if (metempsychosisPoints >= 100)
+                    metempsychosisPoints = 100;
+            }
         }
 
         public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
         {
             MyPlayer mPlayer = Player.GetModPlayer<MyPlayer>();
             if (mPlayer.standOut && mPlayer.standName == "Metempsychosis")
-                metempsychosisPoints += damageDone / 8;
+            {
+                metempsychosisPoints += damageDone / (18 * mPlayer.standTier);
+                if (metempsychosisPoints >= 100)
+                    metempsychosisPoints = 100;
+            }
         }
 
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
             MyPlayer mPlayer = Player.GetModPlayer<MyPlayer>();
-            if (mPlayer.standOut && mPlayer.standName == "Metempsychosis" && proj.ModProjectile is not FanStandFists)
-                metempsychosisPoints += damageDone / 8;
+            if (mPlayer.standOut && mPlayer.standName == "Metempsychosis" && proj.ModProjectile is not Fists && proj.ModProjectile is not FanStandFists)
+            {
+                metempsychosisPoints += damageDone / (18 * mPlayer.standTier);
+                if (metempsychosisPoints >= 100)
+                    metempsychosisPoints = 100;
+            }
         }
 
         public override void HideDrawLayers(PlayerDrawSet drawInfo)
