@@ -16,10 +16,7 @@ namespace JoJoFanStands.Items.Stands
         public override int StandTier => 2;
         public override Color StandTierDisplayColor => Color.LightGreen;
         public override bool FanStandItem => true;
-        public override string Texture
-        {
-            get { return Mod.Name + "/Items/Stands/LucyInTheSkyT1"; }
-        }
+        public override string Texture => Mod.Name + "/Items/Stands/LucyInTheSkyT1";
 
         public override void SetStaticDefaults()
         {

@@ -13,6 +13,7 @@ namespace JoJoFanStands.Projectiles
         public const int TheWorldOverHeavenFists = 0;
         public const int WaywardSonFists = 1;
         public const int MetempsychosisFists = 2;
+        public const int VirtualInsanityFists = 3;
 
         private int standType = 0;
         private int standTier = 0;

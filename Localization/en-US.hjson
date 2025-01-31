@@ -659,6 +659,26 @@ Mods: {
 					Reference: Metempsychosis by Andromida
 					'''
 			}
+
+			VirtualInsanityFinal: {
+				DisplayName: Virtual Insanity Final
+				Tooltip: ""
+			}
+
+			VirtualInsanityT1: {
+				DisplayName: Virtual Insanity T1
+				Tooltip: ""
+			}
+
+			VirtualInsanityT2: {
+				DisplayName: Virtual Insanity T2
+				Tooltip: ""
+			}
+
+			VirtualInsanityT3: {
+				DisplayName: Virtual Insanity T3
+				Tooltip: ""
+			}
 		}
 
 		NPCs.Pao.DisplayName: Pao
@@ -731,6 +751,7 @@ Mods: {
 			MetempsychosisStandT1.DisplayName: Metempsychosis Stand T1
 			MetempsychosisStandT2.DisplayName: Metempsychosis Stand T2
 			MetempsychosisStandT3.DisplayName: Metempsychosis Stand T3
+			VirtualInsanityStandFinal.DisplayName: Virtual Insanity Stand Final
 		}
 
 		Configs: {
@@ -742,6 +763,15 @@ Mods: {
 					Tooltip: Determines whether or not you want an NPC called 'Pao' to spawn. Enable at your own risk!
 				}
 			}
+		}
+
+		JotaroCustomDialogue: {
+			ArrowShard: You seem... reliable. Here, I want you to take this and use it on yourself when you can, I think you'll like what happens when you do.
+			StarPlatinumT1:
+				'''
+				You trying to mock me by asking about my own stand? What a pain... Well, I guess I'd be the one to know the most about it. I'll tell you what I can.
+				Good grief, you've only just awoken Star Platinum? I expected better of a copycat like yourself. In its first or second tier, Star Platinum is nothing but a glorified pair of floating fists, but things get a bit more interesting as you reach its third and fourth tier.
+				'''
 		}
 	}
 }
