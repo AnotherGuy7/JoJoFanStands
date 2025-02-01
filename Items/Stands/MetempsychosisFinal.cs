@@ -44,6 +44,7 @@ namespace JoJoFanStands.Items.Stands
         public override void AddRecipes()
         {
             CreateRecipe()
+                .AddIngredient(ItemType<MetempsychosisT3>())
                 .AddIngredient(ItemType<WillToProtect>(), 4)
                 .AddIngredient(ItemType<WillToFight>(), 4)
                 .AddIngredient(ItemID.SpectreBar, 12)

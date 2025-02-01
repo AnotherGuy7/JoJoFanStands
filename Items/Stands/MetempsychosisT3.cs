@@ -1,4 +1,3 @@
-using JoJoStands.Items;
 using JoJoStands.Items.CraftingMaterials;
 using JoJoStands.Tiles;
 using Microsoft.Xna.Framework;
@@ -13,7 +12,7 @@ namespace JoJoFanStands.Items.Stands
     {
         public override int StandSpeed => 10;
         public override int StandType => 1;
-        public override string StandIdentifierName => "WaywardSon";
+        public override string StandIdentifierName => "Metempsychosis";
         public override int StandTier => 3;
         public override Color StandTierDisplayColor => Color.Magenta;
         public override bool FanStandItem => true;
@@ -45,6 +44,7 @@ namespace JoJoFanStands.Items.Stands
         public override void AddRecipes()
         {
             CreateRecipe()
+                .AddIngredient(ItemType<MetempsychosisT2>())
                 .AddIngredient(ItemID.HallowedBar, 13)
                 .AddIngredient(ItemType<WillToProtect>(), 4)
                 .AddIngredient(ItemType<WillToFight>())
