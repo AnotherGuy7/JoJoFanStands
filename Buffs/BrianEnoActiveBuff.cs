@@ -17,9 +17,7 @@ namespace JoJoFanStands.Buffs
         {
             FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
             if (fPlayer.anyBrianEno)
-            {
                 player.AddBuff(BuffType<BrianEnoActiveBuff>(), 2);
-            }
         }
     }
 }

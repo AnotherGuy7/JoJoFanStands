@@ -33,6 +33,7 @@ namespace JoJoFanStands
         public bool blurLightningFastReflexes = false;
         public bool blurInfiniteVelocity = false;
         public bool realityRewriteActive = false;
+        public bool virtualInsanityRangeBoost = false;
         public bool customCameraOverride = false;
 
         public int banksDefenseReduction = 0;
@@ -144,6 +145,10 @@ namespace JoJoFanStands
                 {
                     player.moveSpeed += 0.4f;
                 }
+            }
+            if (virtualInsanityRangeBoost)
+            {
+                mPlayer.standRangeBoosts += 4f * 16f;
             }
 
             if (!Main.dedServ && Player.whoAmI == Main.myPlayer)

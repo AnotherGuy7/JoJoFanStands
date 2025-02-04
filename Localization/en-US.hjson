@@ -70,6 +70,11 @@ Mods: {
 				DisplayName: Gird Soul
 				Description: Mods.JoJoFanStands.Buffs.GirdSoul.Description
 			}
+
+			PowerInstall: {
+				DisplayName: Power Install
+				Description: Mods.JoJoFanStands.Buffs.PowerInstall.Description
+			}
 		}
 
 		Items: {
@@ -752,6 +757,11 @@ Mods: {
 			MetempsychosisStandT2.DisplayName: Metempsychosis Stand T2
 			MetempsychosisStandT3.DisplayName: Metempsychosis Stand T3
 			VirtualInsanityStandFinal.DisplayName: Virtual Insanity Stand Final
+			BombDrone.DisplayName: Bomb Drone
+			GlueMan.DisplayName: Glue Man
+			GreenDevil.DisplayName: Green Devil
+			PowerMuscler.DisplayName: Power Muscler
+			YellowDevil.DisplayName: Yellow Devil
 		}
 
 		Configs: {

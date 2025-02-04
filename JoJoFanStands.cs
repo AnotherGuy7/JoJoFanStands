@@ -1,6 +1,7 @@
 using JoJoFanStands.Items.Armor;
 using JoJoFanStands.Items.Stands;
 using JoJoFanStands.Projectiles.PlayerStands.Blur;
+using JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear;
 using JoJoFanStands.Projectiles.PlayerStands.TheWorldOverHeaven;
 using JoJoFanStands.Projectiles.PlayerStands.WaywardSon;
 using JoJoStands.UI;
@@ -25,6 +26,16 @@ namespace JoJoFanStands
             BlurStandT1.punchTextures = new Texture2D[2];
             BlurStandT1.punchTextures[0] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Blur/Blur_Punch_1", AssetRequestMode.ImmediateLoad).Value;
             BlurStandT1.punchTextures[1] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Blur/Blur_Punch_2", AssetRequestMode.ImmediateLoad).Value;
+
+            VirtualInsanityStandFinal.AttackStyleTextures = new Texture2D[3];
+            VirtualInsanityStandFinal.AttackStyleTextures[0] = ModContent.Request<Texture2D>("JoJoFanStands/Extras/FistKanji", AssetRequestMode.ImmediateLoad).Value;
+            VirtualInsanityStandFinal.AttackStyleTextures[1] = ModContent.Request<Texture2D>("JoJoFanStands/Extras/SwordKanji", AssetRequestMode.ImmediateLoad).Value;
+            VirtualInsanityStandFinal.AttackStyleTextures[2] = ModContent.Request<Texture2D>("JoJoFanStands/Extras/GunKanji", AssetRequestMode.ImmediateLoad).Value;
+
+            VirtualInsanityStandFinal.PortalTextures = new Texture2D[3];
+            VirtualInsanityStandFinal.PortalTextures[0] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Portal/PortalOpen", AssetRequestMode.ImmediateLoad).Value;
+            VirtualInsanityStandFinal.PortalTextures[1] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Portal/PortalIdle", AssetRequestMode.ImmediateLoad).Value;
+            VirtualInsanityStandFinal.PortalTextures[2] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Portal/PortalClose", AssetRequestMode.ImmediateLoad).Value;
 
             BlurBar.blurBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/BlurEnergyBar", AssetRequestMode.ImmediateLoad).Value;
             SoulBar.soulBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/SoulBar", AssetRequestMode.ImmediateLoad).Value;
