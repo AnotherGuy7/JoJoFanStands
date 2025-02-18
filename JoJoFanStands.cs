@@ -37,6 +37,21 @@ namespace JoJoFanStands
             VirtualInsanityStandFinal.PortalTextures[1] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Portal/PortalIdle", AssetRequestMode.ImmediateLoad).Value;
             VirtualInsanityStandFinal.PortalTextures[2] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Portal/PortalClose", AssetRequestMode.ImmediateLoad).Value;
 
+            VirtualInsanityStandFinal.ArmCannonSpritesheets = new Texture2D[3];
+            VirtualInsanityStandFinal.ArmCannonSpritesheets[0] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Cannon_Arm", AssetRequestMode.ImmediateLoad).Value;
+            VirtualInsanityStandFinal.ArmCannonSpritesheets[1] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Cannon_ArmShoot", AssetRequestMode.ImmediateLoad).Value;
+            VirtualInsanityStandFinal.ArmCannonSpritesheets[2] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Cannon_ArmFlash", AssetRequestMode.ImmediateLoad).Value;
+
+            VirtualInsanityStandFinal.CannonHeadSpritesheets = new Texture2D[3];
+            VirtualInsanityStandFinal.CannonHeadSpritesheets[0] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Cannon_HeadUp", AssetRequestMode.ImmediateLoad).Value;
+            VirtualInsanityStandFinal.CannonHeadSpritesheets[1] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Cannon_HeadStraight", AssetRequestMode.ImmediateLoad).Value;
+            VirtualInsanityStandFinal.CannonHeadSpritesheets[2] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Cannon_HeadDown", AssetRequestMode.ImmediateLoad).Value;
+
+            VirtualInsanityStandFinal.CannonHeadFlashSpritesheets = new Texture2D[3];
+            VirtualInsanityStandFinal.CannonHeadFlashSpritesheets[0] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Cannon_HeadUpFlash", AssetRequestMode.ImmediateLoad).Value;
+            VirtualInsanityStandFinal.CannonHeadFlashSpritesheets[1] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Cannon_HeadStraightFlash", AssetRequestMode.ImmediateLoad).Value;
+            VirtualInsanityStandFinal.CannonHeadFlashSpritesheets[2] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Cannon_HeadDownFlash", AssetRequestMode.ImmediateLoad).Value;
+
             BlurBar.blurBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/BlurEnergyBar", AssetRequestMode.ImmediateLoad).Value;
             SoulBar.soulBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/SoulBar", AssetRequestMode.ImmediateLoad).Value;
             SoulBar.soulBarBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/SoulBar_Bar", AssetRequestMode.ImmediateLoad).Value;

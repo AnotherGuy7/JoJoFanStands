@@ -762,6 +762,7 @@ Mods: {
 			GreenDevil.DisplayName: Green Devil
 			PowerMuscler.DisplayName: Power Muscler
 			YellowDevil.DisplayName: Yellow Devil
+			GunPellet.DisplayName: Gun Pellet
 		}
 
 		Configs: {
