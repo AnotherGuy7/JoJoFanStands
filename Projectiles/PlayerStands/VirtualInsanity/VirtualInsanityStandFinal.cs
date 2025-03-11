@@ -58,7 +58,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
         public static Texture2D[] ArmCannonSpritesheets;
         public static Texture2D[] CannonHeadSpritesheets;
         public static Texture2D[] CannonHeadFlashSpritesheets;
-        private readonly Vector2 ArmOffset = new Vector2(40, 24 - 6);
+        private readonly Vector2 ArmPlacementOffset = new Vector2(40 - 29, 18 + 39);
         private int portalFrame;
         private int portalFrameCounter;
         private int portalAnimationIndex;
@@ -216,21 +216,22 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
                         attacking = true;
                         currentAnimationState = AnimationState.Attack;
                         Projectile.netUpdate = true;
-                        player.direction = Projectile.spriteDirection = Projectile.direction = Main.MouseWorld.X > Projectile.Center.X ? 1 : -1;
+                        player.direction = Projectile.spriteDirection = Projectile.direction = Main.MouseWorld.X > player.Center.X ? 1 : -1;
                         GoInFront();
                         if (shootCount <= 0)
                         {
                             shootCount += newPunchTime * 2;
-                            Vector2 drawOffset = StandOffset - new Vector2(0f, HalfStandHeight * 2);
-                            drawOffset.X *= Projectile.spriteDirection;
-                            Vector2 armTip = Projectile.Center - new Vector2(29, -39) + drawOffset + ArmOffset;
-                            Vector2 shootVel = Main.MouseWorld - armTip;
-                            if (shootVel == Vector2.Zero)
-                                shootVel = new Vector2(0f, 1f);
+                            Vector2 armOffset = StandOffset - new Vector2(0f, HalfStandHeight * 2) + ArmPlacementOffset + new Vector2(0f, 4f);
+                            armOffset.X *= Projectile.spriteDirection;
+                            Vector2 circularOffset = Main.MouseWorld - (Projectile.Center + armOffset);
+                            circularOffset.Normalize();
+                            armOffset += circularOffset * 12f;
 
+                            Vector2 shootPosition = Projectile.Center + armOffset;
+                            Vector2 shootVel = Main.MouseWorld - shootPosition;
                             shootVel.Normalize();
                             shootVel *= ProjectileSpeed;
-                            int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), armTip, shootVel, ModContent.ProjectileType<GunPellet>(), newPunchDamage / 3 , 1f, Projectile.owner);
+                            int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), shootPosition, shootVel, ModContent.ProjectileType<GunPellet>(), newPunchDamage / 3 , 1f, Projectile.owner);
                             Main.projectile[projIndex].netUpdate = true;
                             Projectile.netUpdate = true;
                         }
@@ -418,12 +419,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
             }
             if (attackType == Attack_Cannon)
             {
-                Vector2 drawOffset = StandOffset - new Vector2(0f, HalfStandHeight * 2) + ArmOffset - new Vector2(29, -39);
+                Vector2 drawOffset = StandOffset - new Vector2(0f, HalfStandHeight * 2) + ArmPlacementOffset;
                 drawOffset.X *= Projectile.spriteDirection;
                 Vector2 drawPosition = Projectile.Center - Main.screenPosition + drawOffset;
-                if (Projectile.spriteDirection == -1)
-                    drawPosition.Y -= 8;
-                float rotation = (Main.MouseWorld - (Projectile.Center - new Vector2(29, 39) + drawOffset + ArmOffset)).ToRotation();
+                float rotation = (Main.MouseWorld - (Projectile.Center - new Vector2(29, 39) + drawOffset + ArmPlacementOffset)).ToRotation();
 
                 int textureType = 0;
                 Rectangle animRect = new Rectangle(0, 0, 32, 32);
@@ -433,7 +432,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
                     animRect = new Rectangle(0, 32 * Projectile.frame, 32, 32);
                 }
 
-                Main.EntitySpriteDraw(ArmCannonSpritesheets[textureType], drawPosition, animRect, Color.White, rotation, new Vector2(4, 20), 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically);
+                Vector2 armOrigin = new Vector2(4, 20);
+                if (Projectile.spriteDirection == -1)
+                    armOrigin.Y -= 8;
+
+                Main.EntitySpriteDraw(ArmCannonSpritesheets[textureType], drawPosition, animRect, Color.White, rotation, armOrigin, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically);
             }
 
             return true;
@@ -475,7 +478,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
         {
             if (portalAnimationIndex == 1 && portalFrame == 4)
             {
-                int randomProjectile = ThrowProjectiles[Main.rand.Next(0, ThrowProjectiles.Length)];
+                int randomProjectile = ThrowProjectiles[0];
                 Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center - new Vector2(0f, HalfStandHeight / 2f), Vector2.Zero, randomProjectile, 0, 0f, Projectile.owner);
             }
         }
