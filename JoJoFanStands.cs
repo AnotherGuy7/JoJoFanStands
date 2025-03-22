@@ -3,6 +3,8 @@ using JoJoFanStands.Items.Stands;
 using JoJoFanStands.Projectiles.PlayerStands.Blur;
 using JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear;
 using JoJoFanStands.Projectiles.PlayerStands.TheWorldOverHeaven;
+using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity;
+using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir;
 using JoJoFanStands.Projectiles.PlayerStands.WaywardSon;
 using JoJoStands.UI;
 using Microsoft.Xna.Framework.Graphics;
@@ -51,6 +53,8 @@ namespace JoJoFanStands
             VirtualInsanityStandFinal.CannonHeadFlashSpritesheets[0] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Cannon_HeadUpFlash", AssetRequestMode.ImmediateLoad).Value;
             VirtualInsanityStandFinal.CannonHeadFlashSpritesheets[1] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Cannon_HeadStraightFlash", AssetRequestMode.ImmediateLoad).Value;
             VirtualInsanityStandFinal.CannonHeadFlashSpritesheets[2] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Cannon_HeadDownFlash", AssetRequestMode.ImmediateLoad).Value;
+
+            YellowDevil.splitUpTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/YellowDevilDir/YellowDevil_SplitUp", AssetRequestMode.ImmediateLoad).Value;
 
             BlurBar.blurBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/BlurEnergyBar", AssetRequestMode.ImmediateLoad).Value;
             SoulBar.soulBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/SoulBar", AssetRequestMode.ImmediateLoad).Value;

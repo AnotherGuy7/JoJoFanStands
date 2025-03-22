@@ -1,17 +1,18 @@
 using JoJoFanStands.Buffs;
+using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir;
 using JoJoStands;
 using JoJoStands.Projectiles;
 using JoJoStands.Projectiles.PlayerStands;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using System;
 using System.IO;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
+namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
 {
     public class VirtualInsanityStandFinal : StandClass
     {
@@ -53,6 +54,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
         private readonly int[] AttackStyleIdleFrameAmounts = new int[3] { 5, 5, 4 };
         private readonly int[] AttackStyleAttackFrameAmounts = new int[3] { 17, 18, 4 };
         private readonly int[] ThrowProjectiles = new int[5] { ModContent.ProjectileType<YellowDevil>(), ModContent.ProjectileType<GreenDevil>(), ModContent.ProjectileType<BombDrone>(), ModContent.ProjectileType<GlueMan>(), ModContent.ProjectileType<PowerMuscler>() };
+        private readonly Vector2[] ThrowProjectilesOffset = new Vector2[5] { new Vector2(112, 63), new Vector2(112, 63), new Vector2(112, 63), new Vector2(112, 63), new Vector2(112, 63) };
         public static Texture2D[] AttackStyleTextures;
         public static Texture2D[] PortalTextures;
         public static Texture2D[] ArmCannonSpritesheets;
@@ -68,11 +70,16 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
             new AnimationData(9, 5)
         };
 
+        public static readonly SoundStyle ShootSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/VirtualInsanity/Gun")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+
         public struct AnimationData
         {
             public int maxFrames;
             public int frameDuration;
-            
+
             public AnimationData(int frames, int framesPerFrame)
             {
                 maxFrames = frames;
@@ -231,9 +238,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
                             Vector2 shootVel = Main.MouseWorld - shootPosition;
                             shootVel.Normalize();
                             shootVel *= ProjectileSpeed;
-                            int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), shootPosition, shootVel, ModContent.ProjectileType<GunPellet>(), newPunchDamage / 3 , 1f, Projectile.owner);
+                            int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), shootPosition, shootVel, ModContent.ProjectileType<GunPellet>(), newPunchDamage / 3, 1f, Projectile.owner);
                             Main.projectile[projIndex].netUpdate = true;
                             Projectile.netUpdate = true;
+                            SoundEngine.PlaySound(ShootSound, Projectile.Center);
                         }
                     }
                 }
@@ -307,7 +315,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
                             oldSpinFrame = Projectile.frame;
                             int rectWidth = 80;
                             int rectHeight = 80;
-                            float angle =  (float)Math.Cos((Projectile.frame / 6) * 2 * MathHelper.Pi);
+                            float angle = (float)Math.Cos((Projectile.frame / 6) * 2 * MathHelper.Pi);
                             Vector2 rectPosition = Projectile.Center + (angle.ToRotationVector2() * (rectWidth / 2));
                             Rectangle attackHitbox = new Rectangle((int)(rectPosition.X) - (rectWidth / 2), (int)rectPosition.Y - (rectHeight / 2), rectWidth, rectHeight);
                             for (int n = 0; n < Main.maxNPCs; n++)
@@ -478,8 +486,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear
         {
             if (portalAnimationIndex == 1 && portalFrame == 4)
             {
-                int randomProjectile = ThrowProjectiles[0];
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center - new Vector2(0f, HalfStandHeight / 2f), Vector2.Zero, randomProjectile, 0, 0f, Projectile.owner);
+                int randomIndex = 0;        //Main.random.Next(0, ThrowProjectiles.Length);
+                int projectileIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center - new Vector2(0f, HalfStandHeight / 2f) - (ThrowProjectilesOffset[randomIndex] / 2f), Vector2.Zero, ThrowProjectiles[randomIndex], 0, 0f, Projectile.owner, newPunchDamage * 3 / 4);
+                Main.projectile[projectileIndex].spriteDirection = Main.projectile[projectileIndex].direction = -Projectile.spriteDirection;
             }
         }
 
