@@ -63,6 +63,11 @@ namespace JoJoFanStands.NPCs
                 npc.netUpdate = true;
                 return false;
             }
+            if (npc.HasBuff<GlueStuck>())
+            {
+                npc.velocity = Vector2.Zero;
+                return false;
+            }            
             /*if (affectedByAvalance)
             {
                 icicleTimer++;
@@ -90,11 +95,6 @@ namespace JoJoFanStands.NPCs
             return true;
         }
 
-        public override void PostAI(NPC npc)
-        {
-            base.PostAI(npc);
-        }
-
         public override void OnKill(NPC npc)
         {
             if (banksCoinMultiplier > 1f)
@@ -115,6 +115,10 @@ namespace JoJoFanStands.NPCs
         {
             if (welded)
                 drawColor = Color.DarkGray;
+            if (npc.HasBuff<GreenDevilGoop>())
+                drawColor = Color.LightGreen;
+            if (npc.HasBuff<GlueStuck>())
+                drawColor = Color.PeachPuff;
         }
 
         public override void ModifyHitByProjectile(NPC npc, Projectile projectile, ref NPC.HitModifiers modifiers)

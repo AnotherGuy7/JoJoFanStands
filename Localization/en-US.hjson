@@ -75,6 +75,16 @@ Mods: {
 				DisplayName: Power Install
 				Description: Mods.JoJoFanStands.Buffs.PowerInstall.Description
 			}
+
+			GreenDevilGoop: {
+				DisplayName: Green Devil Goop
+				Description: Mods.JoJoFanStands.Buffs.GreenDevilGoop.Description
+			}
+
+			GlueStuck: {
+				DisplayName: Glue Stuck
+				Description: Mods.JoJoFanStands.Buffs.GlueStuck.Description
+			}
 		}
 
 		Items: {
@@ -764,6 +774,14 @@ Mods: {
 			YellowDevil.DisplayName: Yellow Devil
 			GunPellet.DisplayName: Gun Pellet
 			YellowDevilProjectile.DisplayName: Yellow Devil Projectile
+			GoopProjectile.DisplayName: Goop Projectile
+			BombTelly.DisplayName: Bomb Telly
+			BombTellyBomb.DisplayName: Bomb Telly Bomb
+			GlueBomb.DisplayName: Glue Bomb
+			PowerPieces.DisplayName: Power Pieces
+			ChargedShot1.DisplayName: Charged Shot1
+			ChargedShot2.DisplayName: Charged Shot2
+			ChargedShot3.DisplayName: Charged Shot3
 		}
 
 		Configs: {

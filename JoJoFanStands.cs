@@ -1,9 +1,14 @@
+using JoJoFanStands.Buffs;
 using JoJoFanStands.Items.Armor;
 using JoJoFanStands.Items.Stands;
 using JoJoFanStands.Projectiles.PlayerStands.Blur;
 using JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear;
 using JoJoFanStands.Projectiles.PlayerStands.TheWorldOverHeaven;
 using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity;
+using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir;
+using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir;
+using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GreenDevilDir;
+using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.PowerMusclerDir;
 using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir;
 using JoJoFanStands.Projectiles.PlayerStands.WaywardSon;
 using JoJoStands.UI;
@@ -56,6 +61,16 @@ namespace JoJoFanStands
 
             YellowDevil.splitUpTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/YellowDevilDir/YellowDevil_SplitUp", AssetRequestMode.ImmediateLoad).Value;
 
+            GreenDevil.impactSpritesheet = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/GreenDevilDir/GreenDevilImpact", AssetRequestMode.ImmediateLoad).Value;
+            GoopProjectile.stuckOnSurfaceSpritesheet = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/GreenDevilDir/GoopStuckOnSurface", AssetRequestMode.ImmediateLoad).Value;
+
+            BombTelly.tellySpawnSpritesheet = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/BombTellyDir/BombTellySpawn", AssetRequestMode.ImmediateLoad).Value;
+            BombTelly.tellySecondSpritesheet = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/BombTellyDir/BombTelly_2", AssetRequestMode.ImmediateLoad).Value;
+
+            GlueMan.spawnSheet = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/GlueManDir/GlueSpawn", AssetRequestMode.ImmediateLoad).Value;
+            PowerMuscler.spawnSheet = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/PowerMusclerDir/PowerMuscler_Spawn", AssetRequestMode.ImmediateLoad).Value;
+
+
             BlurBar.blurBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/BlurEnergyBar", AssetRequestMode.ImmediateLoad).Value;
             SoulBar.soulBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/SoulBar", AssetRequestMode.ImmediateLoad).Value;
             SoulBar.soulBarBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/SoulBar_Bar", AssetRequestMode.ImmediateLoad).Value;
@@ -73,7 +88,7 @@ namespace JoJoFanStands
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<ExpansesT1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<BlurT1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<WaywardSonT1>());
-            JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<MetempsychosisRequiem>());
+            JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<MetempsychosisT1>());
 
             JoJoStands.JoJoStands.timestopImmune.Add(ModContent.ProjectileType<TheWorldOverHeavenStandT1>());
             JoJoStands.JoJoStands.timestopImmune.Add(ModContent.ProjectileType<TheWorldOverHeavenStandT2>());

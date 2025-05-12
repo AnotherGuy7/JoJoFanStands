@@ -1,6 +1,11 @@
 using JoJoFanStands.Buffs;
+using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir;
+using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir;
+using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GreenDevilDir;
+using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.PowerMusclerDir;
 using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir;
 using JoJoStands;
+using JoJoStands.Buffs.ItemBuff;
 using JoJoStands.Projectiles;
 using JoJoStands.Projectiles.PlayerStands;
 using Microsoft.Xna.Framework;
@@ -44,6 +49,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
         private bool throwingProjectile;
         private int projectileThrowTimer;
         private int oldSpinFrame = 0;
+        private int throwTimer = 0;
+        private int chargeTimer = 0;
 
         private byte attackType = Attack_Barrage;
 
@@ -53,8 +60,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
         private readonly string[] AttackStyleNames = new string[3] { "Barrage", "Sword", "Cannon" };
         private readonly int[] AttackStyleIdleFrameAmounts = new int[3] { 5, 5, 4 };
         private readonly int[] AttackStyleAttackFrameAmounts = new int[3] { 17, 18, 4 };
-        private readonly int[] ThrowProjectiles = new int[5] { ModContent.ProjectileType<YellowDevil>(), ModContent.ProjectileType<GreenDevil>(), ModContent.ProjectileType<BombDrone>(), ModContent.ProjectileType<GlueMan>(), ModContent.ProjectileType<PowerMuscler>() };
-        private readonly Vector2[] ThrowProjectilesOffset = new Vector2[5] { new Vector2(112, 63), new Vector2(112, 63), new Vector2(112, 63), new Vector2(112, 63), new Vector2(112, 63) };
+        private readonly int[] ThrowProjectiles = new int[5] { ModContent.ProjectileType<YellowDevil>(), ModContent.ProjectileType<GreenDevil>(), ModContent.ProjectileType<BombTelly>(), ModContent.ProjectileType<GlueMan>(), ModContent.ProjectileType<PowerMuscler>() };
+        private readonly Vector2[] ThrowProjectilesOffset = new Vector2[5] { new Vector2(112, -63), new Vector2(50, -53), new Vector2(36, -66), new Vector2(5, -46), new Vector2(8, -58) };
         public static Texture2D[] AttackStyleTextures;
         public static Texture2D[] PortalTextures;
         public static Texture2D[] ArmCannonSpritesheets;
@@ -64,6 +71,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
         private int portalFrame;
         private int portalFrameCounter;
         private int portalAnimationIndex;
+        private bool portalSpawned = false;
+        private bool throwAnimationOverride = false;
         private readonly AnimationData[] portalAnimations = new AnimationData[3] {
             new AnimationData(10, 5),
             new AnimationData(9, 5),
@@ -276,6 +285,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     if (attackType == Attack_Barrage)       //throw
                     {
                         throwingProjectile = true;
+                        portalSpawned = false;
+                        throwAnimationOverride = false;
+                        portalAnimationIndex = 0;
                     }
                     else if (attackType == Attack_Sword)        //mega slash
                     {
@@ -338,25 +350,60 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     else if (attackType == Attack_Cannon)       //Charged shots 1 (2s) & 2 (5s)
                     {
                         mouseRightHoldTimer++;
-                        if (mouseRightHoldTimer >= 2 * 60)
+                        if (powerInstallBuff)
+                            mouseRightHoldTimer++;
+
+                        Vector2 dustSpawnPosition = Projectile.position - new Vector2(0f, HalfStandHeight);
+                        if (Projectile.direction == 1)
+                            dustSpawnPosition += StandOffset;
+                        else
+                            dustSpawnPosition -= StandOffset;
+
+                        if (Main.rand.Next(0, 1 + 1) == 0)
+                            Main.dust[Dust.NewDust(dustSpawnPosition, Projectile.width, HalfStandHeight * 2, DustID.CoralTorch)].noGravity = true;
+                        if (mouseRightHoldTimer >= 4 * 60)
                         {
-                            int chargedProjectile = ModContent.ProjectileType<FireAnkh>();
-                            if (mouseRightHoldTimer <= 5 * 50)
-                                chargedProjectile = ModContent.ProjectileType<FireAnkh>();
-
-                            shootCount += newShootTime * 3;
-                            Vector2 shootVel = Main.MouseWorld - Projectile.Center;
-                            if (shootVel == Vector2.Zero)
-                                shootVel = new Vector2(0f, 1f);
-
-                            shootVel.Normalize();
-                            shootVel *= ProjectileSpeed;
-                            int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, chargedProjectile, newProjectileDamage, 3f, Projectile.owner);
-                            Main.projectile[projIndex].netUpdate = true;
-                            Projectile.netUpdate = true;
+                            if (Main.rand.Next(0, 1 + 1) == 0)
+                                Main.dust[Dust.NewDust(dustSpawnPosition, Projectile.width, HalfStandHeight * 2, DustID.Electric)].noGravity = true;
+                        }
+                        if (mouseRightHoldTimer >= 6 * 60)
+                        {
+                            if (Main.rand.Next(0, 1 + 1) == 0)
+                                Main.dust[Dust.NewDust(dustSpawnPosition, Projectile.width, HalfStandHeight * 2, DustID.BlueFlare)].noGravity = true;
                         }
                     }
                 }
+            }
+
+            if (Main.myPlayer == Projectile.owner && !Main.mouseRight && mouseRightHoldTimer > 0)
+            {
+                if (mouseRightHoldTimer >= 2 * 60)
+                {
+                    int multiplier = 1;
+                    int chargedProjectile = ModContent.ProjectileType<ChargedShot1>();
+                    if (mouseRightHoldTimer >= 4 * 60)
+                    {
+                        multiplier = 2;
+                        chargedProjectile = ModContent.ProjectileType<ChargedShot2>();
+                    }
+                    if (mouseRightHoldTimer >= 6 * 60)
+                    {
+                        multiplier = 4;
+                        chargedProjectile = ModContent.ProjectileType<ChargedShot3>();
+                    }
+
+                    shootCount += newShootTime * 3;
+                    Vector2 shootVel = Main.MouseWorld - Projectile.Center;
+                    if (shootVel == Vector2.Zero)
+                        shootVel = new Vector2(0f, 1f);
+
+                    shootVel.Normalize();
+                    shootVel *= ProjectileSpeed;
+                    int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, chargedProjectile, newPunchDamage * 2 * multiplier, 3f, Projectile.owner);
+                    Main.projectile[projIndex].netUpdate = true;
+                    Projectile.netUpdate = true;
+                }
+                mouseRightHoldTimer = 0;
             }
 
             if (throwingProjectile)
@@ -364,26 +411,35 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                 secondaryAbility = true;
                 currentAnimationState = AnimationState.SecondaryAbility;
                 Projectile.position = player.Center - new Vector2(0f, (HalfStandHeight * 2) + 8f);
+                if (Projectile.spriteDirection == -1)
+                    Projectile.position.X -= 32;
 
-                portalFrameCounter++;
-                if (portalFrameCounter >= portalAnimations[portalAnimationIndex].frameDuration)
+                if (!portalSpawned)
                 {
-                    portalFrame += 1;
-                    portalFrameCounter = 0;
-                    OnPortalFrameChange();
-                    if (portalFrame >= portalAnimations[portalAnimationIndex].maxFrames)
+                    portalFrameCounter++;
+                    if (portalFrameCounter >= portalAnimations[portalAnimationIndex].frameDuration)
                     {
-                        portalFrame = 0;
+                        portalFrame += 1;
                         portalFrameCounter = 0;
-                        portalAnimationIndex++;
-                        if (portalAnimationIndex >= 3)
+                        OnPortalFrameChange();
+                        if (portalFrame >= portalAnimations[portalAnimationIndex].maxFrames)
                         {
-                            portalAnimationIndex = 0;
-                            throwingProjectile = false;
+                            portalFrame = 0;
+                            portalFrameCounter = 0;
+                            portalAnimationIndex++;
+                            if (portalAnimationIndex >= 3)
+                            {
+                                portalAnimationIndex = 2;
+                                portalSpawned = true;
+                            }
                         }
                     }
                 }
-                if (Projectile.frame >= 2 && (portalAnimationIndex == 0 || (portalAnimationIndex == 1 && portalFrame < 4)))
+
+                if (throwTimer > 0)
+                    throwTimer--;
+
+                if ((Projectile.frame >= 2 && (portalAnimationIndex == 0 || (portalAnimationIndex == 1 && portalFrame < 4))) || (throwAnimationOverride && throwTimer > 0))
                 {
                     Projectile.frame = 1;
                     Projectile.frameCounter = 0;
@@ -452,7 +508,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
 
         public override void PostDrawExtras()
         {
-            if (throwingProjectile)
+            if (throwingProjectile && !portalSpawned)
             {
                 Vector2 drawOffset = StandOffset - new Vector2(0f, HalfStandHeight * 2);
                 drawOffset.X *= Projectile.spriteDirection;
@@ -486,10 +542,39 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
         {
             if (portalAnimationIndex == 1 && portalFrame == 4)
             {
-                int randomIndex = 0;        //Main.random.Next(0, ThrowProjectiles.Length);
-                int projectileIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center - new Vector2(0f, HalfStandHeight / 2f) - (ThrowProjectilesOffset[randomIndex] / 2f), Vector2.Zero, ThrowProjectiles[randomIndex], 0, 0f, Projectile.owner, newPunchDamage * 3 / 4);
+                int randomIndex = Main.rand.Next(0, ThrowProjectiles.Length);
+                Vector2 projectileCenter = Projectile.Center + StandOffset - new Vector2(0f, HalfStandHeight / 2f) + ThrowProjectilesOffset[randomIndex];
+                Vector2 shootVelocity = Main.MouseWorld - projectileCenter;
+                shootVelocity.Normalize();
+                shootVelocity *= 16f;
+                int damage = 0;
+                float knockback = 0f;
+                if (randomIndex == 0)
+                    shootVelocity = Vector2.Zero;
+                else if (randomIndex == 1)
+                {
+                    damage = 48 * TierNumber;
+                    knockback = 2f * TierNumber;
+                }
+                else if (randomIndex == 3)       //Glue man
+                {
+                    throwTimer = 60;
+                    throwAnimationOverride = true;
+                }
+                else if (randomIndex == 4)
+                {
+                    damage = 60 * TierNumber;
+                    knockback = 8f * TierNumber;
+                }
+                int projectileIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), projectileCenter, shootVelocity, ThrowProjectiles[randomIndex], damage, knockback, Projectile.owner, newPunchDamage * 3 / 4);
                 Main.projectile[projectileIndex].spriteDirection = Main.projectile[projectileIndex].direction = -Projectile.spriteDirection;
             }
+        }
+
+        public override void AnimationCompleted(string animationName)
+        {
+            if (animationName == "Throw")
+                throwingProjectile = false;
         }
 
         public override void StandKillEffects()
@@ -528,7 +613,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                 else if (attackType == Attack_Sword)
                     PlayAnimation("Spin");
                 else if (attackType == Attack_Cannon)
-                    PlayAnimation("Secondary");
+                    PlayAnimation("Idle");
             }
             else if (currentAnimationState == AnimationState.Special)
                 PlayAnimation("Weld");

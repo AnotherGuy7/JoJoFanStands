@@ -2,7 +2,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
 
-namespace JoJoFanStands.Projectiles
+namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir
 {
     public class YellowDevilProjectile : ModProjectile
     {

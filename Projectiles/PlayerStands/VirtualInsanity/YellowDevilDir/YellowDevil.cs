@@ -67,15 +67,18 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir
                     Projectile.frameCounter = -5;
                     if (Projectile.frame >= 1)
                     {
-                        int offsetFrame = Projectile.frame - 1;
-                        Vector2 offset = new Vector2(72 + (32 * (offsetFrame % 3)), 16 + (38 * (offsetFrame / 3)));
-                        if (Projectile.spriteDirection == -1)
-                            offset.X = 72 + 96 - (32 * (offsetFrame % 3));
-                        Vector2 shootVelocity = Main.MouseWorld - (Projectile.position + offset);
-                        shootVelocity.Normalize();
-                        shootVelocity *= 12f;
-                        Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.position + offset, shootVelocity, ModContent.ProjectileType<YellowDevilProjectile>(), (int)Projectile.ai[0], 2f, Projectile.owner);
-                        SoundEngine.PlaySound(ShootSound, Projectile.Center);
+                        if (Main.myPlayer == Projectile.owner)
+                        {
+                            int offsetFrame = Projectile.frame - 1;
+                            Vector2 offset = new Vector2(72 + (32 * (offsetFrame % 3)), 16 + (38 * (offsetFrame / 3)));
+                            if (Projectile.spriteDirection == -1)
+                                offset.X = 72 + 96 - (32 * (offsetFrame % 3));
+                            Vector2 shootVelocity = Main.MouseWorld - (Projectile.position + offset);
+                            shootVelocity.Normalize();
+                            shootVelocity *= 12f;
+                            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.position + offset, shootVelocity, ModContent.ProjectileType<YellowDevilProjectile>(), (int)Projectile.ai[0], 2f, Projectile.owner);
+                            SoundEngine.PlaySound(ShootSound, Projectile.Center);
+                        }
                     }
                 }
             }
