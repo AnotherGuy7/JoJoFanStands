@@ -1,4 +1,5 @@
 using JoJoFanStands.Buffs;
+using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity;
 using JoJoFanStands.Projectiles.PlayerStands.WaywardSon;
 using JoJoStands;
 using JoJoStands.Buffs.Debuffs;
@@ -89,6 +90,7 @@ namespace JoJoFanStands.Projectiles
                     }
                     SoundEngine.PlaySound(SoundID.Item62, Projectile.Center);
                 }
+                SoundEngine.PlaySound(Main.rand.NextBool() ? VirtualInsanityStandFinal.PunchLand1 : VirtualInsanityStandFinal.PunchLand2, Projectile.Center);
             }
         }
 

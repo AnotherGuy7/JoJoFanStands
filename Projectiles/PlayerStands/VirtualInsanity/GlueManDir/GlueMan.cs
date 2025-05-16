@@ -2,6 +2,7 @@ using JoJoStands;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir
@@ -11,20 +12,34 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir
         public static Texture2D spawnSheet;
         public static Texture2D npcGlueIcon;
 
-        /*public static readonly SoundStyle ShootSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManProjectileShoot")
+        public static readonly SoundStyle ImpactSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManImpact")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+        public static readonly SoundStyle FlailSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManFlail")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+        public static readonly SoundStyle GlueStick = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueStick")
         {
             Volume = JoJoStands.JoJoStands.ModSoundsVolume
         };
 
-        public static readonly SoundStyle[] SpawnSounds = new SoundStyle[6]
+        public static readonly SoundStyle[] SpawnSounds = new SoundStyle[5]
         {
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManProjectileSpawn") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
             new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManSpawn1") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
             new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManSpawn2") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
             new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManSpawn3") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
             new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManSpawn4") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
             new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManSpawn5") { Volume = JoJoStands.JoJoStands.ModSoundsVolume }
-        };*/
+        };
+
+        public static readonly SoundStyle[] ThrowSounds = new SoundStyle[3]
+{
+            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManThrow1") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
+            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManThrow2") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
+            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManThrow3") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
+};
 
         public override void SetStaticDefaults()
         {
@@ -48,6 +63,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir
 
         public override void AI()
         {
+            /*if (!playedSpawnSound)
+            {
+                playedSpawnSound = true;
+                SoundEngine.PlaySound(SpawnSounds[Main.rand.Next(1, SpawnSounds.Length)], Projectile.Center);
+            }*/
+
             if (Projectile.alpha > 0)
             {
                 Projectile.alpha -= 6;
@@ -75,6 +96,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir
                         else
                             Projectile.direction = Projectile.spriteDirection = -1;
                     }
+                    SoundEngine.PlaySound(ThrowSounds[Main.rand.Next(1, ThrowSounds.Length)], Projectile.Center);
+                    SoundEngine.PlaySound(FlailSound, Projectile.Center);
                 }
                 else if (!spawning && Projectile.frame >= 7)
                     Projectile.frame = 0;
@@ -86,18 +109,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir
                 Projectile.position = (Main.player[Projectile.owner].Center - new Vector2(0f, (37 * 4) - 12f)) + new Vector2(-58, 0) - new Vector2(0f, 37 / 2f) + new Vector2(5, -46);
                 return;
             }
-
-            if (!playedSpawnSound)
-            {
-                playedSpawnSound = true;
-                //SoundEngine.PlaySound(SpawnSounds[0], Projectile.Center);
-                //SoundEngine.PlaySound(SpawnSounds[Main.rand.Next(1, SpawnSounds.Length)], Projectile.Center);
-            }
         }
 
         public override void OnKill(int timeLeft)
         {
             Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, ModContent.ProjectileType<GlueBomb>(), 5 * Main.player[Projectile.owner].GetModPlayer<MyPlayer>().standTier, 1f, Projectile.owner);
+            SoundEngine.PlaySound(ImpactSound, Projectile.Center);
         }
 
         public override bool PreDraw(ref Color lightColor)

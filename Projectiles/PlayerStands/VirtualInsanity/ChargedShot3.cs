@@ -1,7 +1,7 @@
 using JoJoFanStands.Dusts;
-using JoJoStands.Dusts;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
@@ -21,7 +21,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.timeLeft = 300;
-            Projectile.tileCollide = true;
+            Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
             Projectile.penetrate = -1;
         }
@@ -44,6 +44,26 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
             int amountOfDust = Main.rand.Next(2, 6 + 1);
             for (int i = 0; i < amountOfDust; i++)
                 Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<ChargedShotTrail>(), Projectile.velocity.X, Projectile.velocity.Y / 2f);
+
+            Point16 projectileCenterPoint = Projectile.Center.ToTileCoordinates16();
+            if (projectileCenterPoint.X >= 0 && projectileCenterPoint.X < Main.maxTilesX && projectileCenterPoint.Y >= 0 && projectileCenterPoint.Y < Main.maxTilesY)
+            {
+                if (Main.tile[projectileCenterPoint.X, projectileCenterPoint.Y].HasTile)
+                {
+                    Projectile.scale -= 0.05f;
+                    if (Projectile.scale <= 0f)
+                        Projectile.Kill();
+                }
+            }
+            else
+                Projectile.Kill();
+        }
+
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            Projectile.scale -= 0.05f;
+            if (Projectile.scale <= 0f)
+                Projectile.Kill();
         }
     }
 }

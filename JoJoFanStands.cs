@@ -90,6 +90,7 @@ namespace JoJoFanStands
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<BlurT1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<WaywardSonT1>());
             JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<MetempsychosisT1>());
+            JoJoStands.JoJoStands.standTier1List.Add(ModContent.ItemType<VirtualInsanityT1>());
 
             JoJoStands.JoJoStands.timestopImmune.Add(ModContent.ProjectileType<TheWorldOverHeavenStandT1>());
             JoJoStands.JoJoStands.timestopImmune.Add(ModContent.ProjectileType<TheWorldOverHeavenStandT2>());

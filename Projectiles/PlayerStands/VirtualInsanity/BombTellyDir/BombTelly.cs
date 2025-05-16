@@ -3,6 +3,7 @@ using JoJoStands.Projectiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir
@@ -12,20 +13,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir
         public static Texture2D tellySpawnSpritesheet;
         public static Texture2D tellySecondSpritesheet;
 
-        /*public static readonly SoundStyle ShootSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/BombTelly/BombTellyProjectileShoot")
+        public static readonly SoundStyle BombDropSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/BombDrone/BombDrop")
         {
             Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };*/
-
-        /*public static readonly SoundStyle[] SpawnSounds = new SoundStyle[6]
-        {
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/BombTelly/BombTellyProjectileSpawn") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/BombTelly/BombTellySpawn1") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/BombTelly/BombTellySpawn2") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/BombTelly/BombTellySpawn3") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/BombTelly/BombTellySpawn4") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/BombTelly/BombTellySpawn5") { Volume = JoJoStands.JoJoStands.ModSoundsVolume }
-        };*/
+        };
 
         public override void SetStaticDefaults()
         {
@@ -94,7 +85,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir
             if (!playedSpawnSound)
             {
                 playedSpawnSound = true;
-                //SoundEngine.PlaySound(SpawnSounds[0], Projectile.Center);
+                //
                 //SoundEngine.PlaySound(SpawnSounds[Main.rand.Next(1, SpawnSounds.Length)], Projectile.Center);
             }
             if (Main.myPlayer == Projectile.owner)
@@ -104,6 +95,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir
                 {
                     bombSpawnTimer = 0;
                     Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + new Vector2(0, Projectile.height / 2f), Projectile.velocity, ModContent.ProjectileType<BombTellyBomb>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+                    SoundEngine.PlaySound(BombDropSound, Projectile.Center);
                 }
             }
         }

@@ -12,20 +12,23 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GreenDevilDir
     {
         public static Texture2D impactSpritesheet;
 
-        public static readonly SoundStyle ShootSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GreenDevil/GreenDevilProjectileShoot")
+        public static readonly SoundStyle ImpactSound1 = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GreenDevil/GreenDevilImpact1")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+        public static readonly SoundStyle ImpactSound2 = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GreenDevil/GreenDevilImpact2")
         {
             Volume = JoJoStands.JoJoStands.ModSoundsVolume
         };
 
-        /*public static readonly SoundStyle[] SpawnSounds = new SoundStyle[6]
+        public static readonly SoundStyle[] SpawnSounds = new SoundStyle[5]
         {
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GreenDevil/GreenDevilProjectileSpawn") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
             new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GreenDevil/GreenDevilSpawn1") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
             new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GreenDevil/GreenDevilSpawn2") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
             new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GreenDevil/GreenDevilSpawn3") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
             new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GreenDevil/GreenDevilSpawn4") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
             new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GreenDevil/GreenDevilSpawn5") { Volume = JoJoStands.JoJoStands.ModSoundsVolume }
-        };*/
+        };
 
         public override void SetStaticDefaults()
         {
@@ -146,8 +149,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GreenDevilDir
             if (!playedSpawnSound)
             {
                 playedSpawnSound = true;
-                //SoundEngine.PlaySound(SpawnSounds[0], Projectile.Center);
-                //SoundEngine.PlaySound(SpawnSounds[Main.rand.Next(1, SpawnSounds.Length)], Projectile.Center);
+                SoundEngine.PlaySound(SpawnSounds[Main.rand.Next(1, SpawnSounds.Length)], Projectile.Center);
             }
         }
 
@@ -167,6 +169,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GreenDevilDir
                 int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, perturbedSpeed, ModContent.ProjectileType<GoopProjectile>(), Projectile.damage, Projectile.knockBack / 2f, Projectile.owner);
                 Main.projectile[projIndex].netUpdate = true;
             }
+            SoundEngine.PlaySound(Main.rand.Next(0, 1 + 1) == 0 ? ImpactSound1 : ImpactSound2, Projectile.Center);
             return false;
         }
 

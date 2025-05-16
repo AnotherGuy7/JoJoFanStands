@@ -9,6 +9,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir
 {
     public class BombTellyBomb : ModProjectile
     {
+        public static readonly SoundStyle ExplosionSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/BombDrone/Impact")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+
         public override void SetStaticDefaults()
         {
             Main.projFrames[Projectile.type] = 6;
@@ -83,7 +88,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir
                     }
                 }
             }
-            SoundEngine.PlaySound(SoundID.Item62, Projectile.Center);
+            SoundEngine.PlaySound(ExplosionSound, Projectile.Center);
             if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().standTier >= 3)
             {
                 int projectileIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, 292, Projectile.damage, 0f, Projectile.owner);
