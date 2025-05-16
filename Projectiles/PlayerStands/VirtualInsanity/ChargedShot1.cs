@@ -1,3 +1,5 @@
+using JoJoFanStands.Dusts;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -19,6 +21,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
             Projectile.timeLeft = 180;
             Projectile.tileCollide = true;
             Projectile.ignoreWater = true;
+            Projectile.penetrate = 1;
         }
 
         public override void AI()
@@ -32,6 +35,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     Projectile.frame = 0;
             }
             Projectile.rotation = Projectile.velocity.ToRotation();
+            Lighting.AddLight(Projectile.Center, Color.CadetBlue.ToVector3());
+            if (Main.rand.Next(0, 1 + 1) == 0)
+                Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<ChargedShotTrail>(), Projectile.velocity.X, Projectile.velocity.Y / 8f, Scale: 0.4f);
         }
     }
 }

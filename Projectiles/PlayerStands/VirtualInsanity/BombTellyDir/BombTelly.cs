@@ -52,6 +52,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir
 
         public override void AI()
         {
+            if (Projectile.alpha > 0)
+            {
+                Projectile.alpha -= 6;
+                if (Projectile.alpha <= 0)
+                    Projectile.alpha = 0;
+            }
+
             Projectile.frameCounter++;
             if (Projectile.frameCounter >= 6)
             {
@@ -60,8 +67,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir
 
                 if (spawning && Projectile.frame >= 11)
                 {
-                    Projectile.frame = 0;
                     spawning = false;
+                    Projectile.frame = 0;
+                    Projectile.frameCounter = 3;
                     if (Main.myPlayer == Projectile.owner)
                     {
                         Projectile.velocity = Main.MouseWorld - Projectile.Center;
@@ -112,9 +120,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir
         public override bool PreDraw(ref Color lightColor)
         {
             if (spawning)
-                Main.EntitySpriteDraw(tellySpawnSpritesheet, Projectile.position - Main.screenPosition, new Rectangle(0, 128 * Projectile.frame, 104, 128), lightColor, Projectile.rotation, Vector2.Zero, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0f);
+                Main.EntitySpriteDraw(tellySpawnSpritesheet, Projectile.position - Main.screenPosition, new Rectangle(0, 128 * Projectile.frame, 104, 128), lightColor * Projectile.Opacity, Projectile.rotation, Vector2.Zero, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0f);
             if (secondSpritesheet)
-                Main.EntitySpriteDraw(tellySecondSpritesheet, Projectile.position - Main.screenPosition, new Rectangle(0, 124 * Projectile.frame, 96, 124), lightColor, Projectile.rotation, Vector2.Zero, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0f);
+                Main.EntitySpriteDraw(tellySecondSpritesheet, Projectile.position - Main.screenPosition, new Rectangle(0, 124 * Projectile.frame, 96, 124), lightColor * Projectile.Opacity, Projectile.rotation, Vector2.Zero, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0f);
             return !spawning && !secondSpritesheet;
         }
     }

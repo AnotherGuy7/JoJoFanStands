@@ -1,5 +1,6 @@
 using JoJoStands;
 using JoJoStands.Buffs;
+using JoJoStands.Buffs.Debuffs;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -24,7 +25,8 @@ namespace JoJoFanStands.Buffs
 
         public override void OnBuffEnd(Player player)
         {
-            player.AddBuff(ModContent.BuffType<PowerInstall>(), (int)((5 * 60 * 60) * (player.buffTime[player.FindBuffIndex(Type)] /  2f * 60f * 60f)));
+            float powerInstallCompletion = ((2f * 60f * 60f) - player.buffTime[player.FindBuffIndex(Type)]) / (2f * 60f * 60f);
+            player.AddBuff(ModContent.BuffType<AbilityCooldown>(), (int)(5 * 60 * 60 * powerInstallCompletion));
         }
     }
 }

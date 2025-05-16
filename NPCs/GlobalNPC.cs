@@ -1,5 +1,7 @@
 using JoJoFanStands.Buffs;
+using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
@@ -119,6 +121,12 @@ namespace JoJoFanStands.NPCs
                 drawColor = Color.LightGreen;
             if (npc.HasBuff<GlueStuck>())
                 drawColor = Color.PeachPuff;
+        }
+
+        public override void PostDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+        {
+            if (npc.HasBuff<GlueStuck>())
+                spriteBatch.Draw(GlueMan.npcGlueIcon, npc.Center - new Vector2(32f) - Main.screenPosition, null, drawColor);
         }
 
         public override void ModifyHitByProjectile(NPC npc, Projectile projectile, ref NPC.HitModifiers modifiers)

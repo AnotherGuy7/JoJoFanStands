@@ -27,7 +27,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir
         }
 
         private bool spawned = false;
-        private const float ExplosionRadius = 4f * 16f;
+        private const float ExplosionRadius = 2f * 16f;
 
         public override void AI()
         {
@@ -56,7 +56,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir
                     NPC npc = Main.npc[n];
                     if (npc.active)
                     {
-                        if (npc.lifeMax > 5 && !npc.friendly && !npc.hide && !npc.immortal && npc.Distance(Projectile.Center) <= ExplosionRadius)
+                        if (npc.lifeMax > 5 && !npc.friendly && !npc.hide && !npc.immortal && npc.Distance(Projectile.Center) <= ExplosionRadius + (2 * Main.player[Projectile.owner].GetModPlayer<MyPlayer>().standTier * 16f))
                         {
                             int hitDirection = -1;
                             if (npc.position.X - Projectile.position.X > 0)
@@ -71,6 +71,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir
                             };
                             npc.StrikeNPC(hitInfo);
                             npc.AddBuff(ModContent.BuffType<GlueStuck>(), 2 * Main.player[Projectile.owner].GetModPlayer<MyPlayer>().standTier * 60);
+                            npc.AddBuff(BuffID.Ichor, 2 * Main.player[Projectile.owner].GetModPlayer<MyPlayer>().standTier * 60);
                         }
                     }
                 }

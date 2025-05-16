@@ -1,3 +1,4 @@
+using JoJoFanStands.Buffs;
 using JoJoFanStands.Projectiles.PlayerStands.WaywardSon;
 using JoJoStands;
 using JoJoStands.Buffs.Debuffs;
@@ -77,6 +78,17 @@ namespace JoJoFanStands.Projectiles
             else if (standType == MetempsychosisFists)
             {
                 modifiers.FinalDamage *= 1f + (0.025f * standTier);
+            }
+            else if (standType == VirtualInsanityFists)
+            {
+                if (player.HasBuff<PowerInstall>())
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        Main.dust[Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Electric)].noGravity = true;
+                    }
+                    SoundEngine.PlaySound(SoundID.Item62, Projectile.Center);
+                }
             }
         }
 

@@ -67,6 +67,7 @@ namespace JoJoFanStands
             BombTelly.tellySpawnSpritesheet = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/BombTellyDir/BombTellySpawn", AssetRequestMode.ImmediateLoad).Value;
             BombTelly.tellySecondSpritesheet = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/BombTellyDir/BombTelly_2", AssetRequestMode.ImmediateLoad).Value;
 
+            GlueMan.npcGlueIcon = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/GlueManDir/GlueStuck", AssetRequestMode.ImmediateLoad).Value;
             GlueMan.spawnSheet = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/GlueManDir/GlueSpawn", AssetRequestMode.ImmediateLoad).Value;
             PowerMuscler.spawnSheet = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/PowerMusclerDir/PowerMuscler_Spawn", AssetRequestMode.ImmediateLoad).Value;
 

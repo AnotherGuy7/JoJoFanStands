@@ -782,6 +782,7 @@ Mods: {
 			ChargedShot1.DisplayName: Charged Shot1
 			ChargedShot2.DisplayName: Charged Shot2
 			ChargedShot3.DisplayName: Charged Shot3
+			Plasma.DisplayName: Plasma
 		}
 
 		Configs: {

@@ -47,6 +47,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir
 
         public override void AI()
         {
+            if (Projectile.alpha > 0)
+            {
+                Projectile.alpha -= 6;
+                if (Projectile.alpha <= 0)
+                    Projectile.alpha = 0;
+            }
+
             Projectile.frameCounter++;
             if (Projectile.frameCounter >= 10)
             {
@@ -94,7 +101,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir
         public override bool PreDraw(ref Color lightColor)
         {
             if (splittingUp)
-                Main.EntitySpriteDraw(splitUpTexture, Projectile.position - Main.screenPosition, new Rectangle(0, Projectile.height * Projectile.frame, Projectile.width, Projectile.height), lightColor, Projectile.rotation, Vector2.Zero, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0f);
+                Main.EntitySpriteDraw(splitUpTexture, Projectile.position - Main.screenPosition, new Rectangle(0, Projectile.height * Projectile.frame, Projectile.width, Projectile.height), lightColor * Projectile.Opacity, Projectile.rotation, Vector2.Zero, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0f);
             return !splittingUp;
         }
     }

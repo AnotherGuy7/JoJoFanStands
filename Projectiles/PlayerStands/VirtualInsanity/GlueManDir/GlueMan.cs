@@ -9,6 +9,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir
     public class GlueMan : ModProjectile
     {
         public static Texture2D spawnSheet;
+        public static Texture2D npcGlueIcon;
 
         /*public static readonly SoundStyle ShootSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManProjectileShoot")
         {
@@ -47,6 +48,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir
 
         public override void AI()
         {
+            if (Projectile.alpha > 0)
+            {
+                Projectile.alpha -= 6;
+                if (Projectile.alpha <= 0)
+                    Projectile.alpha = 0;
+            }
+
             Projectile.frameCounter++;
             if (Projectile.frameCounter >= 4)
             {
@@ -95,7 +103,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir
         public override bool PreDraw(ref Color lightColor)
         {
             if (spawning)
-                Main.EntitySpriteDraw(spawnSheet, Projectile.position - Main.screenPosition, new Rectangle(0, 92 * Projectile.frame, 90, 92), lightColor, Projectile.rotation, Vector2.Zero, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0f);
+                Main.EntitySpriteDraw(spawnSheet, Projectile.position - Main.screenPosition, new Rectangle(0, 92 * Projectile.frame, 90, 92), lightColor * Projectile.Opacity, Projectile.rotation, Vector2.Zero, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0f);
             return !spawning;
         }
     }

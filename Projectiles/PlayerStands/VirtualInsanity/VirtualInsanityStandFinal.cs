@@ -5,8 +5,7 @@ using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GreenDevilDir;
 using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.PowerMusclerDir;
 using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir;
 using JoJoStands;
-using JoJoStands.Buffs.ItemBuff;
-using JoJoStands.Projectiles;
+using JoJoStands.Buffs.Debuffs;
 using JoJoStands.Projectiles.PlayerStands;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -39,7 +38,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
             Attack,
             SecondaryAbility,
             Special,
-            RealityOverwritePunch,
             Pose
         }
 
@@ -61,7 +59,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
         private readonly int[] AttackStyleIdleFrameAmounts = new int[3] { 5, 5, 4 };
         private readonly int[] AttackStyleAttackFrameAmounts = new int[3] { 17, 18, 4 };
         private readonly int[] ThrowProjectiles = new int[5] { ModContent.ProjectileType<YellowDevil>(), ModContent.ProjectileType<GreenDevil>(), ModContent.ProjectileType<BombTelly>(), ModContent.ProjectileType<GlueMan>(), ModContent.ProjectileType<PowerMuscler>() };
-        private readonly Vector2[] ThrowProjectilesOffset = new Vector2[5] { new Vector2(112, -63), new Vector2(50, -53), new Vector2(36, -66), new Vector2(5, -46), new Vector2(8, -58) };
+        private readonly Vector2[] ThrowProjectilesOffset = new Vector2[5] { new Vector2(16, -63), new Vector2(16, -53), new Vector2(36, -66), new Vector2(12, -46), new Vector2(16, -58) };
         public static Texture2D[] AttackStyleTextures;
         public static Texture2D[] PortalTextures;
         public static Texture2D[] ArmCannonSpritesheets;
@@ -73,6 +71,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
         private int portalAnimationIndex;
         private bool portalSpawned = false;
         private bool throwAnimationOverride = false;
+        private int throwProjectileSpawnTimer = 0;
+        private bool powerInstallAnimation = false;
+        private Projectile projectileToThrow;
         private readonly AnimationData[] portalAnimations = new AnimationData[3] {
             new AnimationData(10, 5),
             new AnimationData(9, 5),
@@ -113,99 +114,251 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                 attackChangeEffectTimer--;
             if (projectileThrowTimer > 0)
                 projectileThrowTimer--;
+            if (throwProjectileSpawnTimer > 0)
+                throwProjectileSpawnTimer--;
+            if (powerInstallBuff && attackType == Attack_Barrage)
+                newPunchTime /= 2;
 
-            if (Projectile.owner == Main.myPlayer)
+            if (!powerInstallAnimation && !playerHasAbilityCooldown && SecondSpecialKeyPressed(false))
             {
-                if (Main.mouseLeft && !throwingProjectile)
+                if (!player.HasBuff(ModContent.BuffType<PowerInstall>()))
                 {
-                    if (attackType == Attack_Barrage)
+                    player.AddBuff(ModContent.BuffType<PowerInstall>(), 2 * 60 * 60);
+                    powerInstallAnimation = true;
+                }
+                else
+                    player.ClearBuff(ModContent.BuffType<PowerInstall>());
+            }
+
+            powerInstallBuff = player.HasBuff(ModContent.BuffType<PowerInstall>());
+            if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
+            {
+                if (Projectile.owner == Main.myPlayer)
+                {
+                    if (Main.mouseLeft && !throwingProjectile)
                     {
-                        Punch(afterImages: false);
-                        if (attacking)
-                            currentAnimationState = AnimationState.Attack;
-                    }
-                    else if (attackType == Attack_Sword)
-                    {
-                        Vector2 targetPosition = Main.MouseWorld;
-                        if (JoJoStands.JoJoStands.StandAimAssist)
+                        if (attackType == Attack_Barrage)
                         {
-                            float lowestDistance = 4f * 16f;
-                            for (int n = 0; n < Main.maxNPCs; n++)
-                            {
-                                NPC npc = Main.npc[n];
-                                if (npc.active && npc.CanBeChasedBy(this, false))
-                                {
-                                    float distance = Vector2.Distance(npc.Center, Main.MouseWorld);
-                                    if (distance < lowestDistance && Collision.CanHitLine(Projectile.Center, Projectile.width, Projectile.height, npc.position, npc.width, npc.height) && npc.lifeMax > 5 && !npc.immortal && !npc.hide && !npc.townNPC && !npc.friendly)
-                                    {
-                                        targetPosition = npc.Center;
-                                        lowestDistance = distance;
-                                    }
-                                }
-                            }
+                            Punch(ModContent.ProjectileType<FanStandFists>(), new Vector2(mouseX, mouseY), afterImages: false);
+                            if (attacking)
+                                currentAnimationState = AnimationState.Attack;
                         }
-
-                        if (!mPlayer.canStandBasicAttack)
+                        else if (attackType == Attack_Sword)
                         {
-                            currentAnimationState = AnimationState.Idle;
-                            return;
-                        }
-
-                        attacking = true;
-                        currentAnimationState = AnimationState.Attack;
-                        float rotaY = targetPosition.Y - Projectile.Center.Y;
-                        Projectile.rotation = MathHelper.ToRadians((rotaY * Projectile.spriteDirection) / 6f);
-                        Vector2 velocityAddition = targetPosition - Projectile.Center;
-                        velocityAddition.Normalize();
-                        velocityAddition *= 5f + mPlayer.standTier;
-
-                        Projectile.spriteDirection = Projectile.direction = targetPosition.X > Projectile.Center.X ? 1 : -1;
-                        float targetDistance = Vector2.Distance(targetPosition, Projectile.Center);
-                        if (targetDistance > 16f)
-                            Projectile.velocity = player.velocity + velocityAddition;
-                        else
-                            Projectile.velocity = Vector2.Zero;
-
-                        PlayPunchSound();
-                        if (!powerInstallBuff)
-                        {
-                            if (shootCount <= 0 && (Projectile.frame == 2 || Projectile.frame == 8 || Projectile.frame == 14))
+                            Vector2 targetPosition = Main.MouseWorld;
+                            if (JoJoStands.JoJoStands.StandAimAssist)
                             {
-                                int rectWidth = 128;
-                                int rectHeight = 96;
-                                int rectXPosition = Projectile.direction == 1 ? (int)Projectile.position.X : (int)Projectile.position.X - rectWidth;
-                                Rectangle attackHitbox = new Rectangle(rectXPosition, (int)Projectile.position.Y - (rectHeight / 2), rectWidth, rectHeight);
-                                shootCount += newPunchTime / 2;
+                                float lowestDistance = 4f * 16f;
                                 for (int n = 0; n < Main.maxNPCs; n++)
                                 {
                                     NPC npc = Main.npc[n];
-                                    if (npc.CanBeChasedBy(this) && npc.Hitbox.Intersects(attackHitbox))
+                                    if (npc.active && npc.CanBeChasedBy(this, false))
                                     {
-                                        NPC.HitInfo hitInfo = new NPC.HitInfo()
+                                        float distance = Vector2.Distance(npc.Center, Main.MouseWorld);
+                                        if (distance < lowestDistance && Collision.CanHitLine(Projectile.Center, Projectile.width, Projectile.height, npc.position, npc.width, npc.height) && npc.lifeMax > 5 && !npc.immortal && !npc.hide && !npc.townNPC && !npc.friendly)
                                         {
-                                            Damage = (int)(newPunchDamage * 1.5f),
-                                            Knockback = PunchKnockback * 1.5f,
-                                            HitDirection = npc.direction
-                                        };
-                                        npc.StrikeNPC(hitInfo);
+                                            targetPosition = npc.Center;
+                                            lowestDistance = distance;
+                                        }
                                     }
                                 }
                             }
-                        }
-                        else
-                        {
-                            if (Projectile.frame == 16)
+
+                            if (!mPlayer.canStandBasicAttack)
                             {
-                                int rectWidth = 382;
-                                int rectHeight = 357;
-                                int rectXPosition = Projectile.direction == 1 ? (int)Projectile.position.X : (int)Projectile.position.X - rectWidth;
-                                Rectangle attackHitbox = new Rectangle(rectXPosition, (int)Projectile.position.Y - (rectHeight / 2), rectWidth, rectHeight);
+                                currentAnimationState = AnimationState.Idle;
+                                return;
+                            }
+
+                            attacking = true;
+                            currentAnimationState = AnimationState.Attack;
+                            float rotaY = targetPosition.Y - Projectile.Center.Y;
+                            Projectile.rotation = MathHelper.ToRadians((rotaY * Projectile.spriteDirection) / 6f);
+                            Vector2 velocityAddition = targetPosition - Projectile.Center;
+                            velocityAddition.Normalize();
+                            velocityAddition *= 5f + mPlayer.standTier;
+
+                            Projectile.spriteDirection = Projectile.direction = targetPosition.X > Projectile.Center.X ? 1 : -1;
+                            float targetDistance = Vector2.Distance(targetPosition, Projectile.Center);
+                            if (targetDistance > 16f)
+                                Projectile.velocity = player.velocity + velocityAddition;
+                            else
+                                Projectile.velocity = Vector2.Zero;
+
+                            PlayPunchSound();
+                            if (!powerInstallBuff)
+                            {
+                                if (shootCount <= 0 && (Projectile.frame == 2 || Projectile.frame == 8 || Projectile.frame == 14))
+                                {
+                                    int rectWidth = 128;
+                                    int rectHeight = 96;
+                                    int rectXPosition = Projectile.direction == 1 ? (int)Projectile.position.X : (int)Projectile.position.X - rectWidth;
+                                    Rectangle attackHitbox = new Rectangle(rectXPosition, (int)Projectile.position.Y - (rectHeight / 2), rectWidth, rectHeight);
+                                    shootCount += newPunchTime / 2;
+                                    for (int n = 0; n < Main.maxNPCs; n++)
+                                    {
+                                        NPC npc = Main.npc[n];
+                                        if (npc.CanBeChasedBy(this) && npc.Hitbox.Intersects(attackHitbox))
+                                        {
+                                            NPC.HitInfo hitInfo = new NPC.HitInfo()
+                                            {
+                                                Damage = (int)(newPunchDamage * 1.5f),
+                                                Knockback = PunchKnockback * 1.5f,
+                                                HitDirection = npc.direction
+                                            };
+                                            npc.StrikeNPC(hitInfo);
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (Projectile.frame == 16)
+                                {
+                                    int rectWidth = 382;
+                                    int rectHeight = 357;
+                                    int rectXPosition = Projectile.direction == 1 ? (int)Projectile.position.X : (int)Projectile.position.X - rectWidth;
+                                    Rectangle attackHitbox = new Rectangle(rectXPosition, (int)Projectile.position.Y - (rectHeight / 2), rectWidth, rectHeight);
+                                    for (int n = 0; n < Main.maxNPCs; n++)
+                                    {
+                                        NPC npc = Main.npc[n];
+                                        if (npc.CanBeChasedBy(this) && npc.Hitbox.Intersects(attackHitbox))
+                                        {
+                                            int damage = newPunchDamage * 4;
+                                            NPC.HitInfo hitInfo = new NPC.HitInfo()
+                                            {
+                                                Damage = damage,
+                                                Knockback = PunchKnockback * 4f,
+                                                HitDirection = npc.direction
+                                            };
+                                            npc.StrikeNPC(hitInfo);
+                                        }
+                                    }
+                                }
+                            }
+
+                            LimitDistance();
+                            Projectile.netUpdate = true;
+                        }
+                        else if (attackType == Attack_Cannon)
+                        {
+                            if (!mPlayer.canStandBasicAttack)
+                            {
+                                currentAnimationState = AnimationState.Idle;
+                                return;
+                            }
+
+                            attacking = true;
+                            currentAnimationState = AnimationState.Attack;
+                            Projectile.netUpdate = true;
+                            player.direction = Projectile.spriteDirection = Projectile.direction = Main.MouseWorld.X > player.Center.X ? 1 : -1;
+                            GoInFront();
+                            if (shootCount <= 0)
+                            {
+                                shootCount += newPunchTime * 2;
+                                Vector2 armOffset = StandOffset - new Vector2(0f, HalfStandHeight * 2) + ArmPlacementOffset + new Vector2(0f, 4f);
+                                armOffset.X *= Projectile.spriteDirection;
+                                Vector2 circularOffset = Main.MouseWorld - (Projectile.Center + armOffset);
+                                circularOffset.Normalize();
+                                armOffset += circularOffset * 12f;
+
+                                Vector2 shootPosition = Projectile.Center + armOffset;
+                                Vector2 shootVel = Main.MouseWorld - shootPosition;
+                                shootVel.Normalize();
+                                shootVel *= ProjectileSpeed;
+                                int projectileToShoot = powerInstallBuff ? ModContent.ProjectileType<ChargedShot1>() : ModContent.ProjectileType<GunPellet>();
+                                int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), shootPosition, shootVel, projectileToShoot, newPunchDamage / 3, 1f, Projectile.owner);
+                                Main.projectile[projIndex].netUpdate = true;
+                                Projectile.netUpdate = true;
+                                SoundEngine.PlaySound(ShootSound, Projectile.Center);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        attacking = false;
+                        currentAnimationState = AnimationState.Idle;
+                        if (attackType == Attack_Barrage)
+                        {
+                            if (!secondaryAbility)
+                                StayBehind();
+                            secondaryAbility = false;
+                        }
+                        else if (attackType == Attack_Sword)
+                        {
+                            if (!secondaryAbility)
+                                StayBehind();
+                            secondaryAbility = false;
+                        }
+                        else if (attackType == Attack_Cannon)
+                        {
+                            if (!attacking)
+                                StayBehind();
+                            else
+                                GoInFront();
+                        }
+                    }
+                    if (Main.mouseRight)
+                    {
+                        secondaryAbility = true;
+                        currentAnimationState = AnimationState.SecondaryAbility;
+                        if (attackType == Attack_Barrage)       //throw
+                        {
+                            if (!throwingProjectile)
+                            {
+                                throwingProjectile = true;
+                                portalSpawned = false;
+                                throwAnimationOverride = false;
+                                portalAnimationIndex = 0;
+                            }
+                        }
+                        else if (attackType == Attack_Sword)        //mega slash
+                        {
+                            Vector2 targetPosition = Main.MouseWorld;
+                            if (JoJoStands.JoJoStands.StandAimAssist)
+                            {
+                                float lowestDistance = 4f * 16f;
+                                for (int n = 0; n < Main.maxNPCs; n++)
+                                {
+                                    NPC npc = Main.npc[n];
+                                    if (npc.active && npc.CanBeChasedBy(this, false))
+                                    {
+                                        float distance = Vector2.Distance(npc.Center, Main.MouseWorld);
+                                        if (distance < lowestDistance && Collision.CanHitLine(Projectile.Center, Projectile.width, Projectile.height, npc.position, npc.width, npc.height) && npc.lifeMax > 5 && !npc.immortal && !npc.hide && !npc.townNPC && !npc.friendly)
+                                        {
+                                            targetPosition = npc.Center;
+                                            lowestDistance = distance;
+                                        }
+                                    }
+                                }
+                            }
+
+                            Vector2 velocityAddition = targetPosition - Projectile.Center;
+                            velocityAddition.Normalize();
+                            velocityAddition *= 5f + mPlayer.standTier;
+
+                            Projectile.spriteDirection = Projectile.direction = targetPosition.X > Projectile.Center.X ? 1 : -1;
+                            float targetDistance = Vector2.Distance(targetPosition, Projectile.Center);
+                            if (targetDistance > 16f)
+                                Projectile.velocity = player.velocity + velocityAddition;
+                            else
+                                Projectile.velocity = Vector2.Zero;
+
+                            if (shootCount <= 0 && Projectile.frame != oldSpinFrame)
+                            {
+                                shootCount += newPunchTime * 3 / 4;
+                                oldSpinFrame = Projectile.frame;
+                                int rectWidth = 80;
+                                int rectHeight = 80;
+                                float angle = (float)Math.Cos((Projectile.frame / 6) * 2 * MathHelper.Pi);
+                                Vector2 rectPosition = Projectile.Center + (angle.ToRotationVector2() * (rectWidth / 2));
+                                Rectangle attackHitbox = new Rectangle((int)(rectPosition.X) - (rectWidth / 2), (int)rectPosition.Y - (rectHeight / 2), rectWidth, rectHeight);
                                 for (int n = 0; n < Main.maxNPCs; n++)
                                 {
                                     NPC npc = Main.npc[n];
                                     if (npc.CanBeChasedBy(this) && npc.Hitbox.Intersects(attackHitbox))
                                     {
-                                        int damage = newPunchDamage * 4;
+                                        int damage = newPunchDamage * 5 / 4;
                                         NPC.HitInfo hitInfo = new NPC.HitInfo()
                                         {
                                             Damage = damage,
@@ -217,269 +370,147 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                                 }
                             }
                         }
-
-                        LimitDistance();
-                        Projectile.netUpdate = true;
-                    }
-                    else if (attackType == Attack_Cannon)
-                    {
-                        if (!mPlayer.canStandBasicAttack)
+                        else if (attackType == Attack_Cannon)       //Charged shots 1 (2s) & 2 (5s)
                         {
-                            currentAnimationState = AnimationState.Idle;
-                            return;
-                        }
+                            mouseRightHoldTimer++;
+                            Vector2 dustSpawnPosition = Projectile.position - new Vector2(0f, HalfStandHeight);
+                            if (Projectile.direction == 1)
+                                dustSpawnPosition += StandOffset;
+                            else
+                                dustSpawnPosition -= StandOffset;
 
-                        attacking = true;
-                        currentAnimationState = AnimationState.Attack;
-                        Projectile.netUpdate = true;
-                        player.direction = Projectile.spriteDirection = Projectile.direction = Main.MouseWorld.X > player.Center.X ? 1 : -1;
-                        GoInFront();
-                        if (shootCount <= 0)
-                        {
-                            shootCount += newPunchTime * 2;
-                            Vector2 armOffset = StandOffset - new Vector2(0f, HalfStandHeight * 2) + ArmPlacementOffset + new Vector2(0f, 4f);
-                            armOffset.X *= Projectile.spriteDirection;
-                            Vector2 circularOffset = Main.MouseWorld - (Projectile.Center + armOffset);
-                            circularOffset.Normalize();
-                            armOffset += circularOffset * 12f;
-
-                            Vector2 shootPosition = Projectile.Center + armOffset;
-                            Vector2 shootVel = Main.MouseWorld - shootPosition;
-                            shootVel.Normalize();
-                            shootVel *= ProjectileSpeed;
-                            int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), shootPosition, shootVel, ModContent.ProjectileType<GunPellet>(), newPunchDamage / 3, 1f, Projectile.owner);
-                            Main.projectile[projIndex].netUpdate = true;
-                            Projectile.netUpdate = true;
-                            SoundEngine.PlaySound(ShootSound, Projectile.Center);
+                            if (Main.rand.Next(0, 1 + 1) == 0)
+                                Main.dust[Dust.NewDust(dustSpawnPosition, Projectile.width, HalfStandHeight * 2, DustID.CoralTorch)].noGravity = true;
+                            if (mouseRightHoldTimer >= 3 * 60)
+                            {
+                                if (Main.rand.Next(0, 1 + 1) == 0)
+                                    Main.dust[Dust.NewDust(dustSpawnPosition, Projectile.width, HalfStandHeight * 2, DustID.Firework_Green)].noGravity = true;
+                                if (powerInstallBuff && Main.rand.Next(0, 1 + 1) == 0)
+                                    Main.dust[Dust.NewDust(dustSpawnPosition, Projectile.width, HalfStandHeight * 2, DustID.Electric)].noGravity = true;
+                            }
                         }
                     }
                 }
-                else
+
+                if (Main.myPlayer == Projectile.owner && !Main.mouseRight && mouseRightHoldTimer > 0)
                 {
-                    attacking = false;
-                    currentAnimationState = AnimationState.Idle;
-                    if (attackType == Attack_Barrage)
+                    if (mouseRightHoldTimer >= 1 * 60)
                     {
-                        if (!secondaryAbility)
-                            StayBehind();
-                        secondaryAbility = false;
+                        int multiplier = 1;
+                        int chargedProjectile = ModContent.ProjectileType<ChargedShot1>();
+                        if (mouseRightHoldTimer >= 3 * 60)
+                        {
+                            multiplier = 2;
+                            chargedProjectile = ModContent.ProjectileType<ChargedShot2>();
+                        }
+
+                        if (powerInstallBuff)
+                        {
+                            chargedProjectile = ModContent.ProjectileType<ChargedShot2>();
+                            if (mouseRightHoldTimer >= 3 * 60)
+                                chargedProjectile = ModContent.ProjectileType<ChargedShot3>();
+                        }
+
+                        shootCount += newShootTime * 3;
+                        Vector2 shootVel = Main.MouseWorld - Projectile.Center;
+                        if (shootVel == Vector2.Zero)
+                            shootVel = new Vector2(0f, 1f);
+
+                        shootVel.Normalize();
+                        shootVel *= ProjectileSpeed;
+                        int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, chargedProjectile, newPunchDamage * 2 * multiplier, 3f, Projectile.owner);
+                        Main.projectile[projIndex].netUpdate = true;
+                        Projectile.netUpdate = true;
                     }
-                    else if (attackType == Attack_Sword)
-                    {
-                        if (!secondaryAbility)
-                            StayBehind();
-                        secondaryAbility = false;
-                    }
-                    else if (attackType == Attack_Cannon)
-                    {
-                        if (!attacking)
-                            StayBehind();
-                        else
-                            GoInFront();
-                    }
+                    mouseRightHoldTimer = 0;
                 }
-                if (Main.mouseRight)
+
+                if (throwingProjectile)
                 {
                     secondaryAbility = true;
                     currentAnimationState = AnimationState.SecondaryAbility;
-                    if (attackType == Attack_Barrage)       //throw
+                    Projectile.position = player.Center - new Vector2(0f, (HalfStandHeight * 2) + 8f);
+                    if (Projectile.spriteDirection == -1)
+                        Projectile.position.X -= 32;
+
+                    if (!portalSpawned)
                     {
-                        throwingProjectile = true;
-                        portalSpawned = false;
-                        throwAnimationOverride = false;
-                        portalAnimationIndex = 0;
-                    }
-                    else if (attackType == Attack_Sword)        //mega slash
-                    {
-                        Vector2 targetPosition = Main.MouseWorld;
-                        if (JoJoStands.JoJoStands.StandAimAssist)
+                        portalFrameCounter++;
+                        if (portalFrameCounter >= portalAnimations[portalAnimationIndex].frameDuration)
                         {
-                            float lowestDistance = 4f * 16f;
-                            for (int n = 0; n < Main.maxNPCs; n++)
-                            {
-                                NPC npc = Main.npc[n];
-                                if (npc.active && npc.CanBeChasedBy(this, false))
-                                {
-                                    float distance = Vector2.Distance(npc.Center, Main.MouseWorld);
-                                    if (distance < lowestDistance && Collision.CanHitLine(Projectile.Center, Projectile.width, Projectile.height, npc.position, npc.width, npc.height) && npc.lifeMax > 5 && !npc.immortal && !npc.hide && !npc.townNPC && !npc.friendly)
-                                    {
-                                        targetPosition = npc.Center;
-                                        lowestDistance = distance;
-                                    }
-                                }
-                            }
-                        }
-
-                        Vector2 velocityAddition = targetPosition - Projectile.Center;
-                        velocityAddition.Normalize();
-                        velocityAddition *= 5f + mPlayer.standTier;
-
-                        Projectile.spriteDirection = Projectile.direction = targetPosition.X > Projectile.Center.X ? 1 : -1;
-                        float targetDistance = Vector2.Distance(targetPosition, Projectile.Center);
-                        if (targetDistance > 16f)
-                            Projectile.velocity = player.velocity + velocityAddition;
-                        else
-                            Projectile.velocity = Vector2.Zero;
-
-                        if (shootCount <= 0 && Projectile.frame != oldSpinFrame)
-                        {
-                            shootCount += newPunchTime * 3 / 4;
-                            oldSpinFrame = Projectile.frame;
-                            int rectWidth = 80;
-                            int rectHeight = 80;
-                            float angle = (float)Math.Cos((Projectile.frame / 6) * 2 * MathHelper.Pi);
-                            Vector2 rectPosition = Projectile.Center + (angle.ToRotationVector2() * (rectWidth / 2));
-                            Rectangle attackHitbox = new Rectangle((int)(rectPosition.X) - (rectWidth / 2), (int)rectPosition.Y - (rectHeight / 2), rectWidth, rectHeight);
-                            for (int n = 0; n < Main.maxNPCs; n++)
-                            {
-                                NPC npc = Main.npc[n];
-                                if (npc.CanBeChasedBy(this) && npc.Hitbox.Intersects(attackHitbox))
-                                {
-                                    int damage = newPunchDamage * 5 / 4;
-                                    NPC.HitInfo hitInfo = new NPC.HitInfo()
-                                    {
-                                        Damage = damage,
-                                        Knockback = PunchKnockback * 4f,
-                                        HitDirection = npc.direction
-                                    };
-                                    npc.StrikeNPC(hitInfo);
-                                }
-                            }
-                        }
-                    }
-                    else if (attackType == Attack_Cannon)       //Charged shots 1 (2s) & 2 (5s)
-                    {
-                        mouseRightHoldTimer++;
-                        if (powerInstallBuff)
-                            mouseRightHoldTimer++;
-
-                        Vector2 dustSpawnPosition = Projectile.position - new Vector2(0f, HalfStandHeight);
-                        if (Projectile.direction == 1)
-                            dustSpawnPosition += StandOffset;
-                        else
-                            dustSpawnPosition -= StandOffset;
-
-                        if (Main.rand.Next(0, 1 + 1) == 0)
-                            Main.dust[Dust.NewDust(dustSpawnPosition, Projectile.width, HalfStandHeight * 2, DustID.CoralTorch)].noGravity = true;
-                        if (mouseRightHoldTimer >= 4 * 60)
-                        {
-                            if (Main.rand.Next(0, 1 + 1) == 0)
-                                Main.dust[Dust.NewDust(dustSpawnPosition, Projectile.width, HalfStandHeight * 2, DustID.Electric)].noGravity = true;
-                        }
-                        if (mouseRightHoldTimer >= 6 * 60)
-                        {
-                            if (Main.rand.Next(0, 1 + 1) == 0)
-                                Main.dust[Dust.NewDust(dustSpawnPosition, Projectile.width, HalfStandHeight * 2, DustID.BlueFlare)].noGravity = true;
-                        }
-                    }
-                }
-            }
-
-            if (Main.myPlayer == Projectile.owner && !Main.mouseRight && mouseRightHoldTimer > 0)
-            {
-                if (mouseRightHoldTimer >= 2 * 60)
-                {
-                    int multiplier = 1;
-                    int chargedProjectile = ModContent.ProjectileType<ChargedShot1>();
-                    if (mouseRightHoldTimer >= 4 * 60)
-                    {
-                        multiplier = 2;
-                        chargedProjectile = ModContent.ProjectileType<ChargedShot2>();
-                    }
-                    if (mouseRightHoldTimer >= 6 * 60)
-                    {
-                        multiplier = 4;
-                        chargedProjectile = ModContent.ProjectileType<ChargedShot3>();
-                    }
-
-                    shootCount += newShootTime * 3;
-                    Vector2 shootVel = Main.MouseWorld - Projectile.Center;
-                    if (shootVel == Vector2.Zero)
-                        shootVel = new Vector2(0f, 1f);
-
-                    shootVel.Normalize();
-                    shootVel *= ProjectileSpeed;
-                    int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, shootVel, chargedProjectile, newPunchDamage * 2 * multiplier, 3f, Projectile.owner);
-                    Main.projectile[projIndex].netUpdate = true;
-                    Projectile.netUpdate = true;
-                }
-                mouseRightHoldTimer = 0;
-            }
-
-            if (throwingProjectile)
-            {
-                secondaryAbility = true;
-                currentAnimationState = AnimationState.SecondaryAbility;
-                Projectile.position = player.Center - new Vector2(0f, (HalfStandHeight * 2) + 8f);
-                if (Projectile.spriteDirection == -1)
-                    Projectile.position.X -= 32;
-
-                if (!portalSpawned)
-                {
-                    portalFrameCounter++;
-                    if (portalFrameCounter >= portalAnimations[portalAnimationIndex].frameDuration)
-                    {
-                        portalFrame += 1;
-                        portalFrameCounter = 0;
-                        OnPortalFrameChange();
-                        if (portalFrame >= portalAnimations[portalAnimationIndex].maxFrames)
-                        {
-                            portalFrame = 0;
+                            portalFrame += 1;
                             portalFrameCounter = 0;
-                            portalAnimationIndex++;
-                            if (portalAnimationIndex >= 3)
+                            OnPortalFrameChange();
+                            if (portalFrame >= portalAnimations[portalAnimationIndex].maxFrames)
                             {
-                                portalAnimationIndex = 2;
-                                portalSpawned = true;
+                                portalFrame = 0;
+                                portalFrameCounter = 0;
+                                portalAnimationIndex++;
+                                if (portalAnimationIndex >= 3)
+                                {
+                                    portalAnimationIndex = 2;
+                                    portalSpawned = true;
+                                }
                             }
                         }
                     }
+
+                    if (throwTimer > 0)
+                        throwTimer--;
+
+                    if ((Projectile.frame >= 2 && (portalAnimationIndex == 0 || (portalAnimationIndex == 1 && portalFrame < 4))) || (throwAnimationOverride && throwTimer > 0))
+                    {
+                        Projectile.frame = 1;
+                        Projectile.frameCounter = 0;
+                    }
                 }
 
-                if (throwTimer > 0)
-                    throwTimer--;
 
-                if ((Projectile.frame >= 2 && (portalAnimationIndex == 0 || (portalAnimationIndex == 1 && portalFrame < 4))) || (throwAnimationOverride && throwTimer > 0))
+                if (SpecialKeyPressed(false))
                 {
-                    Projectile.frame = 1;
-                    Projectile.frameCounter = 0;
+                    attackType++;
+                    if (attackType > Attack_Cannon)
+                        attackType = Attack_Barrage;
+
+                    fPlayer.virtualInsanityRangeBoost = attackType == Attack_Sword;
+                    Main.NewText("Attack Style: " + AttackStyleNames[attackType]);
+                    attackChangeEffectTimer = 90;
                 }
+
+                if (mPlayer.posing)
+                    currentAnimationState = AnimationState.Pose;
+
+                if (powerInstallAnimation)
+                    currentAnimationState = AnimationState.PowerInstall;
+
+                LimitDistance();
             }
-
-
-            if (SpecialKeyPressed(false))
+            else if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Auto)
             {
-                attackType++;
-                if (attackType > Attack_Cannon)
+                if (attackType != Attack_Barrage)
+                {
                     attackType = Attack_Barrage;
+                    Main.NewText("Attack Style: " + AttackStyleNames[attackType]);
+                    attackChangeEffectTimer = 90;
+                }
 
-                fPlayer.virtualInsanityRangeBoost = attackType == Attack_Sword;
-                Main.NewText("Attack Style: " + AttackStyleNames[attackType]);
-                attackChangeEffectTimer = 90;
-            }
-
-            if (SecondSpecialKeyPressed(false))
-            {
-                if (!player.HasBuff(ModContent.BuffType<PowerInstall>()))
-                    player.AddBuff(ModContent.BuffType<PowerInstall>(), 2 * 60 * 60);
+                BasicPunchAI();
+                if (attacking)
+                    currentAnimationState = AnimationState.Attack;
                 else
-                    player.ClearBuff(ModContent.BuffType<PowerInstall>());
+                    currentAnimationState = AnimationState.Idle;
             }
-
-            if (mPlayer.posing)
-                currentAnimationState = AnimationState.Pose;
-
-            LimitDistance();
         }
 
         public override bool PreDrawExtras()
         {
+            Color bodyColor = Lighting.GetColor((int)Projectile.Center.X / 16, (int)Projectile.Center.Y / 16);
             if (attackChangeEffectTimer > 0)
             {
                 Vector2 drawOffset = StandOffset - new Vector2(0f, HalfStandHeight * 2);
                 drawOffset.X *= Projectile.spriteDirection;
                 Vector2 drawPosition = Projectile.Center - Main.screenPosition + drawOffset;
-                Main.EntitySpriteDraw(AttackStyleTextures[attackType], drawPosition, null, Color.White * Math.Clamp(attackChangeEffectTimer / 60f, 0f, 1f), 0f, new Vector2(43), 1f, SpriteEffects.None);
+                Main.EntitySpriteDraw(AttackStyleTextures[attackType], drawPosition, null, bodyColor * Math.Clamp(attackChangeEffectTimer / 60f, 0f, 1f), 0f, new Vector2(43), 1f, SpriteEffects.None);
             }
             if (attackType == Attack_Cannon)
             {
@@ -500,7 +531,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                 if (Projectile.spriteDirection == -1)
                     armOrigin.Y -= 8;
 
-                Main.EntitySpriteDraw(ArmCannonSpritesheets[textureType], drawPosition, animRect, Color.White, rotation, armOrigin, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically);
+                Main.EntitySpriteDraw(ArmCannonSpritesheets[textureType], drawPosition, animRect, bodyColor, rotation, armOrigin, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically);
             }
 
             return true;
@@ -508,6 +539,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
 
         public override void PostDrawExtras()
         {
+            Color bodyColor = Lighting.GetColor((int)Projectile.Center.X / 16, (int)Projectile.Center.Y / 16);
             if (throwingProjectile && !portalSpawned)
             {
                 Vector2 drawOffset = StandOffset - new Vector2(0f, HalfStandHeight * 2);
@@ -531,9 +563,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     Vector2 standOrigin = new Vector2(standTexture.Width / 2f, frameHeight / 2f);
                     int textureIndex = Math.Clamp((int)((Main.MouseScreen.Y / Main.screenHeight) * 3), 0, 2);
                     if (currentAnimationState != AnimationState.Attack)
-                        Main.EntitySpriteDraw(CannonHeadSpritesheets[textureIndex], drawPosition, animRect, Color.White, Projectile.rotation, standOrigin, Projectile.scale, effects, 0);
+                        Main.EntitySpriteDraw(CannonHeadSpritesheets[textureIndex], drawPosition, animRect, bodyColor, Projectile.rotation, standOrigin, Projectile.scale, effects, 0);
                     else if (currentAnimationState == AnimationState.Attack)
-                        Main.EntitySpriteDraw(CannonHeadFlashSpritesheets[textureIndex], drawPosition, animRect, Color.White, Projectile.rotation, standOrigin, Projectile.scale, effects, 0);
+                        Main.EntitySpriteDraw(CannonHeadFlashSpritesheets[textureIndex], drawPosition, animRect, bodyColor, Projectile.rotation, standOrigin, Projectile.scale, effects, 0);
                 }
             }
         }
@@ -543,6 +575,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
             if (portalAnimationIndex == 1 && portalFrame == 4)
             {
                 int randomIndex = Main.rand.Next(0, ThrowProjectiles.Length);
+                randomIndex = 3;
                 Vector2 projectileCenter = Projectile.Center + StandOffset - new Vector2(0f, HalfStandHeight / 2f) + ThrowProjectilesOffset[randomIndex];
                 Vector2 shootVelocity = Main.MouseWorld - projectileCenter;
                 shootVelocity.Normalize();
@@ -555,6 +588,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                 {
                     damage = 48 * TierNumber;
                     knockback = 2f * TierNumber;
+                    shootVelocity = Vector2.Zero;
                 }
                 else if (randomIndex == 3)       //Glue man
                 {
@@ -566,8 +600,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     damage = 60 * TierNumber;
                     knockback = 8f * TierNumber;
                 }
-                int projectileIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), projectileCenter, shootVelocity, ThrowProjectiles[randomIndex], damage, knockback, Projectile.owner, newPunchDamage * 3 / 4);
-                Main.projectile[projectileIndex].spriteDirection = Main.projectile[projectileIndex].direction = -Projectile.spriteDirection;
+                projectileToThrow = Main.projectile[Projectile.NewProjectile(Projectile.GetSource_FromThis(), projectileCenter, shootVelocity, ThrowProjectiles[randomIndex], damage, knockback, Projectile.owner, newPunchDamage * 3 / 4)];
+                projectileToThrow.spriteDirection = projectileToThrow.direction = -Projectile.spriteDirection;
+                projectileToThrow.alpha = 255;
+                Main.player[Projectile.owner].AddBuff(ModContent.BuffType<AbilityCooldown>() ,Main.player[Projectile.owner].GetModPlayer<MyPlayer>().AbilityCooldownTime(15 / TierNumber));
             }
         }
 
@@ -575,6 +611,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
         {
             if (animationName == "Throw")
                 throwingProjectile = false;
+            else if (animationName == "PowerInstall")
+                powerInstallAnimation = false;
         }
 
         public override void StandKillEffects()
@@ -616,7 +654,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     PlayAnimation("Idle");
             }
             else if (currentAnimationState == AnimationState.Special)
-                PlayAnimation("Weld");
+                PlayAnimation("PowerInstall");
         }
 
         public override void PlayAnimation(string animationName)
@@ -637,6 +675,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                 AnimateStand(animationName, 6, 8, false);
             else if (animationName == "Spin")
                 AnimateStand(animationName, 7, 2, true);
+            else if (animationName == "PowerInstall")
+                AnimateStand(animationName, 17, 8, false);
             else if (animationName == "Pose")
                 AnimateStand(animationName, 1, 300, false);
         }

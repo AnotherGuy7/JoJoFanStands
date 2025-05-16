@@ -48,6 +48,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.PowerMusclerDir
 
         public override void AI()
         {
+            if (Projectile.alpha > 0)
+            {
+                Projectile.alpha -= 6;
+                if (Projectile.alpha <= 0)
+                    Projectile.alpha = 0;
+            }
+
             Projectile.frameCounter++;
             if (Projectile.frameCounter >= 12)
             {
@@ -107,7 +114,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.PowerMusclerDir
         public override bool PreDraw(ref Color lightColor)
         {
             if (spawning)
-                Main.EntitySpriteDraw(spawnSheet, Projectile.position - Main.screenPosition, new Rectangle(0, 116 * Projectile.frame, 100, 116), lightColor, Projectile.rotation, Vector2.Zero, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0f);
+                Main.EntitySpriteDraw(spawnSheet, Projectile.position - Main.screenPosition, new Rectangle(0, 116 * Projectile.frame, 100, 116), lightColor * Projectile.Opacity, Projectile.rotation, Vector2.Zero, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0f);
             return !spawning;
         }
     }

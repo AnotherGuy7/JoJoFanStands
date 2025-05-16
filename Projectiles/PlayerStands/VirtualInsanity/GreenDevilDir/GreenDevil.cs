@@ -48,10 +48,32 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GreenDevilDir
         private bool exploding = false;
         private bool playedSpawnSound = false;
         private bool explosionEffect = false;
+        private int moveTimer = 24;
 
         public override void AI()
         {
-            if (!exploding)
+            if (Projectile.alpha > 0)
+            {
+                Projectile.alpha -= 24;
+                if (Projectile.alpha <= 0)
+                    Projectile.alpha = 0;
+            }
+
+            if (moveTimer > 0)
+            {
+                moveTimer--;
+                Projectile.velocity = Vector2.Zero;
+                if (moveTimer <= 0)
+                {
+                    moveTimer = 0;
+                    Vector2 shootVelocity = Main.MouseWorld - Projectile.Center;
+                    shootVelocity.Normalize();
+                    shootVelocity *= 16f;
+                    Projectile.velocity = shootVelocity;
+                }
+            }
+
+            if (!exploding && moveTimer <= 0)
             {
                 Projectile.velocity.Y += 0.1f;
                 if (Projectile.velocity.Y >= 18f)
@@ -151,7 +173,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GreenDevilDir
         public override bool PreDraw(ref Color lightColor)
         {
             if (exploding)
-                Main.EntitySpriteDraw(impactSpritesheet, Projectile.position - Main.screenPosition, new Rectangle(0, 94 * Projectile.frame, Projectile.width, 94), lightColor, Projectile.rotation, Vector2.Zero, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0f);
+                Main.EntitySpriteDraw(impactSpritesheet, Projectile.position - Main.screenPosition, new Rectangle(0, 94 * Projectile.frame, Projectile.width, 94), lightColor * Projectile.Opacity, Projectile.rotation, Vector2.Zero, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0f);
             return !exploding;
         }
     }

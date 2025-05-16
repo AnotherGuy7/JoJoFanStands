@@ -1,4 +1,5 @@
 using JoJoStands;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -83,6 +84,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir
                 }
             }
             SoundEngine.PlaySound(SoundID.Item62, Projectile.Center);
+            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().standTier >= 3)
+            {
+                int projectileIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, 292, Projectile.damage, 0f, Projectile.owner);
+                Main.projectile[projectileIndex].hostile = false;
+                Main.projectile[projectileIndex].friendly = true;
+            }
         }
     }
 }

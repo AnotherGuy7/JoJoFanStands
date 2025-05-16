@@ -4,36 +4,39 @@ using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
 {
-    public class GunPellet : ModProjectile
+    public class Plasma : ModProjectile
     {
         public override void SetStaticDefaults()
         {
-            Main.projFrames[Projectile.type] = 6;
+            Main.projFrames[Projectile.type] = 7;
         }
         public override void SetDefaults()
         {
-            Projectile.width = 30;
-            Projectile.height = 18;
+            Projectile.width = 64;
+            Projectile.height = 64;
             Projectile.aiStyle = 0;
             Projectile.friendly = true;
             Projectile.hostile = false;
-            Projectile.timeLeft = 120;
+            Projectile.timeLeft = 5 * 60;
             Projectile.tileCollide = true;
             Projectile.ignoreWater = true;
         }
 
         public override void AI()
         {
+            if (Projectile.timeLeft <= 60)
+                Projectile.alpha = 255 - (int)(255 * (Projectile.timeLeft / 60f));
+
             Projectile.frameCounter++;
             if (Projectile.frameCounter >= 4)
             {
                 Projectile.frame++;
                 Projectile.frameCounter = 0;
-                if (Projectile.frame >= 6)
+                if (Projectile.frame >= 7)
                     Projectile.frame = 0;
             }
-            Projectile.rotation = Projectile.velocity.ToRotation();
-            Lighting.AddLight(Projectile.Center, Color.Blue.ToVector3());
+            Projectile.velocity *= 0.88f;
+            Lighting.AddLight(Projectile.Center, Color.CadetBlue.ToVector3());
         }
     }
 }
