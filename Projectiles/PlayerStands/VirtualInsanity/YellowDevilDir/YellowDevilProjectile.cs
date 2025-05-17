@@ -6,7 +6,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir
 {
     public class YellowDevilProjectile : ModProjectile
     {
-        public static readonly SoundStyle ImpactSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/YellowDevil/YellowDevilProjectileImpact")
+        public static readonly SoundStyle ImpactSound = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/YellowDevil/YellowDevilProjectileImpact")
         {
             Volume = JoJoStands.JoJoStands.ModSoundsVolume
         };
@@ -44,7 +44,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir
 
         public override void OnKill(int timeLeft)
         {
-            SoundEngine.PlaySound(ImpactSound, Projectile.Center);
+            if (JoJoFanStands.SoundsLoaded)
+                SoundEngine.PlaySound(ImpactSound, Projectile.Center);
         }
     }
 }

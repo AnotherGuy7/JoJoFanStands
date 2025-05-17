@@ -184,7 +184,6 @@ namespace JoJoFanStands
             MyPlayer mPlayer = Player.GetModPlayer<MyPlayer>();
             Item inputItem = mPlayer.StandSlot.SlotItem;
 
-            Main.NewText(mPlayer.standName);
             FanStandItemClass standItem = inputItem.ModItem as FanStandItemClass;
             string standClassName = standItem.StandIdentifierName + "StandT" + standItem.StandTier;
             if (standClassName.Contains("T4"))

@@ -72,7 +72,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir
                             npc.StrikeNPC(hitInfo);
                             npc.AddBuff(ModContent.BuffType<GlueStuck>(), 2 * Main.player[Projectile.owner].GetModPlayer<MyPlayer>().standTier * 60);
                             npc.AddBuff(BuffID.Ichor, 2 * Main.player[Projectile.owner].GetModPlayer<MyPlayer>().standTier * 60);
-                            SoundEngine.PlaySound(GlueMan.GlueStick, Projectile.Center);
+                            if (JoJoFanStands.SoundsLoaded)
+                                SoundEngine.PlaySound(GlueMan.GlueStick, Projectile.Center);
                         }
                     }
                 }

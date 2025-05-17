@@ -1,5 +1,4 @@
 using JoJoStands;
-using JoJoStands.Projectiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -13,7 +12,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir
         public static Texture2D tellySpawnSpritesheet;
         public static Texture2D tellySecondSpritesheet;
 
-        public static readonly SoundStyle BombDropSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/BombDrone/BombDrop")
+        public static readonly SoundStyle BombDropSound = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/BombDrone/BombDrop")
         {
             Volume = JoJoStands.JoJoStands.ModSoundsVolume
         };
@@ -36,7 +35,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir
             Projectile.damage = 64;
         }
 
-        private bool playedSpawnSound = false;
         private bool spawning = true;
         private bool secondSpritesheet;
         private int bombSpawnTimer = 0;
@@ -81,13 +79,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir
                 Projectile.velocity = Vector2.Zero;
                 return;
             }
-
-            if (!playedSpawnSound)
-            {
-                playedSpawnSound = true;
-                //
-                //SoundEngine.PlaySound(SpawnSounds[Main.rand.Next(1, SpawnSounds.Length)], Projectile.Center);
-            }
             if (Main.myPlayer == Projectile.owner)
             {
                 bombSpawnTimer++;
@@ -95,7 +86,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir
                 {
                     bombSpawnTimer = 0;
                     Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + new Vector2(0, Projectile.height / 2f), Projectile.velocity, ModContent.ProjectileType<BombTellyBomb>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
-                    SoundEngine.PlaySound(BombDropSound, Projectile.Center);
+                    if (JoJoFanStands.SoundsLoaded)
+                        SoundEngine.PlaySound(BombDropSound, Projectile.Center);
                 }
             }
         }

@@ -12,33 +12,33 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir
         public static Texture2D spawnSheet;
         public static Texture2D npcGlueIcon;
 
-        public static readonly SoundStyle ImpactSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManImpact")
+        public static readonly SoundStyle ImpactSound = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/GlueMan/GlueManImpact")
         {
             Volume = JoJoStands.JoJoStands.ModSoundsVolume
         };
-        public static readonly SoundStyle FlailSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManFlail")
+        public static readonly SoundStyle FlailSound = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/GlueMan/GlueManFlail")
         {
             Volume = JoJoStands.JoJoStands.ModSoundsVolume
         };
-        public static readonly SoundStyle GlueStick = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueStick")
+        public static readonly SoundStyle GlueStick = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/GlueMan/GlueStick")
         {
             Volume = JoJoStands.JoJoStands.ModSoundsVolume
         };
 
         public static readonly SoundStyle[] SpawnSounds = new SoundStyle[5]
         {
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManSpawn1") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManSpawn2") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManSpawn3") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManSpawn4") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManSpawn5") { Volume = JoJoStands.JoJoStands.ModSoundsVolume }
+            new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/GlueMan/GlueManSpawn1") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
+            new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/GlueMan/GlueManSpawn2") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
+            new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/GlueMan/GlueManSpawn3") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
+            new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/GlueMan/GlueManSpawn4") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
+            new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/GlueMan/GlueManSpawn5") { Volume = JoJoStands.JoJoStands.ModSoundsVolume }
         };
 
         public static readonly SoundStyle[] ThrowSounds = new SoundStyle[3]
 {
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManThrow1") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManThrow2") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GlueMan/GlueManThrow3") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
+            new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/GlueMan/GlueManThrow1") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
+            new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/GlueMan/GlueManThrow2") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
+            new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/GlueMan/GlueManThrow3") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
 };
 
         public override void SetStaticDefaults()
@@ -59,16 +59,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir
         }
 
         private bool spawning = true;
-        private bool playedSpawnSound = false;
 
         public override void AI()
         {
-            /*if (!playedSpawnSound)
-            {
-                playedSpawnSound = true;
-                SoundEngine.PlaySound(SpawnSounds[Main.rand.Next(1, SpawnSounds.Length)], Projectile.Center);
-            }*/
-
             if (Projectile.alpha > 0)
             {
                 Projectile.alpha -= 6;
@@ -96,8 +89,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir
                         else
                             Projectile.direction = Projectile.spriteDirection = -1;
                     }
-                    SoundEngine.PlaySound(ThrowSounds[Main.rand.Next(1, ThrowSounds.Length)], Projectile.Center);
-                    SoundEngine.PlaySound(FlailSound, Projectile.Center);
+                    if (JoJoFanStands.SoundsLoaded)
+                    {
+                        SoundEngine.PlaySound(ThrowSounds[Main.rand.Next(1, ThrowSounds.Length)], Projectile.Center);
+                        SoundEngine.PlaySound(FlailSound, Projectile.Center);
+                    }
                 }
                 else if (!spawning && Projectile.frame >= 7)
                     Projectile.frame = 0;
@@ -114,7 +110,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir
         public override void OnKill(int timeLeft)
         {
             Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, ModContent.ProjectileType<GlueBomb>(), 5 * Main.player[Projectile.owner].GetModPlayer<MyPlayer>().standTier, 1f, Projectile.owner);
-            SoundEngine.PlaySound(ImpactSound, Projectile.Center);
+            if (JoJoFanStands.SoundsLoaded)
+                SoundEngine.PlaySound(ImpactSound, Projectile.Center);
         }
 
         public override bool PreDraw(ref Color lightColor)

@@ -8,6 +8,7 @@ using JoJoStands;
 using JoJoStands.Buffs.Debuffs;
 using JoJoStands.Projectiles.PlayerStands;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
@@ -21,8 +22,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
     public class VirtualInsanityStandFinal : StandClass
     {
         public override int HalfStandHeight => 37;
-        public override int PunchDamage => 96;
-        public override int AltDamage => 84;
+        public override int PunchDamage => 91;
+        public override int AltDamage => 79;
         public override int PunchTime => 9;
         public override int TierNumber => 4;
         public override bool CanUseAfterImagePunches => false;
@@ -41,6 +42,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
             Pose
         }
 
+        private const int PowerInstallDuration = 90 * 60;
+
         private int mouseRightHoldTimer = 0;
         private bool powerInstallBuff = false;
         private int attackChangeEffectTimer = 0;
@@ -48,7 +51,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
         private int projectileThrowTimer;
         private int oldSlashFrame = 0;
         private int throwTimer = 0;
-        private int chargeTimer = 0;
 
         private byte attackType = Attack_Barrage;
 
@@ -65,6 +67,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
         public static Texture2D[] ArmCannonSpritesheets;
         public static Texture2D[] CannonHeadSpritesheets;
         public static Texture2D[] CannonHeadFlashSpritesheets;
+        public static Texture2D PowerInstallKanji;
         private readonly Vector2 ArmPlacementOffset = new Vector2(40 - 29, 18 + 39);
         private int portalFrame;
         private int portalFrameCounter;
@@ -73,56 +76,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
         private bool throwAnimationOverride = false;
         private int throwProjectileSpawnTimer = 0;
         private bool powerInstallAnimation = false;
+        private int otherClientMouseRightHoldStage = 0;
         private Projectile projectileToThrow;
-        private readonly AnimationData[] portalAnimations = new AnimationData[3] {
+        public static readonly AnimationData[] PortalAnimations = new AnimationData[3] {
             new AnimationData(10, 5),
             new AnimationData(9, 5),
             new AnimationData(9, 5)
-        };
-
-        public static readonly SoundStyle ShootSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/VirtualInsanity/Gun")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle ChargeShot1 = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/VirtualInsanity/ChargeShot_1")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle ChargeShot2 = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/VirtualInsanity/ChargeShot_2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle ChargeShot3 = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/VirtualInsanity/ChargeShot_3")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle BiggerSlashSwing = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/VirtualInsanity/BiggerSlashSwing")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle PunchLand1 = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/VirtualInsanity/VirtualInsanityPunchLand_1")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle PunchLand2 = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/VirtualInsanity/VirtualInsanityPunchLand_2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle PortalOpen = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/PortalSounds/PortalOpen")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle PortalClose = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/PortalSounds/PortalClose")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle ThrowableSpawn1 = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/PortalSounds/ThrowableSpawn")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
-        public static readonly SoundStyle ThrowableSpawn2 = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/PortalSounds/ThrowableSpawn2")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
         };
 
         public struct AnimationData
@@ -137,16 +96,70 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
             }
         }
 
+        public static readonly SoundStyle ShootSound = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/VirtualInsanity/Gun")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+        public static readonly SoundStyle ChargeShot1 = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/VirtualInsanity/ChargeShot_1")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+        public static readonly SoundStyle ChargeShot2 = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/VirtualInsanity/ChargeShot_2")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+        public static readonly SoundStyle ChargeShot3 = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/VirtualInsanity/ChargeShot_3")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+        public static readonly SoundStyle BiggerSlashSwing = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/VirtualInsanity/BiggerSlashSwing")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+        public static readonly SoundStyle PunchLand1 = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/VirtualInsanity/VirtualInsanityPunchLand_1")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+        public static readonly SoundStyle PunchLand2 = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/VirtualInsanity/VirtualInsanityPunchLand_2")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+        public static readonly SoundStyle PortalOpen = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/PortalSounds/PortalOpen")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+        public static readonly SoundStyle PortalClose = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/PortalSounds/PortalClose")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+        public static readonly SoundStyle ThrowableSpawn1 = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/PortalSounds/ThrowableSpawn")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+        public static readonly SoundStyle ThrowableSpawn2 = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/PortalSounds/ThrowableSpawn2")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+        public static readonly SoundStyle PowerInstallThemeExit = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/VirtualInsanity/PowerInstallExit_4")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
+        public static SoundEffect PowerInstallTheme;
+        public static SoundEffectInstance PowerInstallThemeInstance;
+
         public override void AI()
         {
+            Player player = Main.player[Projectile.owner];
+            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
+            FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
+            if (attackType == Attack_Sword)
+                mPlayer.standRangeBoosts += 4f * 16f;
+
             SelectAnimation();
             UpdateStandInfo();
             if (shootCount > 0)
                 shootCount--;
 
-            Player player = Main.player[Projectile.owner];
-            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
-            FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
             if (mPlayer.standOut)
                 Projectile.timeLeft = 2;
 
@@ -165,12 +178,43 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                 {
                     player.AddBuff(ModContent.BuffType<PowerInstall>(), 2 * 60 * 60);
                     powerInstallAnimation = true;
+                    attackChangeEffectTimer = 60;
                 }
                 else
-                    player.ClearBuff(ModContent.BuffType<PowerInstall>());
+                {
+                    if (player.HasBuff(ModContent.BuffType<PowerInstall>()))
+                    {
+                        float powerInstallCompletion = (PowerInstallDuration - player.buffTime[player.FindBuffIndex(ModContent.BuffType<PowerInstall>())]) / PowerInstallDuration;
+                        player.AddBuff(ModContent.BuffType<AbilityCooldown>(), (int)(5 * 60 * 60 * powerInstallCompletion));
+                        player.ClearBuff(ModContent.BuffType<PowerInstall>());
+                    }
+                }
             }
 
+            if (JoJoFanStands.SoundsLoaded && Projectile.owner == Main.myPlayer)
+            {
+                if (PowerInstallThemeInstance == null)
+                    PowerInstallThemeInstance = PowerInstallTheme.CreateInstance();
+                else
+                {
+                    if (powerInstallBuff)
+                    {
+                        if (PowerInstallThemeInstance.State != SoundState.Playing)
+                            PowerInstallThemeInstance.Play();
+                    }
+                    else
+                    {
+                        if (PowerInstallThemeInstance.State != SoundState.Stopped)
+                            PowerInstallThemeInstance.Stop();
+                    }
+                }
+            }
+
+            bool oldPowerInstallValue = powerInstallBuff;
             powerInstallBuff = player.HasBuff(ModContent.BuffType<PowerInstall>());
+            if (JoJoFanStands.SoundsLoaded && oldPowerInstallValue && !powerInstallBuff)
+                SoundEngine.PlaySound(PowerInstallThemeExit, Projectile.Center);
+
             if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
             {
                 if (Projectile.owner == Main.myPlayer)
@@ -247,6 +291,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                                                 HitDirection = npc.direction
                                             };
                                             npc.StrikeNPC(hitInfo);
+                                            NetMessage.SendStrikeNPC(npc, hitInfo);
                                         }
                                     }
                                 }
@@ -272,6 +317,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                                                 HitDirection = npc.direction
                                             };
                                             npc.StrikeNPC(hitInfo);
+                                            NetMessage.SendStrikeNPC(npc, hitInfo);
                                         }
                                     }
                                 }
@@ -310,7 +356,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                                 int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), shootPosition, shootVel, projectileToShoot, newPunchDamage / 3, 1f, Projectile.owner);
                                 Main.projectile[projIndex].netUpdate = true;
                                 Projectile.netUpdate = true;
-                                SoundEngine.PlaySound(ShootSound, Projectile.Center);
+                                if (JoJoFanStands.SoundsLoaded)
+                                    SoundEngine.PlaySound(ShootSound, Projectile.Center);
                             }
                         }
                     }
@@ -342,6 +389,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     {
                         secondaryAbility = true;
                         currentAnimationState = AnimationState.SecondaryAbility;
+                        Projectile.netUpdate = true;
                         if (attackType == Attack_Barrage)       //throw
                         {
                             if (!throwingProjectile)
@@ -385,6 +433,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                                 Projectile.velocity = player.velocity + velocityAddition;
                             else
                                 Projectile.velocity = Vector2.Zero;
+                            Projectile.netUpdate = true;
 
                             if (shootCount <= 0 && Projectile.frame != oldSlashFrame)
                             {
@@ -395,7 +444,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                                 float angle = (float)Math.Cos((Projectile.frame / 6) * 2 * MathHelper.Pi);
                                 Vector2 rectPosition = Projectile.Center + (angle.ToRotationVector2() * (rectWidth / 2));
                                 Rectangle attackHitbox = new Rectangle((int)(rectPosition.X) - (rectWidth / 2), (int)rectPosition.Y - (rectHeight / 2), rectWidth, rectHeight);
-                                SoundEngine.PlaySound(BiggerSlashSwing, Projectile.Center);
+                                if (JoJoFanStands.SoundsLoaded)
+                                    SoundEngine.PlaySound(BiggerSlashSwing, Projectile.Center);
 
                                 for (int n = 0; n < Main.maxNPCs; n++)
                                 {
@@ -410,6 +460,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                                             HitDirection = npc.direction
                                         };
                                         npc.StrikeNPC(hitInfo);
+                                        NetMessage.SendStrikeNPC(npc, hitInfo);
                                     }
                                 }
                             }
@@ -432,6 +483,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                                 if (powerInstallBuff && Main.rand.Next(0, 1 + 1) == 0)
                                     Main.dust[Dust.NewDust(dustSpawnPosition, Projectile.width, HalfStandHeight * 2, DustID.Electric)].noGravity = true;
                             }
+                            if (mouseRightHoldTimer % 60 == 0)
+                                Projectile.netUpdate = true;
                         }
                     }
                 }
@@ -447,12 +500,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                             if (mouseRightHoldTimer >= 3 * 60)
                             {
                                 chargedProjectile = ModContent.ProjectileType<ChargedShot3>();
-                                SoundEngine.PlaySound(ChargeShot3, Projectile.Center);
+                                if (JoJoFanStands.SoundsLoaded)
+                                    SoundEngine.PlaySound(ChargeShot3, Projectile.Center);
                             }
                             else
                             {
                                 chargedProjectile = ModContent.ProjectileType<ChargedShot2>();
-                                SoundEngine.PlaySound(ChargeShot2, Projectile.Center);
+                                if (JoJoFanStands.SoundsLoaded)
+                                    SoundEngine.PlaySound(ChargeShot2, Projectile.Center);
                             }
                         }
                         else
@@ -461,10 +516,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                             {
                                 multiplier = 2;
                                 chargedProjectile = ModContent.ProjectileType<ChargedShot2>();
-                                SoundEngine.PlaySound(ChargeShot2, Projectile.Center);
+                                if (JoJoFanStands.SoundsLoaded)
+                                    SoundEngine.PlaySound(ChargeShot2, Projectile.Center);
                             }
                             else
-                                SoundEngine.PlaySound(ChargeShot1, Projectile.Center);
+                            {
+                                if (JoJoFanStands.SoundsLoaded)
+                                    SoundEngine.PlaySound(ChargeShot1, Projectile.Center);
+                            }
                         }
 
                         shootCount += newShootTime * 3;
@@ -480,6 +539,24 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     }
                     mouseRightHoldTimer = 0;
                 }
+                if (Main.myPlayer != Projectile.owner && otherClientMouseRightHoldStage > 0)
+                {
+                    Vector2 dustSpawnPosition = Projectile.position - new Vector2(0f, HalfStandHeight);
+                    if (Projectile.direction == 1)
+                        dustSpawnPosition += StandOffset;
+                    else
+                        dustSpawnPosition -= StandOffset;
+
+                    if (Main.rand.Next(0, 1 + 1) == 0)
+                        Main.dust[Dust.NewDust(dustSpawnPosition, Projectile.width, HalfStandHeight * 2, DustID.CoralTorch)].noGravity = true;
+                    if (otherClientMouseRightHoldStage > 3)
+                    {
+                        if (Main.rand.Next(0, 1 + 1) == 0)
+                            Main.dust[Dust.NewDust(dustSpawnPosition, Projectile.width, HalfStandHeight * 2, DustID.Firework_Green)].noGravity = true;
+                        if (powerInstallBuff && Main.rand.Next(0, 1 + 1) == 0)
+                            Main.dust[Dust.NewDust(dustSpawnPosition, Projectile.width, HalfStandHeight * 2, DustID.Electric)].noGravity = true;
+                    }
+                }
 
                 if (throwingProjectile)
                 {
@@ -492,12 +569,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     if (!portalSpawned)
                     {
                         portalFrameCounter++;
-                        if (portalFrameCounter >= portalAnimations[portalAnimationIndex].frameDuration)
+                        if (portalFrameCounter >= PortalAnimations[portalAnimationIndex].frameDuration)
                         {
                             portalFrame += 1;
                             portalFrameCounter = 0;
                             OnPortalFrameChange();
-                            if (portalFrame >= portalAnimations[portalAnimationIndex].maxFrames)
+                            if (portalFrame >= PortalAnimations[portalAnimationIndex].maxFrames)
                             {
                                 portalFrame = 0;
                                 portalFrameCounter = 0;
@@ -520,7 +597,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                         Projectile.frameCounter = 0;
                     }
                 }
-
 
                 if (SpecialKeyPressed(false))
                 {
@@ -563,10 +639,21 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
             Color bodyColor = Lighting.GetColor((int)Projectile.Center.X / 16, (int)Projectile.Center.Y / 16);
             if (attackChangeEffectTimer > 0)
             {
-                Vector2 drawOffset = StandOffset - new Vector2(0f, HalfStandHeight * 2);
-                drawOffset.X *= Projectile.spriteDirection;
-                Vector2 drawPosition = Projectile.Center - Main.screenPosition + drawOffset;
-                Main.EntitySpriteDraw(AttackStyleTextures[attackType], drawPosition, null, bodyColor * Math.Clamp(attackChangeEffectTimer / 60f, 0f, 1f), 0f, new Vector2(43), 1f, SpriteEffects.None);
+                if (powerInstallAnimation)
+                {
+                    Vector2 drawOffset = StandOffset - new Vector2(0f, HalfStandHeight * 2);
+                    drawOffset.X *= Projectile.spriteDirection;
+                    Vector2 drawPosition = Projectile.Center - Main.screenPosition + drawOffset;
+                    Main.EntitySpriteDraw(PowerInstallKanji, drawPosition, null, bodyColor * Math.Clamp(attackChangeEffectTimer / 60f, 0f, 1f), 0f, new Vector2(123, 53), 1f, SpriteEffects.None);
+                }
+                else
+                {
+
+                    Vector2 drawOffset = StandOffset - new Vector2(0f, HalfStandHeight * 2);
+                    drawOffset.X *= Projectile.spriteDirection;
+                    Vector2 drawPosition = Projectile.Center - Main.screenPosition + drawOffset;
+                    Main.EntitySpriteDraw(AttackStyleTextures[attackType], drawPosition, null, bodyColor * Math.Clamp(attackChangeEffectTimer / 60f, 0f, 1f), 0f, new Vector2(43), 1f, SpriteEffects.None);
+                }
             }
             if (attackType == Attack_Cannon)
             {
@@ -628,10 +715,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
 
         private void OnPortalFrameChange()
         {
-            if (portalAnimationIndex == 0 && portalFrame == 1)
+            if (JoJoFanStands.SoundsLoaded && portalAnimationIndex == 0 && portalFrame == 1)
                 SoundEngine.PlaySound(PortalOpen, Projectile.Center);
 
-            if (portalAnimationIndex == 1 && portalFrame == 4)
+            if (Main.myPlayer == Projectile.owner && portalAnimationIndex == 1 && portalFrame == 4)
             {
                 int randomIndex = Main.rand.Next(0, ThrowProjectiles.Length);
                 Vector2 projectileCenter = Projectile.Center + StandOffset - new Vector2(0f, HalfStandHeight / 2f) + ThrowProjectilesOffset[randomIndex];
@@ -661,11 +748,19 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                 projectileToThrow = Main.projectile[Projectile.NewProjectile(Projectile.GetSource_FromThis(), projectileCenter, shootVelocity, ThrowProjectiles[randomIndex], damage, knockback, Projectile.owner, newPunchDamage * 3 / 4)];
                 projectileToThrow.spriteDirection = projectileToThrow.direction = -Projectile.spriteDirection;
                 projectileToThrow.alpha = 255;
-                Main.player[Projectile.owner].AddBuff(ModContent.BuffType<AbilityCooldown>() ,Main.player[Projectile.owner].GetModPlayer<MyPlayer>().AbilityCooldownTime(15 / TierNumber));
-                SoundEngine.PlaySound(Main.rand.Next(0, 1 + 1) == 0 ? ThrowableSpawn1 : ThrowableSpawn2, Projectile.Center);
+                Main.player[Projectile.owner].AddBuff(ModContent.BuffType<AbilityCooldown>(), Main.player[Projectile.owner].GetModPlayer<MyPlayer>().AbilityCooldownTime(15 / TierNumber));
+                if (JoJoFanStands.SoundsLoaded)
+                    SoundEngine.PlaySound(Main.rand.Next(0, 1 + 1) == 0 ? ThrowableSpawn1 : ThrowableSpawn2, Projectile.Center);
             }
+            if (JoJoFanStands.SoundsLoaded && Main.myPlayer != Projectile.owner && portalAnimationIndex == 1 && portalFrame == 4)
+                SoundEngine.PlaySound(Main.rand.Next(0, 1 + 1) == 0 ? ThrowableSpawn1 : ThrowableSpawn2, Projectile.Center);
             if (portalAnimationIndex == 2 && portalFrame == 1)
-                SoundEngine.PlaySound(PortalClose, Projectile.Center);
+            {
+                if (JoJoFanStands.SoundsLoaded)
+                    SoundEngine.PlaySound(PortalClose, Projectile.Center);
+                if (Main.myPlayer == Projectile.owner)
+                    Projectile.netUpdate = true;
+            }
         }
 
         public override void AnimationCompleted(string animationName)
@@ -684,11 +779,17 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
         public override void SendExtraStates(BinaryWriter writer)
         {
             writer.Write(attackType);
+            writer.Write(powerInstallAnimation);
+            writer.Write(mouseRightHoldTimer / 60);
+            writer.Write(throwingProjectile);
         }
 
         public override void ReceiveExtraStates(BinaryReader reader)
         {
             attackType = reader.ReadByte();
+            powerInstallAnimation = reader.ReadBoolean();
+            otherClientMouseRightHoldStage = reader.ReadInt32();
+            throwingProjectile = reader.ReadBoolean();
         }
 
         public override void SelectAnimation()

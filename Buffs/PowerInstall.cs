@@ -12,12 +12,12 @@ namespace JoJoFanStands.Buffs
         {
             // DisplayName.SetDefault("Brian Eno Active");
             // Description.SetDefault("Brian Eno is active!");
-            Main.buffNoTimeDisplay[Type] = true;
+            //Main.buffNoTimeDisplay[Type] = true;
         }
 
         public override void UpdateBuffOnPlayer(Player player)
         {
-            player.statLifeMax2 = (int)(player.statLifeMax2 * 0.92);
+            player.statLifeMax2 = (int)(player.statLifeMax2 * 0.86);
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             if (!mPlayer.standOut)
                 player.ClearBuff(Type);
@@ -25,8 +25,12 @@ namespace JoJoFanStands.Buffs
 
         public override void OnBuffEnd(Player player)
         {
-            float powerInstallCompletion = ((2f * 60f * 60f) - player.buffTime[player.FindBuffIndex(Type)]) / (2f * 60f * 60f);
-            player.AddBuff(ModContent.BuffType<AbilityCooldown>(), (int)(5 * 60 * 60 * powerInstallCompletion));
+            int buffIndex = player.FindBuffIndex(Type);
+            if (buffIndex >= 0 && buffIndex < player.buffTime.Length)
+            {
+                float powerInstallCompletion = ((2f * 60f * 60f) - player.buffTime[buffIndex]) / (2f * 60f * 60f);
+                player.AddBuff(ModContent.BuffType<AbilityCooldown>(), (int)(5 * 60 * 60 * powerInstallCompletion));
+            }
         }
     }
 }

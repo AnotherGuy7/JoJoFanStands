@@ -10,19 +10,19 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir
     {
         public static Texture2D splitUpTexture;
 
-        public static readonly SoundStyle ShootSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/YellowDevil/YellowDevilProjectileShoot")
+        public static readonly SoundStyle ShootSound = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/YellowDevil/YellowDevilProjectileShoot")
         {
             Volume = JoJoStands.JoJoStands.ModSoundsVolume
         };
 
         public static readonly SoundStyle[] SpawnSounds = new SoundStyle[6]
         {
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/YellowDevil/YellowDevilProjectileSpawn") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/YellowDevil/YellowDevilSpawn1") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/YellowDevil/YellowDevilSpawn2") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/YellowDevil/YellowDevilSpawn3") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/YellowDevil/YellowDevilSpawn4") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/YellowDevil/YellowDevilSpawn5") { Volume = JoJoStands.JoJoStands.ModSoundsVolume }
+            new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/YellowDevil/YellowDevilProjectileSpawn") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
+            new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/YellowDevil/YellowDevilSpawn1") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
+            new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/YellowDevil/YellowDevilSpawn2") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
+            new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/YellowDevil/YellowDevilSpawn3") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
+            new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/YellowDevil/YellowDevilSpawn4") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
+            new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/YellowDevil/YellowDevilSpawn5") { Volume = JoJoStands.JoJoStands.ModSoundsVolume }
         };
 
         public override void SetStaticDefaults()
@@ -84,7 +84,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir
                             shootVelocity.Normalize();
                             shootVelocity *= 12f;
                             Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.position + offset, shootVelocity, ModContent.ProjectileType<YellowDevilProjectile>(), (int)Projectile.ai[0], 2f, Projectile.owner);
-                            SoundEngine.PlaySound(ShootSound, Projectile.Center);
+                            if (JoJoFanStands.SoundsLoaded)
+                                SoundEngine.PlaySound(ShootSound, Projectile.Center);
                         }
                     }
                 }
@@ -93,8 +94,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir
             if (!playedSpawnSound)
             {
                 playedSpawnSound = true;
-                SoundEngine.PlaySound(SpawnSounds[0], Projectile.Center);
-                SoundEngine.PlaySound(SpawnSounds[Main.rand.Next(1, SpawnSounds.Length)], Projectile.Center);
+                if (JoJoFanStands.SoundsLoaded)
+                    SoundEngine.PlaySound(SpawnSounds[Main.rand.Next(1, SpawnSounds.Length)], Projectile.Center);
             }
         }
 

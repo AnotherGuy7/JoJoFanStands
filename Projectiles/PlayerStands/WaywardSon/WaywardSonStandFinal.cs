@@ -37,6 +37,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
         public bool canAttack = true;
         public bool canDraw = true;
         public bool limitDistance = true;
+        private float vacuumBonus = 0f;
 
         //private readonly Point HeadParticlePoint = new Point(37 - 6, 11 - 4);
         //private readonly Point ArmParticlePoint = new Point(18, 42);
@@ -95,6 +96,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
         public const byte WaywardSon = 40;
         public const byte GoldExperienceRequiem = 41;
         public const byte Metempsychosis = 42;
+        public const byte VirtualInsanity = 43;
 
         public static Dictionary<string, byte> StandTypes = new Dictionary<string, byte>()
         {
@@ -143,7 +145,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
             { "TheFates", TheFates },
             { "TheWorldOverHeaven", TheWorldOverHeaven },
             { "WaywardSon", WaywardSon },
-            { "Metempsychosis", Metempsychosis }
+            { "Metempsychosis", Metempsychosis },
+            { "VirtualInsanity", VirtualInsanity }
         };
 
         private Vector2 secondaryDirection;
@@ -217,6 +220,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                 canAttack = standAbilities.canAttack;
                 canDraw = standAbilities.canDraw;
                 limitDistance = standAbilities.limitDistance;
+                vacuumBonus = standAbilities.vacuumBonus;
             }
 
             if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
@@ -247,7 +251,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                                     {
                                         Vector2 direction = Projectile.Center - npc.Center;
                                         direction.Normalize();
-                                        direction *= AttackVacuumForce;
+                                        direction *= AttackVacuumForce + vacuumBonus;
                                         npc.velocity += direction;
                                     }
                                 }
@@ -490,7 +494,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                                     {
                                         Vector2 direction = Projectile.Center - npc.Center;
                                         direction.Normalize();
-                                        direction *= AttackVacuumForce;
+                                        direction *= AttackVacuumForce + vacuumBonus;
                                         npc.velocity += direction;
                                     }
                                 }

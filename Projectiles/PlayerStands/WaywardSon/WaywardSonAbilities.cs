@@ -39,6 +39,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
         public bool canAttack = true;
         public bool canDraw = true;
         public bool limitDistance = true;
+        public float vacuumBonus = 0f;
 
         private const byte Aerosmith = 0;
         private const byte BadCompany = 1;
@@ -83,6 +84,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
         private const byte WaywardSon = 40;
         private const byte GoldExperienceRequiem = 41;
         private const byte Metempsychosis = 42;
+        private const byte VirtualInsanity = 43;
 
         public WaywardSonAbilities(int standTier)
         {
@@ -1493,6 +1495,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                     }
                 }
             }
+            else if (currentStandType == VirtualInsanity)
+            {
+                if (!player.HasBuff(ModContent.BuffType<PowerInstall>()))
+                    player.AddBuff(ModContent.BuffType<PowerInstall>(), 2 * 60 * 60);
+                else
+                    player.ClearBuff(ModContent.BuffType<PowerInstall>());
+            }
         }
 
         public void StandEffects()
@@ -1509,6 +1518,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                 Vector3 lightLevel = Lighting.GetColor((int)standOwner.Center.X / 16, (int)standOwner.Center.Y / 16).ToVector3();       //1.703 is max light
                 if (lightLevel.Length() > 1.3f)
                     standOwner.statDefense += (int)(standOwner.statDefense * 0.5f);
+            }
+            else if (currentStandType == VirtualInsanity)
+            {
+                if (standOwner.HasBuff<PowerInstall>())
+                    vacuumBonus += 0.15f;
             }
         }
 
@@ -1796,6 +1810,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                         if (Main.rand.Next(0, 7 + 1) != 0)
                             Main.dust[dustIndex].noLight = true;
                     }
+                }
+            }
+            else if (currentStandType == VirtualInsanity)
+            {
+                if (standOwner.HasBuff<PowerInstall>())
+                {
+                    for (int i = 0; i < 2; i++)
+                        Main.dust[Dust.NewDust(target.position, target.width, target.height, DustID.Electric)].noGravity = true;
+                    SoundEngine.PlaySound(SoundID.Item62, target.Center);
                 }
             }
         }

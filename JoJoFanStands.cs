@@ -1,8 +1,6 @@
-using JoJoFanStands.Buffs;
 using JoJoFanStands.Items.Armor;
 using JoJoFanStands.Items.Stands;
 using JoJoFanStands.Projectiles.PlayerStands.Blur;
-using JoJoFanStands.Projectiles.PlayerStands.SlavesOfFear;
 using JoJoFanStands.Projectiles.PlayerStands.TheWorldOverHeaven;
 using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity;
 using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir;
@@ -12,6 +10,7 @@ using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.PowerMusclerDir;
 using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir;
 using JoJoFanStands.Projectiles.PlayerStands.WaywardSon;
 using JoJoStands.UI;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
@@ -22,12 +21,15 @@ namespace JoJoFanStands
     public class JoJoFanStands : Mod
     {
         public static Mod JoJoStandsMod;
+        public static Mod JoJoStandsSoundsMod;
+        public static bool SoundsLoaded;
         public static JoJoFanStands Instance;
 
         public override void Load()
         {
             Instance = ModContent.GetInstance<JoJoFanStands>();
             JoJoStandsMod = ModLoader.GetMod("JoJoStands");
+            SoundsLoaded = ModLoader.TryGetMod("JoJoStandsSounds", out JoJoStandsSoundsMod);
 
 
             BlurStandT1.punchTextures = new Texture2D[2];
@@ -38,6 +40,7 @@ namespace JoJoFanStands
             VirtualInsanityStandFinal.AttackStyleTextures[0] = ModContent.Request<Texture2D>("JoJoFanStands/Extras/FistKanji", AssetRequestMode.ImmediateLoad).Value;
             VirtualInsanityStandFinal.AttackStyleTextures[1] = ModContent.Request<Texture2D>("JoJoFanStands/Extras/SwordKanji", AssetRequestMode.ImmediateLoad).Value;
             VirtualInsanityStandFinal.AttackStyleTextures[2] = ModContent.Request<Texture2D>("JoJoFanStands/Extras/GunKanji", AssetRequestMode.ImmediateLoad).Value;
+            VirtualInsanityStandFinal.PowerInstallKanji = ModContent.Request<Texture2D>("JoJoFanStands/Extras/PowerInstallKanji", AssetRequestMode.ImmediateLoad).Value;
 
             VirtualInsanityStandFinal.PortalTextures = new Texture2D[3];
             VirtualInsanityStandFinal.PortalTextures[0] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Portal/PortalOpen", AssetRequestMode.ImmediateLoad).Value;
@@ -98,6 +101,20 @@ namespace JoJoFanStands
             JoJoStands.JoJoStands.timestopImmune.Add(ModContent.ProjectileType<TheWorldOverHeavenStandFinal>());
             JoJoStands.JoJoStands.timestopImmune.Add(ModContent.ProjectileType<WaywardSonStandT3>());
             JoJoStands.JoJoStands.timestopImmune.Add(ModContent.ProjectileType<WaywardSonStandFinal>());
+        }
+
+        public override void PostSetupContent()
+        {
+            if (SoundsLoaded)
+            {
+                Asset<SoundEffect> powerInstallTheme;
+                if (JoJoStandsSoundsMod.RequestAssetIfExists<SoundEffect>("JoJoStandsSounds/Sounds/Themes/VirtualInsanity/PowerInstall_2", out powerInstallTheme))
+                    VirtualInsanityStandT2.PowerInstallTheme = (SoundEffect)powerInstallTheme;
+                if (JoJoStandsSoundsMod.RequestAssetIfExists<SoundEffect>("JoJoStandsSounds/Sounds/Themes/VirtualInsanity/PowerInstall_3", out powerInstallTheme))
+                    VirtualInsanityStandT3.PowerInstallTheme = (SoundEffect)powerInstallTheme;
+                if (JoJoStandsSoundsMod.RequestAssetIfExists<SoundEffect>("JoJoStandsSounds/Sounds/Themes/VirtualInsanity/PowerInstall_4", out powerInstallTheme))
+                    VirtualInsanityStandFinal.PowerInstallTheme = (SoundEffect)powerInstallTheme;
+            }
         }
 
         public override void Unload()

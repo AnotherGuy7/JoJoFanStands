@@ -38,6 +38,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
         public bool canAttack = true;
         public bool canDraw = true;
         public bool limitDistance = true;
+        private float vacuumBonus = 0f;
 
         //private readonly Point HeadParticlePoint = new Point(37 - 6, 11 - 4);
         //private readonly Point ArmParticlePoint = new Point(18, 42);
@@ -110,6 +111,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                 canAttack = standAbilities.canAttack;
                 canDraw = standAbilities.canDraw;
                 limitDistance = standAbilities.limitDistance;
+                vacuumBonus = standAbilities.vacuumBonus;
             }
 
             if (mPlayer.standControlStyle == MyPlayer.StandControlStyle.Manual)
@@ -140,7 +142,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                                     {
                                         Vector2 direction = Projectile.Center - npc.Center;
                                         direction.Normalize();
-                                        direction *= AttackVacuumForce;
+                                        direction *= AttackVacuumForce + vacuumBonus;
                                         npc.velocity += direction;
                                     }
                                 }
@@ -372,7 +374,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.WaywardSon
                                     {
                                         Vector2 direction = Projectile.Center - npc.Center;
                                         direction.Normalize();
-                                        direction *= AttackVacuumForce;
+                                        direction *= AttackVacuumForce + vacuumBonus;
                                         npc.velocity += direction;
                                     }
                                 }

@@ -783,6 +783,9 @@ Mods: {
 			ChargedShot2.DisplayName: Charged Shot2
 			ChargedShot3.DisplayName: Charged Shot3
 			Plasma.DisplayName: Plasma
+			VirtualInsanityStandT2.DisplayName: Virtual Insanity Stand T2
+			VirtualInsanityStandT3.DisplayName: Virtual Insanity Stand T3
+			VirtualInsanityStandT1.DisplayName: Virtual Insanity Stand T1
 		}
 
 		Configs: {

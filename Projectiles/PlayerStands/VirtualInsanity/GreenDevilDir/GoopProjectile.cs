@@ -14,11 +14,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GreenDevilDir
     {
         public static Texture2D stuckOnSurfaceSpritesheet;
 
-        public static readonly SoundStyle ImpactSound1 = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GreenDevil/GoopImpact1")
+        public static readonly SoundStyle ImpactSound1 = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/GreenDevil/GoopImpact1")
         {
             Volume = JoJoStands.JoJoStands.ModSoundsVolume
         };
-        public static readonly SoundStyle ImpactSound2 = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/GreenDevil/GoopImpact2")
+        public static readonly SoundStyle ImpactSound2 = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/GreenDevil/GoopImpact2")
         {
             Volume = JoJoStands.JoJoStands.ModSoundsVolume
         };
@@ -145,7 +145,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GreenDevilDir
             if (!foundOpenTile)
                 Projectile.Kill();
             else
-                SoundEngine.PlaySound(Main.rand.Next(0, 1 + 1) == 0 ? ImpactSound1 : ImpactSound2, Projectile.Center);
+            {
+                if (JoJoFanStands.SoundsLoaded)
+                    SoundEngine.PlaySound(Main.rand.Next(0, 1 + 1) == 0 ? ImpactSound1 : ImpactSound2, Projectile.Center);
+            }
 
             return false;
         }

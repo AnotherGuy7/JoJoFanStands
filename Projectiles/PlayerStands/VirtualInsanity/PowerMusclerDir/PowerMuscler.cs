@@ -12,28 +12,18 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.PowerMusclerDir
     {
         public static Texture2D spawnSheet;
 
-        public static readonly SoundStyle FlySound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/PowerMuscler/PowerMusclerThrown")
+        public static readonly SoundStyle FlySound = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/PowerMuscler/PowerMusclerThrown")
         {
             Volume = JoJoStands.JoJoStands.ModSoundsVolume
         };
-        public static readonly SoundStyle CrashSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/PowerMuscler/MetalCrash")
+        public static readonly SoundStyle CrashSound = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/PowerMuscler/MetalCrash")
         {
             Volume = JoJoStands.JoJoStands.ModSoundsVolume
         };
-        public static readonly SoundStyle ImpactSound = new SoundStyle("JoJoFanStands/Sounds/SoundEffects/PowerMuscler/Impact")
+        public static readonly SoundStyle ImpactSound = new SoundStyle("JoJoStandsSounds/Sounds/SoundEffects/PowerMuscler/Impact")
         {
             Volume = JoJoStands.JoJoStands.ModSoundsVolume
         };
-
-        /*public static readonly SoundStyle[] SpawnSounds = new SoundStyle[6]
-        {
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/PowerMuscler/PowerMusclerProjectileSpawn") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/PowerMuscler/PowerMusclerSpawn1") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/PowerMuscler/PowerMusclerSpawn2") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/PowerMuscler/PowerMusclerSpawn3") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/PowerMuscler/PowerMusclerSpawn4") { Volume = JoJoStands.JoJoStands.ModSoundsVolume },
-            new SoundStyle("JoJoFanStands/Sounds/SoundEffects/PowerMuscler/PowerMusclerSpawn5") { Volume = JoJoStands.JoJoStands.ModSoundsVolume }
-        };*/
 
         public override void SetStaticDefaults()
         {
@@ -102,8 +92,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.PowerMusclerDir
             if (!playedSpawnSound)
             {
                 playedSpawnSound = true;
-                SoundEngine.PlaySound(FlySound, Projectile.Center);
-                //SoundEngine.PlaySound(SpawnSounds[Main.rand.Next(1, SpawnSounds.Length)], Projectile.Center);
+                if (JoJoFanStands.SoundsLoaded)
+                    SoundEngine.PlaySound(FlySound, Projectile.Center);
             }
         }
 
@@ -118,8 +108,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.PowerMusclerDir
                 int projIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, perturbedSpeed, ModContent.ProjectileType<PowerPieces>(), Projectile.damage, Projectile.knockBack / 2f, Projectile.owner);
                 Main.projectile[projIndex].netUpdate = true;
             }
-            SoundEngine.PlaySound(CrashSound, Projectile.Center);
-            SoundEngine.PlaySound(ImpactSound, Projectile.Center);
+            if (JoJoFanStands.SoundsLoaded)
+            {
+                SoundEngine.PlaySound(CrashSound, Projectile.Center);
+                SoundEngine.PlaySound(ImpactSound, Projectile.Center);
+            }
         }
 
         public override bool PreDraw(ref Color lightColor)

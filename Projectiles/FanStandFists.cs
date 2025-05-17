@@ -90,7 +90,8 @@ namespace JoJoFanStands.Projectiles
                     }
                     SoundEngine.PlaySound(SoundID.Item62, Projectile.Center);
                 }
-                SoundEngine.PlaySound(Main.rand.NextBool() ? VirtualInsanityStandFinal.PunchLand1 : VirtualInsanityStandFinal.PunchLand2, Projectile.Center);
+                if (JoJoFanStands.SoundsLoaded)
+                    SoundEngine.PlaySound(Main.rand.NextBool() ? VirtualInsanityStandFinal.PunchLand1 : VirtualInsanityStandFinal.PunchLand2, Projectile.Center);
             }
         }
 
