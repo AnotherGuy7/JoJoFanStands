@@ -107,13 +107,9 @@ namespace JoJoFanStands
         {
             if (SoundsLoaded)
             {
-                Asset<SoundEffect> powerInstallTheme;
-                if (JoJoStandsSoundsMod.RequestAssetIfExists<SoundEffect>("JoJoStandsSounds/Sounds/Themes/VirtualInsanity/PowerInstall_2", out powerInstallTheme))
-                    VirtualInsanityStandT2.PowerInstallTheme = (SoundEffect)powerInstallTheme;
-                if (JoJoStandsSoundsMod.RequestAssetIfExists<SoundEffect>("JoJoStandsSounds/Sounds/Themes/VirtualInsanity/PowerInstall_3", out powerInstallTheme))
-                    VirtualInsanityStandT3.PowerInstallTheme = (SoundEffect)powerInstallTheme;
-                if (JoJoStandsSoundsMod.RequestAssetIfExists<SoundEffect>("JoJoStandsSounds/Sounds/Themes/VirtualInsanity/PowerInstall_4", out powerInstallTheme))
-                    VirtualInsanityStandFinal.PowerInstallTheme = (SoundEffect)powerInstallTheme;
+                VirtualInsanityStandT2.PowerInstallTheme = ModContent.Request<SoundEffect>("JoJoStandsSounds/Sounds/Themes/VirtualInsanity/PowerInstall_2", AssetRequestMode.ImmediateLoad).Value;
+                VirtualInsanityStandT3.PowerInstallTheme = ModContent.Request<SoundEffect>("JoJoStandsSounds/Sounds/Themes/VirtualInsanity/PowerInstall_3", AssetRequestMode.ImmediateLoad).Value;
+                VirtualInsanityStandFinal.PowerInstallTheme = ModContent.Request<SoundEffect>("JoJoStandsSounds/Sounds/Themes/VirtualInsanity/PowerInstall_4", AssetRequestMode.ImmediateLoad).Value;
             }
         }
 

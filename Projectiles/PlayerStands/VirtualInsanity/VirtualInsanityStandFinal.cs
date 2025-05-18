@@ -42,7 +42,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
             Pose
         }
 
-        private const int PowerInstallDuration = 90 * 60;
+        private const float PowerInstallDuration = 90f * 60f;
 
         private int mouseRightHoldTimer = 0;
         private bool powerInstallBuff = false;
@@ -172,11 +172,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
             if (powerInstallBuff && attackType == Attack_Barrage)
                 newPunchTime /= 2;
 
-            if (!powerInstallAnimation && !playerHasAbilityCooldown && SecondSpecialKeyPressed(false))
+            if (!throwingProjectile && !powerInstallAnimation && !playerHasAbilityCooldown && SecondSpecialKeyPressed(false))
             {
                 if (!player.HasBuff(ModContent.BuffType<PowerInstall>()))
                 {
-                    player.AddBuff(ModContent.BuffType<PowerInstall>(), 2 * 60 * 60);
+                    player.AddBuff(ModContent.BuffType<PowerInstall>(), (int)PowerInstallDuration);
                     powerInstallAnimation = true;
                     attackChangeEffectTimer = 60;
                 }
@@ -392,7 +392,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                         Projectile.netUpdate = true;
                         if (attackType == Attack_Barrage)       //throw
                         {
-                            if (!throwingProjectile)
+                            if (!playerHasAbilityCooldown && !throwingProjectile)
                             {
                                 throwingProjectile = true;
                                 portalSpawned = false;
@@ -598,7 +598,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     }
                 }
 
-                if (SpecialKeyPressed(false))
+                if (!throwingProjectile && !powerInstallAnimation && SpecialKeyPressed(false))
                 {
                     attackType++;
                     if (attackType > Attack_Cannon)
@@ -748,7 +748,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                 projectileToThrow = Main.projectile[Projectile.NewProjectile(Projectile.GetSource_FromThis(), projectileCenter, shootVelocity, ThrowProjectiles[randomIndex], damage, knockback, Projectile.owner, newPunchDamage * 3 / 4)];
                 projectileToThrow.spriteDirection = projectileToThrow.direction = -Projectile.spriteDirection;
                 projectileToThrow.alpha = 255;
-                Main.player[Projectile.owner].AddBuff(ModContent.BuffType<AbilityCooldown>(), Main.player[Projectile.owner].GetModPlayer<MyPlayer>().AbilityCooldownTime(15 / TierNumber));
+                Main.player[Projectile.owner].AddBuff(ModContent.BuffType<AbilityCooldown>(), Main.player[Projectile.owner].GetModPlayer<MyPlayer>().AbilityCooldownTime(25 / TierNumber));
                 if (JoJoFanStands.SoundsLoaded)
                     SoundEngine.PlaySound(Main.rand.Next(0, 1 + 1) == 0 ? ThrowableSpawn1 : ThrowableSpawn2, Projectile.Center);
             }

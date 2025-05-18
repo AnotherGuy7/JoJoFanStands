@@ -1,14 +1,6 @@
-using JoJoFanStands.Buffs;
-using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir;
-using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GlueManDir;
-using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GreenDevilDir;
-using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.PowerMusclerDir;
-using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir;
 using JoJoStands;
-using JoJoStands.Buffs.Debuffs;
 using JoJoStands.Projectiles.PlayerStands;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
@@ -39,12 +31,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
         private readonly string[] AttackStyleNames = new string[3] { "Barrage", "Sword", "Cannon" };
         private readonly int[] AttackStyleIdleFrameAmounts = new int[3] { 5, 5, 4 };
         private readonly int[] AttackStyleAttackFrameAmounts = new int[3] { 17, 18, 4 };
-        public static Texture2D[] AttackStyleTextures;
-        public static Texture2D[] PortalTextures;
-        public static Texture2D[] ArmCannonSpritesheets;
-        public static Texture2D[] CannonHeadSpritesheets;
-        public static Texture2D[] CannonHeadFlashSpritesheets;
-        public static Texture2D PowerInstallKanji;
         private readonly Vector2 ArmPlacementOffset = new Vector2(40 - 29, 18 + 39);
 
         public struct AnimationData
@@ -262,7 +248,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                 Vector2 drawOffset = StandOffset - new Vector2(0f, HalfStandHeight * 2);
                 drawOffset.X *= Projectile.spriteDirection;
                 Vector2 drawPosition = Projectile.Center - Main.screenPosition + drawOffset;
-                Main.EntitySpriteDraw(AttackStyleTextures[attackType], drawPosition, null, bodyColor * Math.Clamp(attackChangeEffectTimer / 60f, 0f, 1f), 0f, new Vector2(43), 1f, SpriteEffects.None);
+                Main.EntitySpriteDraw(VirtualInsanityStandFinal.AttackStyleTextures[attackType], drawPosition, null, bodyColor * Math.Clamp(attackChangeEffectTimer / 60f, 0f, 1f), 0f, new Vector2(43), 1f, SpriteEffects.None);
             }
             if (attackType == Attack_Cannon)
             {
@@ -283,7 +269,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                 if (Projectile.spriteDirection == -1)
                     armOrigin.Y -= 8;
 
-                Main.EntitySpriteDraw(ArmCannonSpritesheets[textureType], drawPosition, animRect, bodyColor, rotation, armOrigin, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically);
+                Main.EntitySpriteDraw(VirtualInsanityStandFinal.ArmCannonSpritesheets[textureType], drawPosition, animRect, bodyColor, rotation, armOrigin, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically);
             }
 
             return true;
@@ -308,9 +294,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     Vector2 standOrigin = new Vector2(standTexture.Width / 2f, frameHeight / 2f);
                     int textureIndex = Math.Clamp((int)((Main.MouseScreen.Y / Main.screenHeight) * 3), 0, 2);
                     if (currentAnimationState != AnimationState.Attack)
-                        Main.EntitySpriteDraw(CannonHeadSpritesheets[textureIndex], drawPosition, animRect, bodyColor, Projectile.rotation, standOrigin, Projectile.scale, effects, 0);
+                        Main.EntitySpriteDraw(VirtualInsanityStandFinal.CannonHeadSpritesheets[textureIndex], drawPosition, animRect, bodyColor, Projectile.rotation, standOrigin, Projectile.scale, effects, 0);
                     else if (currentAnimationState == AnimationState.Attack)
-                        Main.EntitySpriteDraw(CannonHeadFlashSpritesheets[textureIndex], drawPosition, animRect, bodyColor, Projectile.rotation, standOrigin, Projectile.scale, effects, 0);
+                        Main.EntitySpriteDraw(VirtualInsanityStandFinal.CannonHeadFlashSpritesheets[textureIndex], drawPosition, animRect, bodyColor, Projectile.rotation, standOrigin, Projectile.scale, effects, 0);
                 }
             }
         }

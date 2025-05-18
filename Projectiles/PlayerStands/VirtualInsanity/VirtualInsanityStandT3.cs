@@ -41,7 +41,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
             Pose
         }
 
-        private const int PowerInstallDuration = 60 * 60;
+        private const float PowerInstallDuration = 60f * 60f;
 
         private int mouseRightHoldTimer = 0;
         private bool powerInstallBuff = false;
@@ -61,12 +61,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
         private readonly int[] AttackStyleAttackFrameAmounts = new int[3] { 17, 18, 4 };
         private readonly int[] ThrowProjectiles = new int[5] { ModContent.ProjectileType<YellowDevil>(), ModContent.ProjectileType<GreenDevil>(), ModContent.ProjectileType<BombTelly>(), ModContent.ProjectileType<GlueMan>(), ModContent.ProjectileType<PowerMuscler>() };
         private readonly Vector2[] ThrowProjectilesOffset = new Vector2[5] { new Vector2(16, -63), new Vector2(16, -53), new Vector2(36, -66), new Vector2(12, -46), new Vector2(16, -58) };
-        public static Texture2D[] AttackStyleTextures;
-        public static Texture2D[] PortalTextures;
-        public static Texture2D[] ArmCannonSpritesheets;
-        public static Texture2D[] CannonHeadSpritesheets;
-        public static Texture2D[] CannonHeadFlashSpritesheets;
-        public static Texture2D PowerInstallKanji;
         private readonly Vector2 ArmPlacementOffset = new Vector2(40 - 29, 18 + 39);
         private int portalFrame;
         private int portalFrameCounter;
@@ -110,11 +104,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
             if (powerInstallBuff && attackType == Attack_Barrage)
                 newPunchTime /= 2;
 
-            if (!powerInstallAnimation && !playerHasAbilityCooldown && SecondSpecialKeyPressed(false))
+            if (!throwingProjectile && !powerInstallAnimation && !playerHasAbilityCooldown && SecondSpecialKeyPressed(false))
             {
                 if (!player.HasBuff(ModContent.BuffType<PowerInstall>()))
                 {
-                    player.AddBuff(ModContent.BuffType<PowerInstall>(), 2 * 60 * 60);
+                    player.AddBuff(ModContent.BuffType<PowerInstall>(), (int)PowerInstallDuration);
                     powerInstallAnimation = true;
                     attackChangeEffectTimer = 60;
                 }
@@ -330,7 +324,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                         Projectile.netUpdate = true;
                         if (attackType == Attack_Barrage)       //throw
                         {
-                            if (!throwingProjectile)
+                            if (!playerHasAbilityCooldown && !throwingProjectile)
                             {
                                 throwingProjectile = true;
                                 portalSpawned = false;
@@ -536,7 +530,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     }
                 }
 
-                if (SpecialKeyPressed(false))
+                if (!throwingProjectile && !powerInstallAnimation && SpecialKeyPressed(false))
                 {
                     attackType++;
                     if (attackType > Attack_Cannon)
@@ -582,7 +576,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     Vector2 drawOffset = StandOffset - new Vector2(0f, HalfStandHeight * 2);
                     drawOffset.X *= Projectile.spriteDirection;
                     Vector2 drawPosition = Projectile.Center - Main.screenPosition + drawOffset;
-                    Main.EntitySpriteDraw(PowerInstallKanji, drawPosition, null, bodyColor * Math.Clamp(attackChangeEffectTimer / 60f, 0f, 1f), 0f, new Vector2(123, 53), 1f, SpriteEffects.None);
+                    Main.EntitySpriteDraw(VirtualInsanityStandFinal.PowerInstallKanji, drawPosition, null, bodyColor * Math.Clamp(attackChangeEffectTimer / 60f, 0f, 1f), 0f, new Vector2(123, 53), 1f, SpriteEffects.None);
                 }
                 else
                 {
@@ -590,7 +584,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     Vector2 drawOffset = StandOffset - new Vector2(0f, HalfStandHeight * 2);
                     drawOffset.X *= Projectile.spriteDirection;
                     Vector2 drawPosition = Projectile.Center - Main.screenPosition + drawOffset;
-                    Main.EntitySpriteDraw(AttackStyleTextures[attackType], drawPosition, null, bodyColor * Math.Clamp(attackChangeEffectTimer / 60f, 0f, 1f), 0f, new Vector2(43), 1f, SpriteEffects.None);
+                    Main.EntitySpriteDraw(VirtualInsanityStandFinal.AttackStyleTextures[attackType], drawPosition, null, bodyColor * Math.Clamp(attackChangeEffectTimer / 60f, 0f, 1f), 0f, new Vector2(43), 1f, SpriteEffects.None);
                 }
             }
             if (attackType == Attack_Cannon)
@@ -612,7 +606,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                 if (Projectile.spriteDirection == -1)
                     armOrigin.Y -= 8;
 
-                Main.EntitySpriteDraw(ArmCannonSpritesheets[textureType], drawPosition, animRect, bodyColor, rotation, armOrigin, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically);
+                Main.EntitySpriteDraw(VirtualInsanityStandFinal.ArmCannonSpritesheets[textureType], drawPosition, animRect, bodyColor, rotation, armOrigin, 1f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically);
             }
 
             return true;
@@ -626,7 +620,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                 Vector2 drawOffset = StandOffset - new Vector2(0f, HalfStandHeight * 2);
                 drawOffset.X *= Projectile.spriteDirection;
                 Vector2 drawPosition = Projectile.Center - Main.screenPosition + drawOffset;
-                Main.EntitySpriteDraw(PortalTextures[portalAnimationIndex], drawPosition, new Rectangle(0, 100 * portalFrame, 100, 100), Color.White, 0f, new Vector2(50), 1f, SpriteEffects.None);
+                Main.EntitySpriteDraw(VirtualInsanityStandFinal.PortalTextures[portalAnimationIndex], drawPosition, new Rectangle(0, 100 * portalFrame, 100, 100), Color.White, 0f, new Vector2(50), 1f, SpriteEffects.None);
             }
             if (attackType == Attack_Cannon)
             {
@@ -644,9 +638,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     Vector2 standOrigin = new Vector2(standTexture.Width / 2f, frameHeight / 2f);
                     int textureIndex = Math.Clamp((int)((Main.MouseScreen.Y / Main.screenHeight) * 3), 0, 2);
                     if (currentAnimationState != AnimationState.Attack)
-                        Main.EntitySpriteDraw(CannonHeadSpritesheets[textureIndex], drawPosition, animRect, bodyColor, Projectile.rotation, standOrigin, Projectile.scale, effects, 0);
+                        Main.EntitySpriteDraw(VirtualInsanityStandFinal.CannonHeadSpritesheets[textureIndex], drawPosition, animRect, bodyColor, Projectile.rotation, standOrigin, Projectile.scale, effects, 0);
                     else if (currentAnimationState == AnimationState.Attack)
-                        Main.EntitySpriteDraw(CannonHeadFlashSpritesheets[textureIndex], drawPosition, animRect, bodyColor, Projectile.rotation, standOrigin, Projectile.scale, effects, 0);
+                        Main.EntitySpriteDraw(VirtualInsanityStandFinal.CannonHeadFlashSpritesheets[textureIndex], drawPosition, animRect, bodyColor, Projectile.rotation, standOrigin, Projectile.scale, effects, 0);
                 }
             }
         }
@@ -686,7 +680,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                 projectileToThrow = Main.projectile[Projectile.NewProjectile(Projectile.GetSource_FromThis(), projectileCenter, shootVelocity, ThrowProjectiles[randomIndex], damage, knockback, Projectile.owner, newPunchDamage * 3 / 4)];
                 projectileToThrow.spriteDirection = projectileToThrow.direction = -Projectile.spriteDirection;
                 projectileToThrow.alpha = 255;
-                Main.player[Projectile.owner].AddBuff(ModContent.BuffType<AbilityCooldown>(), Main.player[Projectile.owner].GetModPlayer<MyPlayer>().AbilityCooldownTime(15 / TierNumber));
+                Main.player[Projectile.owner].AddBuff(ModContent.BuffType<AbilityCooldown>(), Main.player[Projectile.owner].GetModPlayer<MyPlayer>().AbilityCooldownTime(25 / TierNumber));
                 if (JoJoFanStands.SoundsLoaded)
                     SoundEngine.PlaySound(Main.rand.Next(0, 1 + 1) == 0 ? VirtualInsanityStandFinal.ThrowableSpawn1 : VirtualInsanityStandFinal.ThrowableSpawn2, Projectile.Center);
             }
