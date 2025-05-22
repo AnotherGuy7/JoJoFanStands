@@ -41,6 +41,7 @@ namespace JoJoFanStands
             VirtualInsanityStandFinal.AttackStyleTextures[1] = ModContent.Request<Texture2D>("JoJoFanStands/Extras/SwordKanji", AssetRequestMode.ImmediateLoad).Value;
             VirtualInsanityStandFinal.AttackStyleTextures[2] = ModContent.Request<Texture2D>("JoJoFanStands/Extras/GunKanji", AssetRequestMode.ImmediateLoad).Value;
             VirtualInsanityStandFinal.PowerInstallKanji = ModContent.Request<Texture2D>("JoJoFanStands/Extras/PowerInstallKanji", AssetRequestMode.ImmediateLoad).Value;
+            VirtualInsanityStandFinal.PowerInstallAuraSpritesheet = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Aura", AssetRequestMode.ImmediateLoad).Value;
 
             VirtualInsanityStandFinal.PortalTextures = new Texture2D[3];
             VirtualInsanityStandFinal.PortalTextures[0] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Portal/PortalOpen", AssetRequestMode.ImmediateLoad).Value;
@@ -61,6 +62,14 @@ namespace JoJoFanStands
             VirtualInsanityStandFinal.CannonHeadFlashSpritesheets[0] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Cannon_HeadUpFlash", AssetRequestMode.ImmediateLoad).Value;
             VirtualInsanityStandFinal.CannonHeadFlashSpritesheets[1] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Cannon_HeadStraightFlash", AssetRequestMode.ImmediateLoad).Value;
             VirtualInsanityStandFinal.CannonHeadFlashSpritesheets[2] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Cannon_HeadDownFlash", AssetRequestMode.ImmediateLoad).Value;
+
+            VirtualInsanityStandFinal.BigSlashFrames = new Texture2D[25];
+            for (int i = 0; i < VirtualInsanityStandFinal.BigSlashFrames.Length; i++)
+                VirtualInsanityStandFinal.BigSlashFrames[i] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Sword_Slash" + (i + 1), AssetRequestMode.ImmediateLoad).Value;
+
+            VirtualInsanityStandFinal.LightningSheets = new Texture2D[4];
+            for (int i = 0; i < VirtualInsanityStandFinal.LightningSheets.Length; i++)
+                VirtualInsanityStandFinal.LightningSheets[i] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Lightning" + (i + 1), AssetRequestMode.ImmediateLoad).Value;
 
             YellowDevil.splitUpTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/YellowDevilDir/YellowDevil_SplitUp", AssetRequestMode.ImmediateLoad).Value;
 

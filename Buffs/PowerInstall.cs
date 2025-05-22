@@ -25,12 +25,7 @@ namespace JoJoFanStands.Buffs
 
         public override void OnBuffEnd(Player player)
         {
-            int buffIndex = player.FindBuffIndex(Type);
-            if (buffIndex >= 0 && buffIndex < player.buffTime.Length)
-            {
-                float powerInstallCompletion = ((2f * 60f * 60f) - player.buffTime[buffIndex]) / (2f * 60f * 60f);
-                player.AddBuff(ModContent.BuffType<AbilityCooldown>(), (int)(5 * 60 * 60 * powerInstallCompletion));
-            }
+            player.AddBuff(ModContent.BuffType<AbilityCooldown>(), 5 * 60 * 60);
         }
     }
 }
