@@ -33,18 +33,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
         private readonly int[] AttackStyleAttackFrameAmounts = new int[3] { 17, 18, 4 };
         private readonly Vector2 ArmPlacementOffset = new Vector2(40 - 29, 18 + 39);
 
-        public struct AnimationData
-        {
-            public int maxFrames;
-            public int frameDuration;
-
-            public AnimationData(int frames, int framesPerFrame)
-            {
-                maxFrames = frames;
-                frameDuration = framesPerFrame;
-            }
-        }
-
         public override void AI()
         {
             Player player = Main.player[Projectile.owner];

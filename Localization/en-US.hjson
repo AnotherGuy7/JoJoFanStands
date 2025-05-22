@@ -676,23 +676,55 @@ Mods: {
 			}
 
 			VirtualInsanityFinal: {
-				DisplayName: Virtual Insanity Final
-				Tooltip: ""
+				DisplayName: Virtual Insanity (Final Tier)
+				Tooltip:
+					'''
+					Left-click to use your currently selected weapon and right-click to use an alternative attack with your weapon!
+					Special: Change the active weapon type
+					Second Special: Power Install
+					Note: Power Install powers up Virtual Insanity by increasing aspects that appeal to each weapon.
+					Note: Power Install reduces max health by 18% while active.
+					Note: Power Install can be disabled and a cooldown proportionate to its active time will be applied.
+					User Name: Cryo
+					'''
 			}
 
 			VirtualInsanityT1: {
-				DisplayName: Virtual Insanity T1
-				Tooltip: ""
+				DisplayName: Virtual Insanity (Tier 1)
+				Tooltip:
+					'''
+					Left-click to use your currently selected weapon!
+					Special: Change the active weapon type
+					User Name: Cryo
+					'''
 			}
 
 			VirtualInsanityT2: {
-				DisplayName: Virtual Insanity T2
-				Tooltip: ""
+				DisplayName: Virtual Insanity (Tier 2)
+				Tooltip:
+					'''
+					Left-click to use your currently selected weapon and right-click to use an alternative attack with your weapon!
+					Special: Change the active weapon type
+					Second Special: Power Install
+					Note: Power Install powers up Virtual Insanity by increasing aspects that appeal to each weapon.
+					Note: Power Install reduces max health by 18% while active.
+					Note: Power Install can be disabled and a cooldown proportionate to its active time will be applied.
+					User Name: Cryo
+					'''
 			}
 
 			VirtualInsanityT3: {
-				DisplayName: Virtual Insanity T3
-				Tooltip: ""
+				DisplayName: Virtual Insanity (Tier 3)
+				Tooltip:
+					'''
+					Left-click to use your currently selected weapon and right-click to use an alternative attack with your weapon!
+					Special: Change the active weapon type
+					Second Special: Power Install
+					Note: Power Install powers up Virtual Insanity by increasing aspects that appeal to each weapon.
+					Note: Power Install reduces max health by 18% while active.
+					Note: Power Install can be disabled and a cooldown proportionate to its active time will be applied.
+					User Name: Cryo
+					'''
 			}
 		}
 

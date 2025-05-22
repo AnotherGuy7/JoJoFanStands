@@ -27,7 +27,7 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetDefaults()
         {
-            Item.damage = 41;
+            Item.damage = 43;
             Item.width = 42;
             Item.height = 46;
             Item.maxStack = 1;
@@ -50,7 +50,17 @@ namespace JoJoFanStands.Items.Stands
                 .AddIngredient(ItemID.Bomb, 6)
                 .AddIngredient(ItemID.IronBar, 9)
                 .AddIngredient(ItemType<WillToFight>())
-                .AddIngredient(ItemType<WillToDestroy>())
+                .AddIngredient(ItemType<WillToChange>())
+                .AddTile(ModContent.TileType<RemixTableTile>())
+                .Register();
+
+            CreateRecipe()
+                .AddIngredient(ItemType<VirtualInsanityT1>())
+                .AddIngredient(ItemID.HellstoneBar, 12)
+                .AddIngredient(ItemID.Bomb, 6)
+                .AddIngredient(ItemID.LeadBar, 9)
+                .AddIngredient(ItemType<WillToFight>())
+                .AddIngredient(ItemType<WillToChange>())
                 .AddTile(ModContent.TileType<RemixTableTile>())
                 .Register();
         }

@@ -69,7 +69,7 @@ namespace JoJoFanStands
 
             VirtualInsanityStandFinal.LightningSheets = new Texture2D[4];
             for (int i = 0; i < VirtualInsanityStandFinal.LightningSheets.Length; i++)
-                VirtualInsanityStandFinal.LightningSheets[i] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Lightning" + (i + 1), AssetRequestMode.ImmediateLoad).Value;
+                VirtualInsanityStandFinal.LightningSheets[i] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/Lightning_" + (i + 1), AssetRequestMode.ImmediateLoad).Value;
 
             YellowDevil.splitUpTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/YellowDevilDir/YellowDevil_SplitUp", AssetRequestMode.ImmediateLoad).Value;
 

@@ -27,7 +27,7 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetDefaults()
         {
-            Item.damage = 74;
+            Item.damage = 62;
             Item.width = 42;
             Item.height = 46;
             Item.maxStack = 1;
@@ -50,7 +50,7 @@ namespace JoJoFanStands.Items.Stands
                 .AddIngredient(ItemID.Ichor, 4)
                 .AddIngredient(ItemID.LifeCrystal, 2)
                 .AddIngredient(ItemType<WillToFight>(), 2)
-                .AddIngredient(ItemType<WillToDestroy>())
+                .AddIngredient(ItemType<WillToChange>())
                 .AddTile(ModContent.TileType<RemixTableTile>())
                 .Register();
         }

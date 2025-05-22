@@ -26,7 +26,7 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetDefaults()
         {
-            Item.damage = 41;
+            Item.damage = 20;
             Item.width = 42;
             Item.height = 46;
             Item.maxStack = 1;

@@ -17,7 +17,7 @@ namespace JoJoFanStands.Buffs
 
         public override void UpdateBuffOnPlayer(Player player)
         {
-            player.statLifeMax2 = (int)(player.statLifeMax2 * 0.86);
+            player.statLifeMax2 = (int)(player.statLifeMax2 * 0.82);
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             if (!mPlayer.standOut)
                 player.ClearBuff(Type);
