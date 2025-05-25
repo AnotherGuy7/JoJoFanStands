@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir
@@ -86,6 +87,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir
                             Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.position + offset, shootVelocity, ModContent.ProjectileType<YellowDevilProjectile>(), (int)Projectile.ai[0], 2f, Projectile.owner);
                             if (JoJoFanStands.SoundsLoaded)
                                 SoundEngine.PlaySound(ShootSound, Projectile.Center);
+                            else
+                                SoundEngine.PlaySound(SoundID.Item1.WithPitchOffset(-0.2f), Projectile.Center);
                         }
                     }
                 }

@@ -20,6 +20,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
             Projectile.timeLeft = 5 * 60;
             Projectile.tileCollide = true;
             Projectile.ignoreWater = true;
+            Projectile.penetrate = -1;
         }
 
         public override void AI()

@@ -1,3 +1,4 @@
+using JoJoFanStands.Buffs;
 using JoJoStands;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -46,6 +47,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GreenDevilDir
             Projectile.tileCollide = true;
             Projectile.ignoreWater = true;
             Projectile.damage = 64;
+            Projectile.penetrate = -1;
         }
 
         private bool exploding = false;
@@ -173,6 +175,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GreenDevilDir
             if (JoJoFanStands.SoundsLoaded)
                 SoundEngine.PlaySound(Main.rand.Next(0, 1 + 1) == 0 ? ImpactSound1 : ImpactSound2, Projectile.Center);
             return false;
+        }
+
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            if (!exploding)
+                exploding = true;
+            target.AddBuff(ModContent.BuffType<GreenDevilGoop>(), 60 * 60);
+            Projectile.Kill();
         }
 
         public override bool PreDraw(ref Color lightColor)

@@ -107,22 +107,22 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                                 Projectile.velocity = Vector2.Zero;
 
                             PlayPunchSound();
-                            if (Projectile.frame == 16)
+                            if (shootCount <= 0 && (Projectile.frame == 2 || Projectile.frame == 8 || Projectile.frame == 14))
                             {
-                                int rectWidth = 382;
-                                int rectHeight = 357;
+                                int rectWidth = 128;
+                                int rectHeight = 96;
                                 int rectXPosition = Projectile.direction == 1 ? (int)Projectile.position.X : (int)Projectile.position.X - rectWidth;
                                 Rectangle attackHitbox = new Rectangle(rectXPosition, (int)Projectile.position.Y - (rectHeight / 2), rectWidth, rectHeight);
+                                shootCount += newPunchTime / 2;
                                 for (int n = 0; n < Main.maxNPCs; n++)
                                 {
                                     NPC npc = Main.npc[n];
                                     if (npc.CanBeChasedBy(this) && npc.Hitbox.Intersects(attackHitbox))
                                     {
-                                        int damage = newPunchDamage * 4;
                                         NPC.HitInfo hitInfo = new NPC.HitInfo()
                                         {
-                                            Damage = damage,
-                                            Knockback = PunchKnockback * 4f,
+                                            Damage = (int)(newPunchDamage * 1.5),
+                                            Knockback = PunchKnockback * 1.5f,
                                             HitDirection = npc.direction
                                         };
                                         npc.StrikeNPC(hitInfo);

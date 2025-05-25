@@ -1,5 +1,8 @@
+using JoJoFanStands.Buffs;
+using JoJoStands;
 using Terraria;
 using Terraria.Audio;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir
@@ -24,7 +27,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.timeLeft = 180;
-            Projectile.tileCollide = true;
+            Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
         }
 
@@ -40,6 +43,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir
                 if (Projectile.frame >= Main.projFrames[Projectile.type])
                     Projectile.frame = 0;
             }
+        }
+
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().standTier >= 3)
+                target.AddBuff(BuffID.Ichor, 30 * 60);
         }
 
         public override void OnKill(int timeLeft)

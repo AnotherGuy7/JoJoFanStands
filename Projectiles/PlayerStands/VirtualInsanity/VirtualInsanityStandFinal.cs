@@ -91,6 +91,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
         private int lightningFrameCounter = 0;
         private int lightningShowTimer = 0;
         private int lightningShowTime = 0;
+        private int powerInstallBossCheckTimer = 0;
         private List<LightningData> lightningDatas = new List<LightningData>();
         public static readonly AnimationData[] PortalAnimations = new AnimationData[3] {
             new AnimationData(10, 5),
@@ -240,6 +241,39 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                         lightningFrameOffset = 0;
                 }
             }
+            if (powerInstallBuff && powerInstallBossCheckTimer > 0)
+            {
+                powerInstallBossCheckTimer--;
+                if (powerInstallBossCheckTimer <= 0 && Projectile.owner == Main.myPlayer)
+                {
+                    if (PowerInstallThemeInstance == null)
+                        PowerInstallThemeInstance = PowerInstallTheme.CreateInstance();
+
+                    powerInstallBossCheckTimer = 60;
+                    if (JoJoFanStands.SoundsLoaded && powerInstallBuff)
+                    {
+                        bool playMusic = Main.bloodMoon || Main.pumpkinMoon || Main.snowMoon || Main.invasionType != 0;
+                        if (!playMusic)
+                        {
+                            for (int n = 0; n < Main.maxNPCs; n++)
+                            {
+                                if (Main.npc[n].active && Main.npc[n].boss && Main.npc[n].life > 0)
+                                {
+                                    playMusic = true;
+                                    break;
+                                }
+                            }
+
+                        }
+
+                        if (playMusic && PowerInstallThemeInstance.State != SoundState.Playing)
+                            PowerInstallThemeInstance.Play();
+                    }
+                }
+            }
+
+            if (!powerInstallBuff && PowerInstallThemeInstance != null && PowerInstallThemeInstance.State != SoundState.Stopped)
+                PowerInstallThemeInstance.Stop();
 
             bool canPerformAction = !throwingProjectile && !performingBigSlash && !powerInstallAnimation;
             if (canPerformAction && !playerHasAbilityCooldown && SecondSpecialKeyPressed(false))
@@ -250,17 +284,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     powerInstallAnimation = true;
                     attackChangeEffectTimer = 60;
                     lightningShowTime = lightningShowTimer = 40;
+                    powerInstallBossCheckTimer = 1;
                     lightningDatas.Clear();
-                    int amountOfLightning = Main.rand.Next(7, 12 + 1);
-                    for (int i = 0; i < amountOfLightning; i++)
-                    {
-                        AddLightning(Projectile.Center - new Vector2(Main.rand.Next(-120, 120 + 1), (Main.screenHeight * 3 / 4)), Projectile.Center + StandOffset);
-                        if (JoJoFanStands.SoundsLoaded && i % 2 == 0)
-                            SoundEngine.PlaySound(ElectricitySounds[Main.rand.Next(0, ElectricitySounds.Length)], Projectile.Center);
-                    }
-
+                    AddLightning(Projectile.Center - new Vector2(0, (Main.screenHeight * 3 / 4)), Projectile.Center + StandOffset);
                     if (JoJoFanStands.SoundsLoaded)
+                    {
+                        SoundEngine.PlaySound(ElectricitySounds[Main.rand.Next(0, ElectricitySounds.Length)], Projectile.Center);
                         SoundEngine.PlaySound(PowerInstall, Projectile.Center);
+                    }
                 }
                 else
                 {
@@ -269,25 +300,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                         float powerInstallCompletion = (PowerInstallDuration - player.buffTime[player.FindBuffIndex(ModContent.BuffType<PowerInstall>())]) / PowerInstallDuration;
                         player.AddBuff(ModContent.BuffType<AbilityCooldown>(), (int)(5 * 60 * 60 * powerInstallCompletion));
                         player.ClearBuff(ModContent.BuffType<PowerInstall>());
-                    }
-                }
-            }
-
-            if (JoJoFanStands.SoundsLoaded && Projectile.owner == Main.myPlayer)
-            {
-                if (PowerInstallThemeInstance == null)
-                    PowerInstallThemeInstance = PowerInstallTheme.CreateInstance();
-                else
-                {
-                    if (powerInstallBuff)
-                    {
-                        if (PowerInstallThemeInstance.State != SoundState.Playing)
-                            PowerInstallThemeInstance.Play();
-                    }
-                    else
-                    {
-                        if (PowerInstallThemeInstance.State != SoundState.Stopped)
-                            PowerInstallThemeInstance.Stop();
                     }
                 }
             }
@@ -352,58 +364,29 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                                 Projectile.velocity = Vector2.Zero;
 
                             PlayPunchSound();
-                            if (!powerInstallBuff)
+                            if (shootCount <= 0 && (Projectile.frame == 2 || Projectile.frame == 8 || Projectile.frame == 14))
                             {
-                                if (shootCount <= 0 && (Projectile.frame == 2 || Projectile.frame == 8 || Projectile.frame == 14))
+                                int rectWidth = 128;
+                                int rectHeight = 96;
+                                int rectXPosition = Projectile.direction == 1 ? (int)Projectile.position.X : (int)Projectile.position.X - rectWidth;
+                                Rectangle attackHitbox = new Rectangle(rectXPosition, (int)Projectile.position.Y - (rectHeight / 2), rectWidth, rectHeight);
+                                shootCount += newPunchTime / 2;
+                                for (int n = 0; n < Main.maxNPCs; n++)
                                 {
-                                    int rectWidth = 128;
-                                    int rectHeight = 96;
-                                    int rectXPosition = Projectile.direction == 1 ? (int)Projectile.position.X : (int)Projectile.position.X - rectWidth;
-                                    Rectangle attackHitbox = new Rectangle(rectXPosition, (int)Projectile.position.Y - (rectHeight / 2), rectWidth, rectHeight);
-                                    shootCount += newPunchTime / 2;
-                                    for (int n = 0; n < Main.maxNPCs; n++)
+                                    NPC npc = Main.npc[n];
+                                    if (npc.CanBeChasedBy(this) && npc.Hitbox.Intersects(attackHitbox))
                                     {
-                                        NPC npc = Main.npc[n];
-                                        if (npc.CanBeChasedBy(this) && npc.Hitbox.Intersects(attackHitbox))
+                                        NPC.HitInfo hitInfo = new NPC.HitInfo()
                                         {
-                                            NPC.HitInfo hitInfo = new NPC.HitInfo()
-                                            {
-                                                Damage = (int)(newPunchDamage * 1.5f),
-                                                Knockback = PunchKnockback * 1.5f,
-                                                HitDirection = npc.direction
-                                            };
-                                            npc.StrikeNPC(hitInfo);
-                                            NetMessage.SendStrikeNPC(npc, hitInfo);
-                                        }
-                                    }
-                                    SoundEngine.PlaySound(SoundID.Item1.WithPitchOffset(-0.8f), Projectile.Center);
-                                }
-                            }
-                            else
-                            {
-                                if (Projectile.frame == 16)
-                                {
-                                    int rectWidth = 382;
-                                    int rectHeight = 357;
-                                    int rectXPosition = Projectile.direction == 1 ? (int)Projectile.position.X : (int)Projectile.position.X - rectWidth;
-                                    Rectangle attackHitbox = new Rectangle(rectXPosition, (int)Projectile.position.Y - (rectHeight / 2), rectWidth, rectHeight);
-                                    for (int n = 0; n < Main.maxNPCs; n++)
-                                    {
-                                        NPC npc = Main.npc[n];
-                                        if (npc.CanBeChasedBy(this) && npc.Hitbox.Intersects(attackHitbox))
-                                        {
-                                            int damage = newPunchDamage * 4;
-                                            NPC.HitInfo hitInfo = new NPC.HitInfo()
-                                            {
-                                                Damage = damage,
-                                                Knockback = PunchKnockback * 4f,
-                                                HitDirection = npc.direction
-                                            };
-                                            npc.StrikeNPC(hitInfo);
-                                            NetMessage.SendStrikeNPC(npc, hitInfo);
-                                        }
+                                            Damage = (int)(newPunchDamage * 1.5f),
+                                            Knockback = PunchKnockback * 1.5f,
+                                            HitDirection = npc.direction
+                                        };
+                                        npc.StrikeNPC(hitInfo);
+                                        NetMessage.SendStrikeNPC(npc, hitInfo);
                                     }
                                 }
+                                SoundEngine.PlaySound(SoundID.Item1.WithPitchOffset(-0.8f), Projectile.Center);
                             }
 
                             LimitDistance();
@@ -1013,6 +996,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     damage = 48 * TierNumber;
                     knockback = 2f * TierNumber;
                     shootVelocity = Vector2.Zero;
+                }
+                else if (randomIndex == 2)
+                {
+                    damage = 40 * TierNumber;
+                    knockback = 5f * TierNumber;
                 }
                 else if (randomIndex == 3)       //Glue man
                 {

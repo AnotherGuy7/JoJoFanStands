@@ -90,6 +90,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir
             }
             if (JoJoFanStands.SoundsLoaded)
                 SoundEngine.PlaySound(ExplosionSound, Projectile.Center);
+            else
+                SoundEngine.PlaySound(SoundID.Item14, Projectile.Center);
             if (Main.player[Projectile.owner].GetModPlayer<MyPlayer>().standTier >= 3)
             {
                 int projectileIndex = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, 292, Projectile.damage, 0f, Projectile.owner);
