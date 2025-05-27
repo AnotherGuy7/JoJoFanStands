@@ -44,7 +44,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
             Pose
         }
 
-        private const float PowerInstallDuration = 90f * 60f;
+        private const float PowerInstallDuration = (2 * 60 * 60) + (35 * 60);
 
         private int mouseRightHoldTimer = 0;
         private bool powerInstallBuff = false;
@@ -298,7 +298,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity
                     if (player.HasBuff(ModContent.BuffType<PowerInstall>()))
                     {
                         float powerInstallCompletion = (PowerInstallDuration - player.buffTime[player.FindBuffIndex(ModContent.BuffType<PowerInstall>())]) / PowerInstallDuration;
-                        player.AddBuff(ModContent.BuffType<AbilityCooldown>(), (int)(5 * 60 * 60 * powerInstallCompletion));
+                        player.AddBuff(ModContent.BuffType<AbilityCooldown>(), (int)(8 * 60 * 60 * powerInstallCompletion));
                         player.ClearBuff(ModContent.BuffType<PowerInstall>());
                     }
                 }

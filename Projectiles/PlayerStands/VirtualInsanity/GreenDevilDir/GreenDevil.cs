@@ -181,8 +181,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GreenDevilDir
         {
             if (!exploding)
                 exploding = true;
+            Projectile.velocity = Vector2.Zero;
+            if (JoJoFanStands.SoundsLoaded)
+                SoundEngine.PlaySound(Main.rand.Next(0, 1 + 1) == 0 ? ImpactSound1 : ImpactSound2, Projectile.Center);
+
             target.AddBuff(ModContent.BuffType<GreenDevilGoop>(), 60 * 60);
-            Projectile.Kill();
         }
 
         public override bool PreDraw(ref Color lightColor)

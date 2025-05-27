@@ -25,7 +25,10 @@ namespace JoJoFanStands.Buffs
 
         public override void OnBuffEnd(Player player)
         {
-            player.AddBuff(ModContent.BuffType<AbilityCooldown>(), 5 * 60 * 60);
+            if (player.GetModPlayer<MyPlayer>().standTier <= 3)
+                player.AddBuff(ModContent.BuffType<AbilityCooldown>(), 5 * 60 * 60);
+            else
+                player.AddBuff(ModContent.BuffType<AbilityCooldown>(), 8 * 60 * 60);
         }
     }
 }
