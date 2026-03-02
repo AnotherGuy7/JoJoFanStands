@@ -1,4 +1,6 @@
 ﻿using JoJoFanStands.Buffs;
+using JoJoFanStands.UI.AbilityWheel.Blur;
+using JoJoFanStands.UI.AbilityWheel.HolyDiver;
 using JoJoStands;
 using JoJoStands.Buffs.Debuffs;
 using JoJoStands.Projectiles.PlayerStands;
@@ -103,7 +105,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 // Special 1 - Skill Selection Wheel
                 if (SpecialKeyPressed())
                 {
-                    // TODO: Open Skill Selection Wheel
+                    if (HolyDiverAbilityWheel.Visible)
+                        HolyDiverAbilityWheel.CloseAbilityWheel();
+                    else
+                        HolyDiverAbilityWheel.OpenAbilityWheel(mPlayer, 3);
                 }
 
                 // Special 2 - Hydro Symbiosis install form

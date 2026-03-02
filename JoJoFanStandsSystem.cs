@@ -1,5 +1,6 @@
 ﻿using JoJoFanStands.UI;
 using JoJoFanStands.UI.AbilityWheel.Blur;
+using JoJoFanStands.UI.AbilityWheel.HolyDiver;
 using JoJoStands.UI;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
@@ -15,12 +16,14 @@ namespace JoJoFanStands
         private UserInterface _lightBridgeUI;
         private UserInterface _blurBarUI;
         private UserInterface _blurAbilityWheelUI;
+        private UserInterface _holyDiverAbilityWheelUI;
         private UserInterface _soulBarUI;
 
         internal AbilityChooserUI AbilityUI;
         public static LightBridgeUI LightBridgeUI;
         public static BlurBar BlurBarUI;
         public static BlurAbilityWheel BlurAbilityWheelUI;
+        public static HolyDiverAbilityWheel HolyDiverAbilityWheelUI;
         public static SoulBar SoulBarUI;
 
         public override void Load()
@@ -46,6 +49,11 @@ namespace JoJoFanStands
                 BlurAbilityWheelUI.Activate();
                 _blurAbilityWheelUI = new UserInterface();
                 _blurAbilityWheelUI.SetState(BlurAbilityWheelUI);
+
+                HolyDiverAbilityWheelUI = new HolyDiverAbilityWheel();
+                HolyDiverAbilityWheelUI.Activate();
+                _holyDiverAbilityWheelUI = new UserInterface();
+                _holyDiverAbilityWheelUI.SetState(HolyDiverAbilityWheelUI);
 
                 SoulBarUI = new SoulBar();
                 SoulBarUI.Activate();
