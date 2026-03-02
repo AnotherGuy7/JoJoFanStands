@@ -1,9 +1,9 @@
 ﻿using JoJoFanStands.Buffs;
-using JoJoFanStands.UI.AbilityWheel.Blur;
 using JoJoFanStands.UI.AbilityWheel.HolyDiver;
 using JoJoStands;
 using JoJoStands.Buffs.Debuffs;
 using JoJoStands.Projectiles.PlayerStands;
+using JoJoStands.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
@@ -49,6 +49,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         public override void StandKillEffects()
         {
             // TODO: Hide Liquid Gauge UI
+            HolyDiverAbilityWheel.CloseAbilityWheel();
         }
 
 
