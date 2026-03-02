@@ -17,7 +17,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         public override int AltDamage => 90;
         public override int PunchTime => 5;
         public override int TierNumber => 4;
-        public override float MaxDistance => 62.5f * 16f;
         public override Vector2 StandOffset => new Vector2(-2 * 2, 0f);
         public override bool CanUseAfterImagePunches => false;
         public override StandAttackType StandType => StandAttackType.Melee;
@@ -72,18 +71,21 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 {
                     if (Main.mouseLeft)
                     {
-                        Punch(7f, afterImages: false);
+                        attacking = true;
+                        Punch();
                         currentAnimationState = AnimationState.Idle;
-                        punchAnimationTimer++;
                         Projectile.netUpdate = true;
                     }
-                    else if (Main.mouseRight)
+                    else
                     {
-                        // M2 - Ability usage (Skill Wheel abilities will go here)
+                        attacking = false;
+                    }
+
+                    if (Main.mouseRight)
+                    {
                         secondaryAbility = true;
-                        StayBehind();
+                        StayBehindWithAbility();
                         currentAnimationState = AnimationState.Secondary;
-                        Projectile.netUpdate = true;
                     }
                     else
                     {
