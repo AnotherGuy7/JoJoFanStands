@@ -21,8 +21,8 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Holy Diver (Tier 4)");
-            Tooltip.SetDefault("Left-click to unleash a scorching torrent barrage.\nUser Name: Some long name\nReference: Holy Diver by Ronnie James Dio");
+            //DisplayName.SetDefault("Holy Diver (Tier 4)");
+            //Tooltip.SetDefault("Left-click to unleash a scorching torrent barrage.\nUser Name: Some long name\nReference: Holy Diver by Ronnie James Dio");
         }
 
         public override void SetDefaults()

@@ -13,8 +13,6 @@
     <None Remove="Projectiles\PlayerStands\WaywardSon\WaywardSon_Secondary.png" />
   </ItemGroup>
   <ItemGroup>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\JoJoStands\JoJoStands.csproj" />
   </ItemGroup>
 </Project>
