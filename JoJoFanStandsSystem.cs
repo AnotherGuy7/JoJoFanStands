@@ -76,6 +76,9 @@ namespace JoJoFanStands
             if (BlurAbilityWheel.Visible)
                 _blurAbilityWheelUI.Update(gameTime);
 
+            if (HolyDiverAbilityWheel.Visible)
+                _holyDiverAbilityWheelUI.Update(gameTime);
+
             if (SoulBar.Visible)
                 _soulBarUI.Update(gameTime);
         }
@@ -83,9 +86,13 @@ namespace JoJoFanStands
         public override void Unload()
         {
             BlurAbilityWheelUI = null;
+            HolyDiverAbilityWheelUI = null;
             for (int i = 0; i < BlurAbilityWheel.blurAbilityWheel.abilityButtons.Length; i++)
                 BlurAbilityWheel.blurAbilityWheel.abilityButtons[i] = null;
+            for (int i = 0; i < HolyDiverAbilityWheel.holyDiverAbilityWheel.abilityButtons.Length; i++)
+                HolyDiverAbilityWheel.holyDiverAbilityWheel.abilityButtons[i] = null;
             BlurAbilityWheel.blurAbilityWheel = null;
+            HolyDiverAbilityWheel.holyDiverAbilityWheel = null;
         }
 
         public override void OnWorldUnload()
@@ -94,6 +101,7 @@ namespace JoJoFanStands
             GoldExperienceRequiemAbilityWheel.CloseAbilityWheel();
             StoneFreeAbilityWheel.CloseAbilityWheel();
             BlurAbilityWheel.CloseAbilityWheel();
+            HolyDiverAbilityWheel.CloseAbilityWheel();
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)     //from ExampleMod's ExampleUI
@@ -114,6 +122,9 @@ namespace JoJoFanStands
 
             if (BlurAbilityWheel.Visible)
                 _blurAbilityWheelUI.Draw(Main.spriteBatch, new GameTime());
+
+            if (HolyDiverAbilityWheel.Visible)
+                _holyDiverAbilityWheelUI.Draw(Main.spriteBatch, new GameTime());
 
             if (SoulBar.Visible)
                 _soulBarUI.Draw(Main.spriteBatch, new GameTime());
