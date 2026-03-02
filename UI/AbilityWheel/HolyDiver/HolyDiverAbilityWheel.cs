@@ -10,7 +10,7 @@ namespace JoJoFanStands.UI.AbilityWheel.HolyDiver
         public static bool Visible;
         public static HolyDiverAbilityWheel holyDiverAbilityWheel;
 
-        private const int AmountOfAbilities = 6;
+        private const int AmountOfAbilities = 5;
         public override int amountOfAbilities => AmountOfAbilities;
         public override string buttonTexturePath => "JoJoFanStands/UI/AbilityWheel/HolyDiver/";
         public override string centerTexturePath => "JoJoFanStands/Items/Stands/HolyDiverT1";
@@ -19,7 +19,6 @@ namespace JoJoFanStands.UI.AbilityWheel.HolyDiver
         {
             "  Water Replicant",
             "     Holy Water",
-            "    Water Sword",
             "Scorching Water Cannon",
             " Scorching Water Mine",
             " Water Absorption",
@@ -29,7 +28,6 @@ namespace JoJoFanStands.UI.AbilityWheel.HolyDiver
         {
             "WaterReplicant",
             "HolyWater",
-            "WaterSword",
             "ScorchingWaterCannon",
             "ScorchingWaterMine",
             "WaterAbsorption",
@@ -39,7 +37,6 @@ namespace JoJoFanStands.UI.AbilityWheel.HolyDiver
         {
             "Summon a water replicant that acts as a defensive sentry, shooting enemies from range and brawling up close.",
             "[Special]\nUse stored water to heal yourself or allies. Damages enemies and applies Burning.",
-            "[Passive]\nEquip the water katana, a precise blade that scales with stand level and applies Bleed at higher tiers.",
             "[Special]\nFire a scorching hydro pump. Hold M2 to convert it into homing water missiles targeting up to 3 enemies.",
             "[Special]\nPlace a water mine that homes in on nearby enemies, dealing extreme damage and applying Burning.",
             "[Special]\nAbsorb water from the environment or enemies to refill your liquid gauge.",
