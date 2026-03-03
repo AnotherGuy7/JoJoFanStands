@@ -7,11 +7,6 @@ using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 {
-    /// <summary>
-    /// Scorching Hot Water Cannon beam — Hydro Pump style linear projectile.
-    /// Spawned by HolyDiverStandFinal when the ability fires in beam mode (no right-click hold).
-    /// ai[0] = ownerIndex, ai[1] = unused/reserved
-    /// </summary>
     public class HolyDiverWaterCannon : ModProjectile
     {
         // How long the beam lingers before fading (in ticks)
@@ -39,8 +34,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Projectile.tileCollide = true;
             Projectile.ignoreWater = true;
             Projectile.timeLeft = BeamLifetime;
-            Projectile.penetrate = 3;            // pierces up to 3 enemies
-            Projectile.extraUpdates = 3;            // fast travel — 4× speed updates per tick
+            Projectile.penetrate = 3;
+            Projectile.extraUpdates = 3;
         }
 
         public override void AI()

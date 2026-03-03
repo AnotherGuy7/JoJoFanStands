@@ -31,30 +31,25 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         // -------------------------------------------------------
         // Water Cannon tuning
         // -------------------------------------------------------
-        /// <summary>Base damage for the Water Cannon beam.</summary>
         private const int WaterCannonDamage = 75;
-        /// <summary>Base damage for each homing missile.</summary>
         private const int WaterMissileDamage = 55;
-        /// <summary>Speed of the beam projectile (pixels per extraUpdate tick).</summary>
         private const float CannonSpeed = 18f;
-        /// <summary>Speed at which missiles are launched before homing kicks in.</summary>
         private const float MissileSpeed = 9f;
-        /// <summary>
-        /// How long (ticks) right-click must be held before missiles fire instead of the beam.
-        /// Acts as a short charge window so accidental holds don't trigger missiles.
-        /// </summary>
-        private const int MissileChargeThreshold = 12;
-        /// <summary>Cooldown in ticks between Water Cannon uses.</summary>
+        /// <summary>Ticks the Special key must be held to trigger missiles instead of beam.</summary>
+        private const int MissileChargeThreshold = 30;
         private const int WaterCannonCooldown = 45;
 
-        // Max targets scale with tier: tier 4 = 3 targets cap
         private int MaxMissileTargets => TierNumber >= 4 ? 3 : TierNumber >= 3 ? 2 : 1;
 
         private int waterCannonCooldownTimer = 0;
-        /// <summary>Tracks how many ticks right-click has been held during a Water Cannon window.</summary>
-        private int rightClickHoldTimer = 0;
-        /// <summary>True while the Water Cannon ability is in its active window (Special key has been pressed once).</summary>
-        private bool waterCannonActive = false;
+        private int specialHoldTimer = 0;
+        /// <summary>Counts down while the beam is actively firing after a tap.</summary>
+        private int beamTimer = 0;
+        /// <summary>How long (ticks) the beam fires after a tap release.</summary>
+        private const int BeamDuration = 90;
+        /// <summary>How often (ticks) the beam spawns a new projectile while active.</summary>
+        private const int BeamFireRate = 8;
+        private int beamFireRateTimer = 0;
 
         private int punchAnimationTimer = 0;
 
@@ -105,7 +100,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 if (Projectile.owner == Main.myPlayer)
                 {
                     // ---- M1: Scorching Torrent Barrage ----
-                    if (Main.mouseLeft && !waterCannonActive)
+                    if (Main.mouseLeft)
                     {
                         attacking = true;
                         Punch();
@@ -117,77 +112,74 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                         attacking = false;
                     }
 
-                    // ---- M2 while Water Cannon is active: charge for missiles ----
-                    if (waterCannonActive)
-                    {
-                        if (Main.mouseRight)
-                            rightClickHoldTimer++;
-                        else
-                            rightClickHoldTimer = 0;
-                    }
-
-                    // ---- M2 (secondary, no ability window): original secondary ----
-                    if (!waterCannonActive && Main.mouseRight)
+                    // ---- M2: Secondary ability ----
+                    if (Main.mouseRight)
                     {
                         secondaryAbility = true;
                         StayBehindWithAbility();
                         currentAnimationState = AnimationState.Secondary;
                     }
-                    else if (!waterCannonActive)
+                    else
                     {
                         secondaryAbility = false;
                     }
+
+                    // ---- Special 1: Tap = beam (fires for BeamDuration), Hold = missiles ----
+                    if (SpecialKeyCurrent() && waterCannonCooldownTimer <= 0 && beamTimer <= 0)
+                    {
+                        // Key is held — count up toward missile threshold
+                        specialHoldTimer++;
+                        currentAnimationState = AnimationState.Idle;
+
+                        if (specialHoldTimer >= MissileChargeThreshold)
+                        {
+                            FireWaterCannon(player, missile: true);
+                            waterCannonCooldownTimer = WaterCannonCooldown;
+                            specialHoldTimer = 0;
+                            Projectile.netUpdate = true;
+                        }
+                    }
+                    else if (!SpecialKeyCurrent() && specialHoldTimer > 0)
+                    {
+                        // Key was released — wait one extra frame (specialHoldTimer still > 0 here,
+                        // we decrement it so next frame it hits 0 and we know the key is truly up)
+                        specialHoldTimer--;
+                        if (specialHoldTimer == 0 && waterCannonCooldownTimer <= 0)
+                        {
+                            // Confirmed tap: start beam
+                            beamTimer = BeamDuration;
+                            beamFireRateTimer = 0;
+                            waterCannonCooldownTimer = WaterCannonCooldown + BeamDuration;
+                            Projectile.netUpdate = true;
+                        }
+                    }
+
+                    // ---- Beam active: keep firing projectiles each BeamFireRate ticks ----
+                    if (beamTimer > 0)
+                    {
+                        beamTimer--;
+                        beamFireRateTimer--;
+                        currentAnimationState = AnimationState.Idle;
+
+                        if (beamFireRateTimer <= 0)
+                        {
+                            FireWaterCannon(player, missile: false);
+                            beamFireRateTimer = BeamFireRate;
+                        }
+
+                        if (beamTimer == 0)
+                            currentAnimationState = AnimationState.Idle;
+
+                        Projectile.netUpdate = true;
+                    }
                 }
 
-                if (!attacking && !waterCannonActive)
+                if (!attacking && specialHoldTimer == 0)
                 {
                     StayBehind();
-                    currentAnimationState = AnimationState.Idle;
+                    if (!secondaryAbility)
+                        currentAnimationState = AnimationState.Idle;
                     punchAnimationTimer = 0;
-                }
-
-                // ---- Special 1: DEBUG — directly fire Water Cannon ability ----
-                if (SpecialKeyPressed() && waterCannonCooldownTimer <= 0)
-                {
-                    if (!waterCannonActive)
-                    {
-                        // Enter Water Cannon window — player now has MissileChargeThreshold ticks
-                        // to hold right-click before we fire; otherwise fires beam on release.
-                        waterCannonActive = true;
-                        rightClickHoldTimer = 0;
-                        currentAnimationState = AnimationState.KnifeThrow;
-                        Projectile.netUpdate = true;
-                    }
-                    else
-                    {
-                        // Second press cancels the window and fires beam immediately
-                        if (Projectile.owner == Main.myPlayer)
-                            FireWaterCannon(player, missile: false);
-                        waterCannonActive = false;
-                    }
-                }
-
-                // ---- Resolve Water Cannon window ----
-                if (waterCannonActive && Projectile.owner == Main.myPlayer)
-                {
-                    // If right-click held long enough -> fire missiles
-                    if (rightClickHoldTimer >= MissileChargeThreshold)
-                    {
-                        FireWaterCannon(player, missile: true);
-                        waterCannonActive = false;
-                        rightClickHoldTimer = 0;
-                        waterCannonCooldownTimer = WaterCannonCooldown;
-                        Projectile.netUpdate = true;
-                    }
-                    // Left-click while in window -> fire beam instantly
-                    else if (Main.mouseLeft)
-                    {
-                        FireWaterCannon(player, missile: false);
-                        waterCannonActive = false;
-                        rightClickHoldTimer = 0;
-                        waterCannonCooldownTimer = WaterCannonCooldown;
-                        Projectile.netUpdate = true;
-                    }
                 }
 
                 // ---- Special 2 - Hydro Symbiosis install form ----
@@ -212,14 +204,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         // -------------------------------------------------------
         // Scorching Hot Water Cannon
         // -------------------------------------------------------
+
         private void FireWaterCannon(Player player, bool missile)
         {
-            currentAnimationState = AnimationState.KnifeThrow;
+            currentAnimationState = AnimationState.Idle;
             Projectile.netUpdate = true;
 
             if (!missile)
             {
-                // ---- Beam mode ----
+                // Beam mode — fast piercing shot toward cursor
                 Vector2 toMouse = Main.MouseWorld - Projectile.Center;
                 if (toMouse == Vector2.Zero)
                     toMouse = Vector2.UnitX;
@@ -240,6 +233,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
             else
             {
+                // Missile mode — one missile per found target, fanned out
                 int[] targets = FindMissileTargets(player);
 
                 for (int i = 0; i < targets.Length; i++)
@@ -282,18 +276,16 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 if (d > ScanRange)
                     continue;
 
-                if (found < cap)
-                {
-                    ids[found] = npc.whoAmI;
-                    dists[found] = d;
-                    found++;
-                }
+                ids[found] = npc.whoAmI;
+                dists[found] = d;
+                found++;
             }
 
             int[] result = new int[found];
             for (int i = 0; i < found; i++)
                 result[i] = ids[i];
 
+            // Sort by distance (insertion sort — tiny array)
             for (int i = 1; i < result.Length; i++)
             {
                 int k = result[i];
@@ -309,7 +301,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 dists[j + 1] = kd;
             }
 
-            // If no targets found at all, fall back to -1 (missile will self-home)
+            // No targets found — fire one self-homing missile
             if (result.Length == 0)
                 return new int[] { -1 };
 
@@ -375,15 +367,17 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         public override void SendExtraStates(BinaryWriter writer)
         {
             writer.Write(secondaryAbility);
-            writer.Write(waterCannonActive);
+            writer.Write(specialHoldTimer);
             writer.Write(waterCannonCooldownTimer);
+            writer.Write(beamTimer);
         }
 
         public override void ReceiveExtraStates(BinaryReader reader)
         {
             secondaryAbility = reader.ReadBoolean();
-            waterCannonActive = reader.ReadBoolean();
+            specialHoldTimer = reader.ReadInt32();
             waterCannonCooldownTimer = reader.ReadInt32();
+            beamTimer = reader.ReadInt32();
         }
 
         // -------------------------------------------------------
@@ -392,13 +386,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         public override bool PreDrawExtras()
         {
-            // TODO: Draw after-images for Hydro Symbiosis if needed
             return false;
         }
 
         public override void PostDrawExtras()
         {
-            // TODO: Draw front-layer effects (e.g. water effects on M1)
+            // TODO: Draw front-layer effects
         }
     }
 }
