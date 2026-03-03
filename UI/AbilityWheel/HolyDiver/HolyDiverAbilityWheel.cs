@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.Localization;
 
 namespace JoJoFanStands.UI.AbilityWheel.HolyDiver
 {
@@ -21,7 +22,7 @@ namespace JoJoFanStands.UI.AbilityWheel.HolyDiver
             "     Holy Water",
             "Scorching Water Cannon",
             " Scorching Water Mine",
-            " Water Absorption",
+            " Water Absorption"
         };
 
         public override string[] abilityTextureNames => new string[AmountOfAbilities]
@@ -30,7 +31,7 @@ namespace JoJoFanStands.UI.AbilityWheel.HolyDiver
             "HolyWater",
             "ScorchingWaterCannon",
             "ScorchingWaterMine",
-            "WaterAbsorption",
+            "WaterAbsorption"
         };
 
         public override string[] abilityDescriptions => new string[AmountOfAbilities]
@@ -39,7 +40,7 @@ namespace JoJoFanStands.UI.AbilityWheel.HolyDiver
             "[Special]\nUse stored water to heal yourself or allies. Damages enemies and applies Burning.",
             "[Special]\nFire a scorching hydro pump. Hold M2 to convert it into homing water missiles targeting up to 3 enemies.",
             "[Special]\nPlace a water mine that homes in on nearby enemies, dealing extreme damage and applying Burning.",
-            "[Special]\nAbsorb water from the environment or enemies to refill your liquid gauge.",
+            "[Special]\nAbsorb water from the environment or enemies to refill your liquid gauge."
         };
 
         public override void ExtraInitialize()
@@ -56,21 +57,19 @@ namespace JoJoFanStands.UI.AbilityWheel.HolyDiver
             HolyDiverAbilityWheel wheel = holyDiverAbilityWheel;
             wheel.abilitiesShown = amountOfAbilities;
 
-            for (int i = 0; i < amountOfAbilities; i++)
+            for (int i = 0; i < AmountOfAbilities; i++)
             {
                 wheel.abilityButtons[i].SetButtonPosiiton(
                     wheel.wheelCenter.buttonPosition +
                     wheel.IndexToRadianPosition(i, wheel.abilitiesShown, wheel.wheelRotation) * wheel.wheelSpace
                 );
-                if (i > wheel.abilitiesShown - 1)
+                if (i >= amountOfAbilities)
                     wheel.abilityButtons[i].invisible = true;
+                else
+                    wheel.abilityButtons[i].invisible = false;
             }
 
-            wheel.wheelCenterPosition = new Vector2(
-                Main.screenWidth - (wheel.AbilityWheelSize.X / 2f),
-                Main.screenHeight * JoJoStands.UI.AbilityWheel.VerticalAlignmentPercentage
-            );
-
+            wheel.wheelCenterPosition = new Vector2(Main.screenWidth - (wheel.AbilityWheelSize.X / 2f), Main.screenHeight * 0.5f);
             wheel.abilityNameText.SetText(wheel.abilityNames[0]);
             wheel.abilityNameText.Left.Pixels = wheel.wheelCenterPosition.X + wheel.wheelCenter.buttonPosition.X;
             wheel.abilityNameText.Top.Pixels = wheel.wheelCenterPosition.Y + wheel.wheelCenter.buttonPosition.Y + 60f;
@@ -81,7 +80,7 @@ namespace JoJoFanStands.UI.AbilityWheel.HolyDiver
 
             if (!Main.player[Main.myPlayer].GetModPlayer<MyPlayer>().abilityWheelTipDisplayed)
             {
-                Main.NewText("*To use the Ability Wheel, use the numbers 1-x OR hover over the ability wheel with your cursor and scroll up or down!*", Color.Gold);
+                Main.NewText(Language.GetText("Mods.JoJoStands.MiscText.AbilityWheelHint").Value, Color.Gold);
                 Main.player[Main.myPlayer].GetModPlayer<MyPlayer>().abilityWheelTipDisplayed = true;
             }
         }

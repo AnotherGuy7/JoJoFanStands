@@ -1,4 +1,4 @@
-- Metempsychosis Requiem now has an Aura
+- Metempsychosis Requiem now has Aura
 - Metempsychosis now properly modified defense with soul points
 - Increased the amount of damagen needed per soul point when using Metempsychosis
 - Lucy in the Sky now properly boosts defense based on the tier of the Stand
