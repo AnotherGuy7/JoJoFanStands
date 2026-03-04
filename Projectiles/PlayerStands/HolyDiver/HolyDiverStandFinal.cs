@@ -44,6 +44,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private const int BeamDuration = 90;
         /// <summary>How often (ticks) the beam spawns a new projectile while active.</summary>
         private const int BeamFireRate = 8;
+        /// <summary>Total missiles fired per salvo.</summary>
+        private const int MissileSalvoCount = 5;
+        /// <summary>Ticks between each missile in a salvo (~0.1 s at 60 FPS = 6 ticks).</summary>
+        private const int MissileSalvoInterval = 6;
 
         // -------------------------------------------------------
         // Timers
@@ -56,6 +60,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private int punchAnimationTimer = 0;
         /// <summary>Prevents Special toggling every frame — must release between presses.</summary>
         private bool specialKeyWasHeld = false;
+        private int salvoRemaining = 0;   // missiles left to fire in current salvo
+        private int salvoTimer = 0;       // countdown between salvo shots
+        private int[] salvoTargets = null; // cached targets for the ongoing salvo
+        private Vector2 salvoDirection;    // cached aim direction
 
         private int MaxMissileTargets => TierNumber >= 4 ? 3 : TierNumber >= 3 ? 2 : 1;
 
@@ -124,6 +132,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                     HandleM2(player);
                     HandleSpecialToggle();
                     HandleBeamTick(player);
+                    TickSalvo(player);
                 }
 
                 HandleIdleState();
@@ -350,9 +359,47 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         private void DoMissiles(Player player)
         {
-            FireWaterMissiles(player);
+            salvoTargets = FindMissileTargets(player);
+            salvoDirection = Main.MouseWorld - Projectile.Center;
+            salvoRemaining = MissileSalvoCount;
+            salvoTimer = 0;
             waterCannonCooldownTimer = WaterCannonCooldown;
             m2HoldTimer = 0;
+            Projectile.netUpdate = true;
+        }
+
+        private void TickSalvo(Player player)
+        {
+            if (salvoRemaining <= 0)
+                return;
+
+            if (salvoTimer > 0)
+            {
+                salvoTimer--;
+                return;
+            }
+            int targetIndex = (MissileSalvoCount - salvoRemaining) % (salvoTargets?.Length > 0 ? salvoTargets.Length : 1);
+            int targetId = salvoTargets != null && salvoTargets.Length > 0 ? salvoTargets[targetIndex] : -1;
+
+            int shotIndex = MissileSalvoCount - salvoRemaining;
+            float spreadAngle = MathHelper.ToRadians((shotIndex - (MissileSalvoCount - 1) / 2f) * 12f);
+            Vector2 launchDir = Vector2.UnitX.RotatedBy(salvoDirection.ToRotation() + spreadAngle) * MissileSpeed;
+
+            int proj = Projectile.NewProjectile(
+                Projectile.GetSource_FromThis(),
+                Projectile.Center,
+                launchDir,
+                ModContent.ProjectileType<HolyDiverWaterMissile>(),
+                WaterMissileDamage,
+                3f,
+                Projectile.owner,
+                ai0: targetId);
+            Main.projectile[proj].netUpdate = true;
+
+            SoundEngine.PlaySound(SoundID.Item17, player.Center);
+
+            salvoRemaining--;
+            salvoTimer = MissileSalvoInterval;
             Projectile.netUpdate = true;
         }
 
@@ -500,6 +547,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             writer.Write(beamTimer);
             writer.Write(m2HoldTimer);
             writer.Write(mineCooldownTimer);
+            writer.Write(salvoRemaining);
+            writer.Write(salvoTimer);
         }
 
         public override void ReceiveExtraStates(BinaryReader reader)
@@ -510,6 +559,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             beamTimer = reader.ReadInt32();
             m2HoldTimer = reader.ReadInt32();
             mineCooldownTimer = reader.ReadInt32();
+            salvoRemaining = reader.ReadInt32();
+            salvoTimer = reader.ReadInt32();
         }
 
 
