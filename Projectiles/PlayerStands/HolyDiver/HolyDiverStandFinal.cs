@@ -1,5 +1,7 @@
 ﻿using JoJoFanStands.Buffs;
 using JoJoFanStands.UI.AbilityWheel.HolyDiver;
+using JoJoFanStands.UI;
+using System.Collections.Generic;
 using JoJoStands;
 using JoJoStands.Buffs.Debuffs;
 using JoJoStands.Projectiles.PlayerStands;
@@ -63,13 +65,29 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private int[] salvoTargets = null;
         private Vector2 salvoDirection;
 
+        private const int WaterCostBarrage = 2;
+        private const int WaterCostBeamShot = 10;
+        private const int WaterCostMissiles = 20;
+        private const int WaterCostMine = 5;
+        private const int WaterCostHolyWater = 8;
+        private const int WaterRestoreAbsorb = 25;
+        private const int WaterCostSymbiosis = 1;
+        private const int WaterPerTileCluster = 1;
+        private const int MaxTileClusters = 5;
+        private const int WaterAbsorbFromEnemy = 3;
+        private const int WaterAbsorbPassive = 1;
+        private const int AbsorbEnemyDamage = 12;
+        private const int MaxEnemyAbsorb = 3;
+        private const int AbsorptionRadius = 30 * 16;
+        private const int PassiveAccrualInterval = 90;
+        private int passiveAccrualTimer = 0;
+
         // -------------------------------------------------------
         // Replicant tracking
         // -------------------------------------------------------
         private int replicantProjIndex = -1;
         private int replicantCooldown = 0;
 
-        // FIX: dedicated tap tracking for replicant mode — avoids sharing m2HoldTimer
         private bool replicantM2WasHeld = false;
 
         private bool HasActiveReplicant => replicantProjIndex >= 0
@@ -82,8 +100,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         // -------------------------------------------------------
         // M2 mode
         // -------------------------------------------------------
-        public enum M2Mode { Mine, WaterCannon, WaterReplicant }
-        public M2Mode currentM2Mode = M2Mode.Mine;
+        public enum M2Mode { WaterReplicant, WaterCannon, Mine, WaterAbsorption }
+        public M2Mode currentM2Mode = M2Mode.WaterReplicant;
 
         // -------------------------------------------------------
         // Animation
@@ -106,6 +124,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         public override void ExtraSpawnEffects()
         {
             if (Projectile.owner != Main.myPlayer) return;
+            WaterGaugeBar.ShowWaterGaugeBar();
         }
 
         public override void StandKillEffects()
@@ -115,6 +134,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 Main.projectile[replicantProjIndex].Kill();
                 replicantProjIndex = -1;
             }
+            WaterGaugeBar.HideWaterGaugeBar();
             HolyDiverAbilityWheel.CloseAbilityWheel();
         }
 
@@ -206,7 +226,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             {
                 secondaryAbility = false;
 
-                // FIX: reset m2HoldTimer on release for ALL modes, not just WaterCannon
                 if (currentM2Mode == M2Mode.WaterCannon)
                 {
                     if (m2HoldTimer > 0 && m2HoldTimer < MissileChargeThreshold)
@@ -224,11 +243,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 }
                 else
                 {
-                    // FIX: always reset m2HoldTimer on release so HandleIdleState isn't blocked
                     m2HoldTimer = 0;
                 }
 
-                // FIX: reset replicant tap state when button is released
                 replicantM2WasHeld = false;
                 return;
             }
@@ -239,7 +256,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             {
                 // ---- Mine ----
                 case M2Mode.Mine:
-                    currentAnimationState = AnimationState.Secondary;
+                    currentAnimationState = AnimationState.Idle;
                     if (CanPlaceMine) DoMine(player);
                     break;
 
@@ -265,6 +282,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 case M2Mode.WaterReplicant:
                     HandleReplicantM2(player);
                     break;
+
+                case M2Mode.WaterAbsorption:
+                    DoWaterAbsorption(player);
+                    currentAnimationState = AnimationState.Idle;
+                    break;
             }
         }
 
@@ -280,11 +302,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         /// </summary>
         private void HandleReplicantM2(Player player)
         {
-            // FIX: use replicantM2WasHeld for tap detection, completely independent of m2HoldTimer
             if (replicantM2WasHeld)
-                return; // key was already held last frame — wait for release
+                return;
 
-            replicantM2WasHeld = true; // mark as consumed this press
+            replicantM2WasHeld = true;
 
             if (!HasActiveReplicant)
             {
@@ -411,7 +432,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                     {
                         M2Mode.Mine => M2Mode.WaterCannon,
                         M2Mode.WaterCannon => M2Mode.WaterReplicant,
-                        M2Mode.WaterReplicant => M2Mode.Mine,
+                        M2Mode.WaterReplicant => M2Mode.WaterAbsorption,
+                        M2Mode.WaterAbsorption => M2Mode.Mine,
                         _ => M2Mode.Mine
                     };
 
@@ -420,7 +442,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                     beamChargeTimer = 0;
                     beamCharged = false;
                     m2HoldTimer = 0;
-                    // FIX: also reset replicant tap state when switching modes
                     replicantM2WasHeld = false;
 
                     Projectile.netUpdate = true;
@@ -450,6 +471,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         private void DoMine(Player player)
         {
+            WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
+            if (!wgp.TrySpend(WaterCostMine)) return;
             PlaceMine(player);
             mineCooldownTimer = MinePlaceCooldown;
             Projectile.netUpdate = true;
@@ -504,6 +527,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         private void FireBeamShot(Player player)
         {
+            WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
+            if (!wgp.TrySpend(WaterCostBeamShot))
+            {
+                beamTimer = 0;
+                return;
+            }
+
             Vector2 toMouse = Main.MouseWorld - Projectile.Center;
             if (toMouse == Vector2.Zero) toMouse = Vector2.UnitX;
             toMouse.Normalize();
@@ -529,6 +559,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         private void DoMissiles(Player player)
         {
+            WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
+            if (!wgp.TrySpend(WaterCostMissiles)) return;
+
             salvoTargets = FindMissileTargets(player);
             salvoDirection = Main.MouseWorld - Projectile.Center;
             salvoRemaining = MissileSalvoCount;
@@ -536,6 +569,132 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             waterCannonCooldownTimer = WaterCannonCooldown;
             m2HoldTimer = 0;
             Projectile.netUpdate = true;
+        }
+
+        /// <summary>
+        /// Water Absorption: absorbs from nearby water tiles, then nearby enemies,
+        /// then passively accrues if nothing else is available.
+        /// Does NOT remove or lower tile water levels.
+        /// </summary>
+        private void DoWaterAbsorption(Player player)
+        {
+            WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
+
+            if (wgp.IsFull)
+            {
+                ShowAbsorbParticles(player.Center, Color.LightCyan, 3);
+                return;
+            }
+
+            int totalRestored = 0;
+            bool absorbedFromEnvironment = false;
+            bool absorbedFromEnemies = false;
+
+            List<Vector2> waterTilePositions = GetNearbyWaterTilePositions(player);
+            if (waterTilePositions.Count > 0)
+            {
+                int clusters = System.Math.Min(waterTilePositions.Count, MaxTileClusters);
+                totalRestored += clusters * WaterPerTileCluster;
+                absorbedFromEnvironment = true;
+
+                foreach (Vector2 tileWorldPos in waterTilePositions)
+                    ShowAbsorbPullParticlesFrom(tileWorldPos, player.Center);
+            }
+
+            int enemiesAbsorbed = AbsorbFromEnemies(player, ref totalRestored);
+            absorbedFromEnemies = enemiesAbsorbed > 0;
+
+            if (!absorbedFromEnvironment && !absorbedFromEnemies)
+            {
+                passiveAccrualTimer++;
+                if (passiveAccrualTimer >= PassiveAccrualInterval)
+                {
+                    passiveAccrualTimer = 0;
+                    totalRestored += WaterAbsorbPassive;
+                }
+            }
+            else
+            {
+                passiveAccrualTimer = 0;
+            }
+
+            if (totalRestored > 0)
+            {
+                wgp.Restore(totalRestored);
+                SoundEngine.PlaySound(SoundID.Splash, player.Center);
+            }
+
+            currentAnimationState = AnimationState.Idle;
+            Projectile.netUpdate = true;
+        }
+
+        /// <summary>
+        /// Returns world-space center positions of up to MaxTileClusters water tiles near the player.
+        /// </summary>
+        private List<Vector2> GetNearbyWaterTilePositions(Player player)
+        {
+            int radiusTiles = AbsorptionRadius / 16;
+            int playerTileX = (int)(player.Center.X / 16f);
+            int playerTileY = (int)(player.Center.Y / 16f);
+
+            var positions = new List<Vector2>();
+            int step = 3;
+
+            for (int tx = playerTileX - radiusTiles; tx <= playerTileX + radiusTiles; tx += step)
+            {
+                for (int ty = playerTileY - radiusTiles; ty <= playerTileY + radiusTiles; ty += step)
+                {
+                    if (tx < 0 || ty < 0 || tx >= Main.maxTilesX || ty >= Main.maxTilesY)
+                        continue;
+
+                    float distTiles = Vector2.Distance(new Vector2(tx, ty), new Vector2(playerTileX, playerTileY));
+                    if (distTiles > radiusTiles) continue;
+
+                    Tile tile = Main.tile[tx, ty];
+                    if (tile != null && tile.LiquidAmount > 0 && tile.LiquidType == LiquidID.Water)
+                    {
+                        positions.Add(new Vector2(tx * 16f + 8f, ty * 16f + 8f));
+                        if (positions.Count >= MaxTileClusters)
+                            return positions;
+                    }
+                }
+            }
+
+            return positions;
+        }
+
+        /// <summary>
+        /// Hits up to MaxEnemyAbsorb enemies within radius for minor damage
+        /// and adds to totalRestored. Returns how many were hit.
+        /// </summary>
+        private int AbsorbFromEnemies(Player player, ref int totalRestored)
+        {
+            int hit = 0;
+
+            for (int i = 0; i < Main.maxNPCs && hit < MaxEnemyAbsorb; i++)
+            {
+                NPC npc = Main.npc[i];
+                if (!npc.active || npc.friendly || npc.lifeMax <= 5 || npc.dontTakeDamage)
+                    continue;
+
+                float dist = Vector2.Distance(player.Center, npc.Center);
+                if (dist > AbsorptionRadius) continue;
+
+                if (Projectile.owner == Main.myPlayer)
+                {
+                    npc.SimpleStrikeNPC(
+                        damage: AbsorbEnemyDamage,
+                        hitDirection: npc.Center.X > player.Center.X ? 1 : -1,
+                        noPlayerInteraction: false);
+
+                    ShowAbsorbPullParticlesFrom(npc.Center, player.Center);
+                }
+
+                totalRestored += WaterAbsorbFromEnemy;
+                hit++;
+            }
+
+            return hit;
         }
 
         private void TickSalvo(Player player)
@@ -642,6 +801,45 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             else if (animationName == "WaterCannon") AnimateStand(animationName, 3, 6, true);
             else if (animationName == "HydroSymbiosis") AnimateStand(animationName, 4, 8, true);
             else if (animationName == "Pose") AnimateStand(animationName, 1, 600, true);
+        }
+
+        private void ShowAbsorbParticles(Vector2 center, Color color, int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                float a = Main.rand.NextFloat(MathHelper.TwoPi);
+                Vector2 vel = new Vector2(Main.rand.NextFloat(1.5f, 3.5f), 0f).RotatedBy(a);
+                int d = Dust.NewDust(center, 4, 4, DustID.Water,
+                    vel.X, vel.Y, 100, color, 1.4f);
+                Main.dust[d].noGravity = true;
+            }
+        }
+
+        private void ShowAbsorbPullParticles(Player player)
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                float a = Main.rand.NextFloat(MathHelper.TwoPi);
+                float radius = Main.rand.NextFloat(32f, 80f);
+                Vector2 spawnPos = player.Center + new Vector2(radius, 0f).RotatedBy(a);
+                Vector2 vel = (player.Center - spawnPos) * 0.12f;
+
+                int d = Dust.NewDust(spawnPos, 2, 2, DustID.Water,
+                    vel.X, vel.Y, 80, Color.CornflowerBlue, 1.2f);
+                Main.dust[d].noGravity = true;
+            }
+        }
+
+        private void ShowAbsorbPullParticlesFrom(Vector2 from, Vector2 to)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                Vector2 t = (float)i / 6f * (to - from) + from;
+                Vector2 vel = (to - from) * 0.08f;
+                int d = Dust.NewDust(t, 2, 2, DustID.Water,
+                    vel.X, vel.Y, 60, Color.Aquamarine, 1.0f);
+                Main.dust[d].noGravity = true;
+            }
         }
 
 

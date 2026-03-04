@@ -1,6 +1,7 @@
 using JoJoFanStands.Items.Armor;
 using JoJoFanStands.Items.Stands;
 using JoJoFanStands.Projectiles.PlayerStands.Blur;
+using JoJoFanStands.Projectiles.PlayerStands.Metempsychosis;
 using JoJoFanStands.Projectiles.PlayerStands.TheWorldOverHeaven;
 using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity;
 using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.BombTellyDir;
@@ -9,6 +10,7 @@ using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.GreenDevilDir;
 using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.PowerMusclerDir;
 using JoJoFanStands.Projectiles.PlayerStands.VirtualInsanity.YellowDevilDir;
 using JoJoFanStands.Projectiles.PlayerStands.WaywardSon;
+using JoJoFanStands.UI;
 using JoJoStands.UI;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -83,10 +85,12 @@ namespace JoJoFanStands
             GlueMan.spawnSheet = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/GlueManDir/GlueSpawn", AssetRequestMode.ImmediateLoad).Value;
             PowerMuscler.spawnSheet = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/VirtualInsanity/PowerMusclerDir/PowerMuscler_Spawn", AssetRequestMode.ImmediateLoad).Value;
 
-
             BlurBar.blurBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/BlurEnergyBar", AssetRequestMode.ImmediateLoad).Value;
             SoulBar.soulBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/SoulBar", AssetRequestMode.ImmediateLoad).Value;
             SoulBar.soulBarBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/SoulBar_Bar", AssetRequestMode.ImmediateLoad).Value;
+
+            WaterGaugeBar.WaterGaugeBarTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/WaterGaugeBar", AssetRequestMode.ImmediateLoad).Value;
+            WaterGaugeBar.WaterGaugeFillTexture = ModContent.Request<Texture2D>("JoJoFanStands/UI/WaterGaugeFill", AssetRequestMode.ImmediateLoad).Value;
 
             if (!Main.dedServ)
                 JoJoFanStandsShaders.LoadShaders();
@@ -129,6 +133,10 @@ namespace JoJoFanStands
                 BlurBar.blurBarTexture = null;
             if (BlurStandT1.punchTextures != null)
                 BlurStandT1.punchTextures = null;
+            if (WaterGaugeBar.WaterGaugeBarTexture != null)
+                WaterGaugeBar.WaterGaugeBarTexture = null;
+            if (WaterGaugeBar.WaterGaugeFillTexture != null)
+                WaterGaugeBar.WaterGaugeFillTexture = null;
             Instance = null;
         }
     }

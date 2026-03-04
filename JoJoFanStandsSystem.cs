@@ -18,6 +18,7 @@ namespace JoJoFanStands
         private UserInterface _blurAbilityWheelUI;
         private UserInterface _holyDiverAbilityWheelUI;
         private UserInterface _soulBarUI;
+        private UserInterface _waterGaugeBarUI;
 
         internal AbilityChooserUI AbilityUI;
         public static LightBridgeUI LightBridgeUI;
@@ -25,6 +26,7 @@ namespace JoJoFanStands
         public static BlurAbilityWheel BlurAbilityWheelUI;
         public static HolyDiverAbilityWheel HolyDiverAbilityWheelUI;
         public static SoulBar SoulBarUI;
+        public static WaterGaugeBar WaterGaugeBarUI;
 
         public override void Load()
         {
@@ -59,6 +61,11 @@ namespace JoJoFanStands
                 SoulBarUI.Activate();
                 _soulBarUI = new UserInterface();
                 _soulBarUI.SetState(SoulBarUI);
+
+                WaterGaugeBarUI = new WaterGaugeBar();
+                WaterGaugeBarUI.Activate();
+                _waterGaugeBarUI = new UserInterface();
+                _waterGaugeBarUI.SetState(WaterGaugeBarUI);
             }
         }
 
@@ -81,12 +88,16 @@ namespace JoJoFanStands
 
             if (SoulBar.Visible)
                 _soulBarUI.Update(gameTime);
+
+            if (WaterGaugeBar.Visible)
+                _waterGaugeBarUI.Update(gameTime);
         }
 
         public override void Unload()
         {
             BlurAbilityWheelUI = null;
             HolyDiverAbilityWheelUI = null;
+            WaterGaugeBarUI = null;
             for (int i = 0; i < BlurAbilityWheel.blurAbilityWheel.abilityButtons.Length; i++)
                 BlurAbilityWheel.blurAbilityWheel.abilityButtons[i] = null;
             for (int i = 0; i < HolyDiverAbilityWheel.holyDiverAbilityWheel.abilityButtons.Length; i++)
@@ -104,12 +115,12 @@ namespace JoJoFanStands
             HolyDiverAbilityWheel.CloseAbilityWheel();
         }
 
-        public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)     //from ExampleMod's ExampleUI
+        public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
-            layers.Insert(5, new LegacyGameInterfaceLayer("JoJoFanStands: UI", DrawUI, InterfaceScaleType.UI));     //from Terraria Interface for Dummies, and Insert so it doesn't draw over everything
+            layers.Insert(5, new LegacyGameInterfaceLayer("JoJoFanStands: UI", DrawUI, InterfaceScaleType.UI));
         }
 
-        private bool DrawUI()       //also from Terraria Interface for Dummies
+        private bool DrawUI()
         {
             if (AbilityChooserUI.Visible)
                 _abilityui.Draw(Main.spriteBatch, new GameTime());
@@ -128,6 +139,10 @@ namespace JoJoFanStands
 
             if (SoulBar.Visible)
                 _soulBarUI.Draw(Main.spriteBatch, new GameTime());
+
+            if (WaterGaugeBar.Visible)
+                _waterGaugeBarUI.Draw(Main.spriteBatch, new GameTime());
+
             return true;
         }
     }
