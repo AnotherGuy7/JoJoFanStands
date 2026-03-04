@@ -33,49 +33,55 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         // -------------------------------------------------------
         private const int WaterCannonDamage = 75;
         private const int WaterMissileDamage = 55;
-        private const int MineDamage = 120; // base; multiplied x3 by ModifyHitNPC in the mine itself
+        private const int MineDamage = 120;
         private const int MinePlaceCooldown = 90;
         private const float CannonSpeed = 18f;
         private const float MissileSpeed = 9f;
-        /// <summary>Ticks M2 must be held to trigger missiles instead of beam (Water Cannon mode).</summary>
         private const int MissileChargeThreshold = 30;
         private const int WaterCannonCooldown = 45;
-        /// <summary>How long (ticks) the beam fires after charge completes.</summary>
         private const int BeamDuration = 90;
-        /// <summary>How often (ticks) the beam spawns a new projectile while active.</summary>
         private const int BeamFireRate = 5;
-        /// <summary>Total missiles fired per salvo.</summary>
         private const int MissileSalvoCount = 5;
-        /// <summary>Ticks between each missile in a salvo (~0.1 s at 60 FPS = 6 ticks).</summary>
         private const int MissileSalvoInterval = 6;
-        /// <summary>Ticks the beam must charge before firing (1 second = 60 ticks).</summary>
         private const int BeamChargeTime = 60;
+        private const int ReplicantCooldown = 180; // 3 s after warp/place before a new one can be placed
 
         // -------------------------------------------------------
         // Timers
         // -------------------------------------------------------
         private int mineCooldownTimer = 0;
         private int waterCannonCooldownTimer = 0;
-        private int m2HoldTimer = 0;       // counts up while M2 held in Water Cannon mode
+        private int m2HoldTimer = 0;
         private int beamTimer = 0;
         private int beamFireRateTimer = 0;
         private int punchAnimationTimer = 0;
-        private int beamChargeTimer = 0;   // counts up while charging beam
-        private bool beamCharged = false;  // true once charge threshold is met
-        /// <summary>Prevents Special toggling every frame — must release between presses.</summary>
+        private int beamChargeTimer = 0;
+        private bool beamCharged = false;
         private bool specialKeyWasHeld = false;
-        private int salvoRemaining = 0;   // missiles left to fire in current salvo
-        private int salvoTimer = 0;       // countdown between salvo shots
-        private int[] salvoTargets = null; // cached targets for the ongoing salvo
-        private Vector2 salvoDirection;    // cached aim direction
+        private int salvoRemaining = 0;
+        private int salvoTimer = 0;
+        private int[] salvoTargets = null;
+        private Vector2 salvoDirection;
+
+        // -------------------------------------------------------
+        // Replicant tracking
+        // -------------------------------------------------------
+        /// <summary>whoAmI of the active HolyDiverWaterReplicant projectile, or -1 if none.</summary>
+        private int replicantProjIndex = -1;
+        private int replicantCooldown = 0;
+
+        private bool HasActiveReplicant => replicantProjIndex >= 0
+            && replicantProjIndex < Main.maxProjectiles
+            && Main.projectile[replicantProjIndex].active
+            && Main.projectile[replicantProjIndex].type == ModContent.ProjectileType<HolyDiverWaterReplicant>();
 
         private int MaxMissileTargets => TierNumber >= 4 ? 3 : TierNumber >= 3 ? 2 : 1;
 
         // -------------------------------------------------------
-        // M2 mode
+        // M2 mode  (now three-way cycle)
         // -------------------------------------------------------
 
-        public enum M2Mode { Mine, WaterCannon }
+        public enum M2Mode { Mine, WaterCannon, WaterReplicant }
         public M2Mode currentM2Mode = M2Mode.Mine;
 
         // -------------------------------------------------------
@@ -85,10 +91,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         public new enum AnimationState
         {
             Idle,
-            Attack,         // M1 - Scorching Torrent Barrage
-            KnifeThrow,     // Water Cannon charge / fire animation
-            Secondary,      // M2 ability animation
-            HydroSymbiosis, // Special install form
+            Attack,
+            KnifeThrow,
+            Secondary,
+            HydroSymbiosis,
             Pose
         }
 
@@ -99,14 +105,16 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         public override void ExtraSpawnEffects()
         {
-            if (Projectile.owner != Main.myPlayer)
-                return;
-            // TODO: Show Liquid Gauge UI
+            if (Projectile.owner != Main.myPlayer) return;
         }
 
         public override void StandKillEffects()
         {
-            // TODO: Hide Liquid Gauge UI
+            if (HasActiveReplicant)
+            {
+                Main.projectile[replicantProjIndex].Kill();
+                replicantProjIndex = -1;
+            }
             HolyDiverAbilityWheel.CloseAbilityWheel();
         }
 
@@ -122,7 +130,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             SelectAnimation();
             UpdateStandInfo();
-
             TickTimers();
 
             if (mPlayer.standOut)
@@ -164,19 +171,20 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (waterCannonCooldownTimer > 0) waterCannonCooldownTimer--;
             if (mineCooldownTimer > 0) mineCooldownTimer--;
             if (beamFireRateTimer > 0) beamFireRateTimer--;
+            if (replicantCooldown > 0) replicantCooldown--;
         }
 
         private bool CanFireCannon => waterCannonCooldownTimer <= 0;
         private bool CanPlaceMine => mineCooldownTimer <= 0;
         private bool BeamIsActive => beamTimer > 0;
         private bool IsChargingBeam => beamChargeTimer > 0 && !beamCharged;
+        private bool CanUseReplicant => replicantCooldown <= 0;
 
 
         // -------------------------------------------------------
         // Input handlers
         // -------------------------------------------------------
 
-        /// <summary>M1 - Scorching Torrent Barrage punch.</summary>
         private void HandleM1()
         {
             if (Main.mouseLeft)
@@ -192,32 +200,21 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
         }
 
-        /// <summary>
-        /// M2 - behaviour depends on the active mode:
-        ///   Mine mode       : tap/hold places a mine (on cooldown).
-        ///   Water Cannon    : tap triggers a 1-second Kamehameha charge then fires beam;
-        ///                     hold past MissileChargeThreshold = fire missiles instead.
-        /// </summary>
         private void HandleM2(Player player)
         {
             if (!Main.mouseRight)
             {
                 secondaryAbility = false;
 
-                // Key released while we have been holding (missile charge range) — cancel
                 if (currentM2Mode == M2Mode.WaterCannon)
                 {
                     if (m2HoldTimer > 0 && m2HoldTimer < MissileChargeThreshold)
                     {
-                        // Tap released — begin beam charge if not already charging/active
                         if (!beamCharged && !BeamIsActive && CanFireCannon)
-                        {
-                            beamChargeTimer = 1; // kick off charge (increments next frame)
-                        }
+                            beamChargeTimer = 1;
                         m2HoldTimer = 0;
                     }
 
-                    // Complete a charged beam when the charge timer finishes naturally
                     if (beamCharged && !BeamIsActive && CanFireCannon)
                     {
                         StartBeam();
@@ -229,29 +226,23 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
 
             secondaryAbility = true;
-            StayBehindWithAbility();
 
             switch (currentM2Mode)
             {
+                // ---- Mine ----
                 case M2Mode.Mine:
                     currentAnimationState = AnimationState.Secondary;
-                    if (CanPlaceMine)
-                        DoMine(player);
+                    if (CanPlaceMine) DoMine(player);
                     break;
 
+                // ---- Water Cannon ----
                 case M2Mode.WaterCannon:
-                    // If already charging beam or beam is active, don't interrupt
-                    if (beamCharged || BeamIsActive)
-                        break;
-
-                    if (!CanFireCannon)
-                        break;
+                    if (beamCharged || BeamIsActive) break;
+                    if (!CanFireCannon) break;
 
                     m2HoldTimer++;
-
                     if (m2HoldTimer >= MissileChargeThreshold)
                     {
-                        // Cancel any pending beam charge and fire missiles instead
                         beamChargeTimer = 0;
                         beamCharged = false;
                         DoMissiles(player);
@@ -261,23 +252,109 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                         currentAnimationState = AnimationState.Idle;
                     }
                     break;
+
+                // ---- Water Replicant ----
+                case M2Mode.WaterReplicant:
+                    HandleReplicantM2(player);
+                    break;
             }
         }
 
+        // -------------------------------------------------------
+        // Water Replicant M2 logic
+        // -------------------------------------------------------
+
         /// <summary>
-        /// Advances the beam charge timer while M2 is not held.
-        /// Once BeamChargeTime ticks have elapsed, marks the beam as ready to fire.
-        /// Called every frame when the owner is local.
+        /// Single tap M2 in Replicant mode:
+        ///   • If NO replicant exists → place one at the stand's current position.
+        ///   • If a replicant EXISTS → warp the player to it and destroy it.
         /// </summary>
+        private void HandleReplicantM2(Player player)
+        {
+            // Only respond on the frame the key is first pressed (tap detection via m2HoldTimer)
+            m2HoldTimer++;
+            if (m2HoldTimer != 1)
+                return; // wait for a fresh tap
+
+            if (!HasActiveReplicant)
+            {
+                if (!CanUseReplicant)
+                    return;
+                PlaceReplicant(player);
+            }
+            else
+            {
+                WarpToReplicant(player);
+            }
+        }
+
+        private void PlaceReplicant(Player player)
+        {
+            int proj = Projectile.NewProjectile(
+                Projectile.GetSource_FromThis(),
+                Projectile.Center,
+                Vector2.Zero,
+                ModContent.ProjectileType<HolyDiverWaterReplicant>(),
+                0,
+                0f,
+                Projectile.owner);
+
+            replicantProjIndex = proj;
+            replicantCooldown = ReplicantCooldown;
+            Main.projectile[proj].netUpdate = true;
+
+            // Placement burst
+            for (int i = 0; i < 20; i++)
+            {
+                float a = Main.rand.NextFloat(MathHelper.TwoPi);
+                Vector2 dustVel = new Vector2(3f, 0f).RotatedBy(a);
+                int d = Dust.NewDust(Projectile.Center, 4, 4, DustID.Water,
+                    dustVel.X, dustVel.Y, 100, Color.DeepSkyBlue, 1.4f);
+                Main.dust[d].noGravity = true;
+            }
+
+            SoundEngine.PlaySound(SoundID.Item6, player.Center);
+            currentAnimationState = AnimationState.Idle;
+            Projectile.netUpdate = true;
+        }
+
+        private void WarpToReplicant(Player player)
+        {
+            HolyDiverWaterReplicant replicant =
+                Main.projectile[replicantProjIndex].ModProjectile as HolyDiverWaterReplicant;
+
+            if (replicant != null)
+                replicant.ConsumeAsWarp();
+
+            replicantProjIndex = -1;
+            replicantCooldown = ReplicantCooldown;
+
+            // Warp flash particles on the PLAYER side
+            for (int i = 0; i < 20; i++)
+            {
+                float a = Main.rand.NextFloat(MathHelper.TwoPi);
+                Vector2 dustVel = new Vector2(3f, 0f).RotatedBy(a);
+                int d = Dust.NewDust(Projectile.Center, 4, 4, DustID.Water,
+                    dustVel.X, dustVel.Y, 0, Color.White, 1.6f);
+                Main.dust[d].noGravity = true;
+            }
+
+            SoundEngine.PlaySound(SoundID.Item6, player.Center);
+            Projectile.netUpdate = true;
+        }
+
+
+        // -------------------------------------------------------
+        // Beam charge particles
+        // -------------------------------------------------------
+
         private void SpawnBeamChargeParticles(Player player)
         {
-            if (beamChargeTimer <= 0 || beamCharged)
-                return;
+            if (beamChargeTimer <= 0 || beamCharged) return;
 
             beamChargeTimer++;
             currentAnimationState = AnimationState.Idle;
 
-            // Particle burst — orbiting water / energy rings around the stand
             float chargeProgress = (float)beamChargeTimer / BeamChargeTime;
             int particleCount = (int)MathHelper.Lerp(1f, 4f, chargeProgress);
 
@@ -286,14 +363,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 float angle = Main.rand.NextFloat(MathHelper.TwoPi);
                 float radius = MathHelper.Lerp(20f, 60f, chargeProgress);
                 Vector2 offset = new Vector2(radius, 0f).RotatedBy(angle);
-                Vector2 vel = new Vector2(-offset.Y, offset.X) * 0.05f; // tangential orbit
+                Vector2 vel = new Vector2(-offset.Y, offset.X) * 0.05f;
 
-                // Blue water orbs
                 int d = Dust.NewDust(Projectile.Center + offset, 1, 1, DustID.Water,
                     vel.X, vel.Y, 0, Color.DeepSkyBlue, MathHelper.Lerp(1f, 2.5f, chargeProgress));
                 Main.dust[d].noGravity = true;
 
-                // Occasional bright spark
                 if (Main.rand.NextBool(3))
                 {
                     int spark = Dust.NewDust(Projectile.Center + offset * 0.5f, 1, 1, DustID.Electric,
@@ -302,31 +377,40 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 }
             }
 
-            // Sound cue at the halfway point
             if (beamChargeTimer == BeamChargeTime / 2)
                 SoundEngine.PlaySound(SoundID.Item20, player.Center);
 
-            // Charge complete
             if (beamChargeTimer >= BeamChargeTime)
             {
                 beamCharged = true;
                 beamChargeTimer = 0;
-                SoundEngine.PlaySound(SoundID.Item29, player.Center); // "ready" sound
+                SoundEngine.PlaySound(SoundID.Item29, player.Center);
                 Projectile.netUpdate = true;
             }
         }
 
-        /// <summary>Special - toggles M2 mode between Mine and Water Cannon.</summary>
+        // -------------------------------------------------------
+        // Special key — cycle through all three modes
+        // -------------------------------------------------------
+
         private void HandleSpecialToggle()
         {
             if (SpecialKeyCurrent())
             {
                 if (!specialKeyWasHeld)
                 {
-                    currentM2Mode = currentM2Mode == M2Mode.Mine ? M2Mode.WaterCannon : M2Mode.Mine;
+                    // Cycle: Mine → WaterCannon → WaterReplicant → Mine …
+                    currentM2Mode = currentM2Mode switch
+                    {
+                        M2Mode.Mine => M2Mode.WaterCannon,
+                        M2Mode.WaterCannon => M2Mode.WaterReplicant,
+                        M2Mode.WaterReplicant => M2Mode.Mine,
+                        _ => M2Mode.Mine
+                    };
+
                     specialKeyWasHeld = true;
 
-                    // Reset any in-progress charge when switching modes
+                    // Reset in-progress states from other modes
                     beamChargeTimer = 0;
                     beamCharged = false;
                     m2HoldTimer = 0;
@@ -340,7 +424,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
         }
 
-        /// <summary>Resets to idle when no inputs are active.</summary>
         private void HandleIdleState()
         {
             if (!attacking && !BeamIsActive && m2HoldTimer == 0 && !IsChargingBeam && !beamCharged)
@@ -394,8 +477,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         private void HandleBeamTick(Player player)
         {
-            if (!BeamIsActive)
-                return;
+            if (!BeamIsActive) return;
 
             beamTimer--;
             currentAnimationState = AnimationState.Idle;
@@ -406,7 +488,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 beamFireRateTimer = BeamFireRate;
             }
 
-            if (!BeamIsActive) // just finished this tick
+            if (!BeamIsActive)
                 currentAnimationState = AnimationState.Idle;
 
             Projectile.netUpdate = true;
@@ -415,8 +497,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private void FireBeamShot(Player player)
         {
             Vector2 toMouse = Main.MouseWorld - Projectile.Center;
-            if (toMouse == Vector2.Zero)
-                toMouse = Vector2.UnitX;
+            if (toMouse == Vector2.Zero) toMouse = Vector2.UnitX;
             toMouse.Normalize();
             toMouse *= CannonSpeed;
 
@@ -451,20 +532,16 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         private void TickSalvo(Player player)
         {
-            if (salvoRemaining <= 0)
-                return;
+            if (salvoRemaining <= 0) return;
 
-            if (salvoTimer > 0)
-            {
-                salvoTimer--;
-                return;
-            }
+            if (salvoTimer > 0) { salvoTimer--; return; }
+
             int targetIndex = (MissileSalvoCount - salvoRemaining) % (salvoTargets?.Length > 0 ? salvoTargets.Length : 1);
             int targetId = salvoTargets != null && salvoTargets.Length > 0 ? salvoTargets[targetIndex] : -1;
 
             int shotIndex = MissileSalvoCount - salvoRemaining;
-            float spreadAngle = MathHelper.ToRadians((shotIndex - (MissileSalvoCount - 1) / 2f) * 12f);
-            Vector2 launchDir = Vector2.UnitX.RotatedBy(salvoDirection.ToRotation() + spreadAngle) * MissileSpeed;
+            float spread = MathHelper.ToRadians((shotIndex - (MissileSalvoCount - 1) / 2f) * 12f);
+            Vector2 launchDir = Vector2.UnitX.RotatedBy(salvoDirection.ToRotation() + spread) * MissileSpeed;
 
             int proj = Projectile.NewProjectile(
                 Projectile.GetSource_FromThis(),
@@ -484,36 +561,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Projectile.netUpdate = true;
         }
 
-        private void FireWaterMissiles(Player player)
-        {
-            int[] targets = FindMissileTargets(player);
-
-            for (int i = 0; i < targets.Length; i++)
-            {
-                float spreadAngle = MathHelper.ToRadians((i - (targets.Length - 1) / 2f) * 12f);
-                Vector2 launchDir = Vector2.UnitX.RotatedBy(
-                    (Main.MouseWorld - Projectile.Center).ToRotation() + spreadAngle) * MissileSpeed;
-
-                int proj = Projectile.NewProjectile(
-                    Projectile.GetSource_FromThis(),
-                    Projectile.Center,
-                    launchDir,
-                    ModContent.ProjectileType<HolyDiverWaterMissile>(),
-                    WaterMissileDamage,
-                    3f,
-                    Projectile.owner,
-                    ai0: targets[i]);
-                Main.projectile[proj].netUpdate = true;
-            }
-
-            SoundEngine.PlaySound(SoundID.Item17, player.Center);
-        }
-
         private int[] FindMissileTargets(Player player)
         {
             const float ScanRange = 1200f;
             int cap = MaxMissileTargets;
-
             int[] ids = new int[cap];
             float[] dists = new float[cap];
             int found = 0;
@@ -521,42 +572,25 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             for (int i = 0; i < Main.maxNPCs && found < cap; i++)
             {
                 NPC npc = Main.npc[i];
-                if (!npc.active || npc.friendly || npc.lifeMax <= 5 || npc.dontTakeDamage)
-                    continue;
+                if (!npc.active || npc.friendly || npc.lifeMax <= 5 || npc.dontTakeDamage) continue;
                 float d = Vector2.Distance(player.Center, npc.Center);
-                if (d > ScanRange)
-                    continue;
-
+                if (d > ScanRange) continue;
                 ids[found] = npc.whoAmI;
                 dists[found] = d;
                 found++;
             }
 
             int[] result = new int[found];
-            for (int i = 0; i < found; i++)
-                result[i] = ids[i];
+            for (int i = 0; i < found; i++) result[i] = ids[i];
 
-            // Sort by distance (insertion sort - tiny array)
             for (int i = 1; i < result.Length; i++)
             {
-                int k = result[i];
-                float kd = dists[i];
-                int j = i - 1;
-                while (j >= 0 && dists[j] > kd)
-                {
-                    result[j + 1] = result[j];
-                    dists[j + 1] = dists[j];
-                    j--;
-                }
-                result[j + 1] = k;
-                dists[j + 1] = kd;
+                int k = result[i]; float kd = dists[i]; int j = i - 1;
+                while (j >= 0 && dists[j] > kd) { result[j + 1] = result[j]; dists[j + 1] = dists[j]; j--; }
+                result[j + 1] = k; dists[j + 1] = kd;
             }
 
-            // No targets found - fire one self-homing missile
-            if (result.Length == 0)
-                return new int[] { -1 };
-
-            return result;
+            return result.Length == 0 ? new int[] { -1 } : result;
         }
 
 
@@ -583,34 +617,23 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 Projectile.netUpdate = true;
             }
 
-            if (currentAnimationState == AnimationState.Idle)
-                PlayAnimation("Idle");
-            else if (currentAnimationState == AnimationState.Attack)
-                PlayAnimation("Attack");
-            else if (currentAnimationState == AnimationState.Secondary)
-                PlayAnimation("Secondary");
-            else if (currentAnimationState == AnimationState.HydroSymbiosis)
-                PlayAnimation("HydroSymbiosis");
-            else if (currentAnimationState == AnimationState.Pose)
-                PlayAnimation("Pose");
+            if (currentAnimationState == AnimationState.Idle) PlayAnimation("Idle");
+            else if (currentAnimationState == AnimationState.Attack) PlayAnimation("Attack");
+            else if (currentAnimationState == AnimationState.Secondary) PlayAnimation("Secondary");
+            else if (currentAnimationState == AnimationState.HydroSymbiosis) PlayAnimation("HydroSymbiosis");
+            else if (currentAnimationState == AnimationState.Pose) PlayAnimation("Pose");
         }
 
         public override void PlayAnimation(string animationName)
         {
             standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/HolyDiver/HolyDiver_" + animationName).Value;
 
-            if (animationName == "Idle")
-                AnimateStand(animationName, 4, 8, true);
-            else if (animationName == "Attack")
-                AnimateStand(animationName, 4, PunchTime / 2, true);
-            else if (animationName == "Secondary")
-                AnimateStand(animationName, 2, 10, true);
-            else if (animationName == "WaterCannon")
-                AnimateStand(animationName, 3, 6, true);
-            else if (animationName == "HydroSymbiosis")
-                AnimateStand(animationName, 4, 8, true);
-            else if (animationName == "Pose")
-                AnimateStand(animationName, 1, 600, true);
+            if (animationName == "Idle") AnimateStand(animationName, 4, 8, true);
+            else if (animationName == "Attack") AnimateStand(animationName, 4, PunchTime / 2, true);
+            else if (animationName == "Secondary") AnimateStand(animationName, 2, 10, true);
+            else if (animationName == "WaterCannon") AnimateStand(animationName, 3, 6, true);
+            else if (animationName == "HydroSymbiosis") AnimateStand(animationName, 4, 8, true);
+            else if (animationName == "Pose") AnimateStand(animationName, 1, 600, true);
         }
 
 
@@ -630,6 +653,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             writer.Write(salvoTimer);
             writer.Write(beamChargeTimer);
             writer.Write(beamCharged);
+            writer.Write(replicantProjIndex);
+            writer.Write(replicantCooldown);
         }
 
         public override void ReceiveExtraStates(BinaryReader reader)
@@ -644,6 +669,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             salvoTimer = reader.ReadInt32();
             beamChargeTimer = reader.ReadInt32();
             beamCharged = reader.ReadBoolean();
+            replicantProjIndex = reader.ReadInt32();
+            replicantCooldown = reader.ReadInt32();
         }
 
 
@@ -651,14 +678,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         // Draw
         // -------------------------------------------------------
 
-        public override bool PreDrawExtras()
-        {
-            return false;
-        }
+        public override bool PreDrawExtras() => false;
 
         public override void PostDrawExtras()
         {
-            // TODO: Draw front-layer effects (e.g. current M2 mode indicator)
+            // TODO: Draw current M2 mode indicator (Mine / Water Cannon / Water Replicant)
         }
     }
 }
