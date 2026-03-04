@@ -40,14 +40,16 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         /// <summary>Ticks M2 must be held to trigger missiles instead of beam (Water Cannon mode).</summary>
         private const int MissileChargeThreshold = 30;
         private const int WaterCannonCooldown = 45;
-        /// <summary>How long (ticks) the beam fires after a tap.</summary>
+        /// <summary>How long (ticks) the beam fires after charge completes.</summary>
         private const int BeamDuration = 90;
         /// <summary>How often (ticks) the beam spawns a new projectile while active.</summary>
-        private const int BeamFireRate = 8;
+        private const int BeamFireRate = 5;
         /// <summary>Total missiles fired per salvo.</summary>
         private const int MissileSalvoCount = 5;
         /// <summary>Ticks between each missile in a salvo (~0.1 s at 60 FPS = 6 ticks).</summary>
         private const int MissileSalvoInterval = 6;
+        /// <summary>Ticks the beam must charge before firing (1 second = 60 ticks).</summary>
+        private const int BeamChargeTime = 60;
 
         // -------------------------------------------------------
         // Timers
@@ -58,6 +60,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private int beamTimer = 0;
         private int beamFireRateTimer = 0;
         private int punchAnimationTimer = 0;
+        private int beamChargeTimer = 0;   // counts up while charging beam
+        private bool beamCharged = false;  // true once charge threshold is met
         /// <summary>Prevents Special toggling every frame — must release between presses.</summary>
         private bool specialKeyWasHeld = false;
         private int salvoRemaining = 0;   // missiles left to fire in current salvo
@@ -82,7 +86,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         {
             Idle,
             Attack,         // M1 - Scorching Torrent Barrage
-            KnifeThrow,     // Water Cannon / Missile fire animation
+            KnifeThrow,     // Water Cannon charge / fire animation
             Secondary,      // M2 ability animation
             HydroSymbiosis, // Special install form
             Pose
@@ -133,6 +137,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                     HandleSpecialToggle();
                     HandleBeamTick(player);
                     TickSalvo(player);
+                    SpawnBeamChargeParticles(player);
                 }
 
                 HandleIdleState();
@@ -164,6 +169,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private bool CanFireCannon => waterCannonCooldownTimer <= 0;
         private bool CanPlaceMine => mineCooldownTimer <= 0;
         private bool BeamIsActive => beamTimer > 0;
+        private bool IsChargingBeam => beamChargeTimer > 0 && !beamCharged;
 
 
         // -------------------------------------------------------
@@ -189,7 +195,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         /// <summary>
         /// M2 - behaviour depends on the active mode:
         ///   Mine mode       : tap/hold places a mine (on cooldown).
-        ///   Water Cannon    : tap = beam, hold = missiles (original logic).
+        ///   Water Cannon    : tap triggers a 1-second Kamehameha charge then fires beam;
+        ///                     hold past MissileChargeThreshold = fire missiles instead.
         /// </summary>
         private void HandleM2(Player player)
         {
@@ -197,12 +204,25 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             {
                 secondaryAbility = false;
 
-                // Key released while charging in Water Cannon mode — fire beam if it was a tap
-                if (currentM2Mode == M2Mode.WaterCannon && m2HoldTimer > 0)
+                // Key released while we have been holding (missile charge range) — cancel
+                if (currentM2Mode == M2Mode.WaterCannon)
                 {
-                    m2HoldTimer--;
-                    if (m2HoldTimer == 0 && CanFireCannon && !BeamIsActive)
+                    if (m2HoldTimer > 0 && m2HoldTimer < MissileChargeThreshold)
+                    {
+                        // Tap released — begin beam charge if not already charging/active
+                        if (!beamCharged && !BeamIsActive && CanFireCannon)
+                        {
+                            beamChargeTimer = 1; // kick off charge (increments next frame)
+                        }
+                        m2HoldTimer = 0;
+                    }
+
+                    // Complete a charged beam when the charge timer finishes naturally
+                    if (beamCharged && !BeamIsActive && CanFireCannon)
+                    {
                         StartBeam();
+                        beamCharged = false;
+                    }
                 }
 
                 return;
@@ -210,35 +230,90 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             secondaryAbility = true;
             StayBehindWithAbility();
-            currentAnimationState = AnimationState.Secondary;
 
             switch (currentM2Mode)
             {
                 case M2Mode.Mine:
+                    currentAnimationState = AnimationState.Secondary;
                     if (CanPlaceMine)
                         DoMine(player);
                     break;
 
                 case M2Mode.WaterCannon:
-                    if (!BeamIsActive)
-                        HandleWaterCannonCharge(player);
+                    // If already charging beam or beam is active, don't interrupt
+                    if (beamCharged || BeamIsActive)
+                        break;
+
+                    if (!CanFireCannon)
+                        break;
+
+                    m2HoldTimer++;
+
+                    if (m2HoldTimer >= MissileChargeThreshold)
+                    {
+                        // Cancel any pending beam charge and fire missiles instead
+                        beamChargeTimer = 0;
+                        beamCharged = false;
+                        DoMissiles(player);
+                    }
+                    else
+                    {
+                        currentAnimationState = AnimationState.Idle;
+                    }
                     break;
             }
         }
 
         /// <summary>
-        /// Counts up while M2 is held in Water Cannon mode.
-        /// Fires missiles once the charge threshold is reached.
+        /// Advances the beam charge timer while M2 is not held.
+        /// Once BeamChargeTime ticks have elapsed, marks the beam as ready to fire.
+        /// Called every frame when the owner is local.
         /// </summary>
-        private void HandleWaterCannonCharge(Player player)
+        private void SpawnBeamChargeParticles(Player player)
         {
-            if (!CanFireCannon)
+            if (beamChargeTimer <= 0 || beamCharged)
                 return;
 
-            m2HoldTimer++;
+            beamChargeTimer++;
+            currentAnimationState = AnimationState.Idle;
 
-            if (m2HoldTimer >= MissileChargeThreshold)
-                DoMissiles(player);
+            // Particle burst — orbiting water / energy rings around the stand
+            float chargeProgress = (float)beamChargeTimer / BeamChargeTime;
+            int particleCount = (int)MathHelper.Lerp(1f, 4f, chargeProgress);
+
+            for (int i = 0; i < particleCount; i++)
+            {
+                float angle = Main.rand.NextFloat(MathHelper.TwoPi);
+                float radius = MathHelper.Lerp(20f, 60f, chargeProgress);
+                Vector2 offset = new Vector2(radius, 0f).RotatedBy(angle);
+                Vector2 vel = new Vector2(-offset.Y, offset.X) * 0.05f; // tangential orbit
+
+                // Blue water orbs
+                int d = Dust.NewDust(Projectile.Center + offset, 1, 1, DustID.Water,
+                    vel.X, vel.Y, 0, Color.DeepSkyBlue, MathHelper.Lerp(1f, 2.5f, chargeProgress));
+                Main.dust[d].noGravity = true;
+
+                // Occasional bright spark
+                if (Main.rand.NextBool(3))
+                {
+                    int spark = Dust.NewDust(Projectile.Center + offset * 0.5f, 1, 1, DustID.Electric,
+                        vel.X * 2f, vel.Y * 2f, 0, Color.White, 1.2f);
+                    Main.dust[spark].noGravity = true;
+                }
+            }
+
+            // Sound cue at the halfway point
+            if (beamChargeTimer == BeamChargeTime / 2)
+                SoundEngine.PlaySound(SoundID.Item20, player.Center);
+
+            // Charge complete
+            if (beamChargeTimer >= BeamChargeTime)
+            {
+                beamCharged = true;
+                beamChargeTimer = 0;
+                SoundEngine.PlaySound(SoundID.Item29, player.Center); // "ready" sound
+                Projectile.netUpdate = true;
+            }
         }
 
         /// <summary>Special - toggles M2 mode between Mine and Water Cannon.</summary>
@@ -250,6 +325,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 {
                     currentM2Mode = currentM2Mode == M2Mode.Mine ? M2Mode.WaterCannon : M2Mode.Mine;
                     specialKeyWasHeld = true;
+
+                    // Reset any in-progress charge when switching modes
+                    beamChargeTimer = 0;
+                    beamCharged = false;
+                    m2HoldTimer = 0;
+
                     Projectile.netUpdate = true;
                 }
             }
@@ -262,7 +343,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         /// <summary>Resets to idle when no inputs are active.</summary>
         private void HandleIdleState()
         {
-            if (!attacking && !BeamIsActive && m2HoldTimer == 0)
+            if (!attacking && !BeamIsActive && m2HoldTimer == 0 && !IsChargingBeam && !beamCharged)
             {
                 StayBehind();
                 if (!secondaryAbility)
@@ -508,8 +589,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 PlayAnimation("Attack");
             else if (currentAnimationState == AnimationState.Secondary)
                 PlayAnimation("Secondary");
-            else if (currentAnimationState == AnimationState.KnifeThrow)
-                PlayAnimation("WaterCannon");
             else if (currentAnimationState == AnimationState.HydroSymbiosis)
                 PlayAnimation("HydroSymbiosis");
             else if (currentAnimationState == AnimationState.Pose)
@@ -549,6 +628,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             writer.Write(mineCooldownTimer);
             writer.Write(salvoRemaining);
             writer.Write(salvoTimer);
+            writer.Write(beamChargeTimer);
+            writer.Write(beamCharged);
         }
 
         public override void ReceiveExtraStates(BinaryReader reader)
@@ -561,6 +642,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             mineCooldownTimer = reader.ReadInt32();
             salvoRemaining = reader.ReadInt32();
             salvoTimer = reader.ReadInt32();
+            beamChargeTimer = reader.ReadInt32();
+            beamCharged = reader.ReadBoolean();
         }
 
 
