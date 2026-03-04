@@ -44,7 +44,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private const int MissileSalvoCount = 5;
         private const int MissileSalvoInterval = 6;
         private const int BeamChargeTime = 60;
-        private const int ReplicantCooldown = 180; // 3 s after warp/place before a new one can be placed
+        private const int ReplicantCooldown = 180;
 
         // -------------------------------------------------------
         // Timers
@@ -66,9 +66,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         // -------------------------------------------------------
         // Replicant tracking
         // -------------------------------------------------------
-        /// <summary>whoAmI of the active HolyDiverWaterReplicant projectile, or -1 if none.</summary>
         private int replicantProjIndex = -1;
         private int replicantCooldown = 0;
+
+        // FIX: dedicated tap tracking for replicant mode — avoids sharing m2HoldTimer
+        private bool replicantM2WasHeld = false;
 
         private bool HasActiveReplicant => replicantProjIndex >= 0
             && replicantProjIndex < Main.maxProjectiles
@@ -78,16 +80,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private int MaxMissileTargets => TierNumber >= 4 ? 3 : TierNumber >= 3 ? 2 : 1;
 
         // -------------------------------------------------------
-        // M2 mode  (now three-way cycle)
+        // M2 mode
         // -------------------------------------------------------
-
         public enum M2Mode { Mine, WaterCannon, WaterReplicant }
         public M2Mode currentM2Mode = M2Mode.Mine;
 
         // -------------------------------------------------------
         // Animation
         // -------------------------------------------------------
-
         public new enum AnimationState
         {
             Idle,
@@ -206,6 +206,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             {
                 secondaryAbility = false;
 
+                // FIX: reset m2HoldTimer on release for ALL modes, not just WaterCannon
                 if (currentM2Mode == M2Mode.WaterCannon)
                 {
                     if (m2HoldTimer > 0 && m2HoldTimer < MissileChargeThreshold)
@@ -221,7 +222,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                         beamCharged = false;
                     }
                 }
+                else
+                {
+                    // FIX: always reset m2HoldTimer on release so HandleIdleState isn't blocked
+                    m2HoldTimer = 0;
+                }
 
+                // FIX: reset replicant tap state when button is released
+                replicantM2WasHeld = false;
                 return;
             }
 
@@ -268,13 +276,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         /// Single tap M2 in Replicant mode:
         ///   • If NO replicant exists → place one at the stand's current position.
         ///   • If a replicant EXISTS → warp the player to it and destroy it.
+        /// Uses a dedicated bool for tap detection instead of sharing m2HoldTimer.
         /// </summary>
         private void HandleReplicantM2(Player player)
         {
-            // Only respond on the frame the key is first pressed (tap detection via m2HoldTimer)
-            m2HoldTimer++;
-            if (m2HoldTimer != 1)
-                return; // wait for a fresh tap
+            // FIX: use replicantM2WasHeld for tap detection, completely independent of m2HoldTimer
+            if (replicantM2WasHeld)
+                return; // key was already held last frame — wait for release
+
+            replicantM2WasHeld = true; // mark as consumed this press
 
             if (!HasActiveReplicant)
             {
@@ -303,7 +313,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             replicantCooldown = ReplicantCooldown;
             Main.projectile[proj].netUpdate = true;
 
-            // Placement burst
             for (int i = 0; i < 20; i++)
             {
                 float a = Main.rand.NextFloat(MathHelper.TwoPi);
@@ -329,7 +338,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             replicantProjIndex = -1;
             replicantCooldown = ReplicantCooldown;
 
-            // Warp flash particles on the PLAYER side
             for (int i = 0; i < 20; i++)
             {
                 float a = Main.rand.NextFloat(MathHelper.TwoPi);
@@ -399,7 +407,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             {
                 if (!specialKeyWasHeld)
                 {
-                    // Cycle: Mine → WaterCannon → WaterReplicant → Mine …
                     currentM2Mode = currentM2Mode switch
                     {
                         M2Mode.Mine => M2Mode.WaterCannon,
@@ -410,10 +417,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
                     specialKeyWasHeld = true;
 
-                    // Reset in-progress states from other modes
                     beamChargeTimer = 0;
                     beamCharged = false;
                     m2HoldTimer = 0;
+                    // FIX: also reset replicant tap state when switching modes
+                    replicantM2WasHeld = false;
 
                     Projectile.netUpdate = true;
                 }

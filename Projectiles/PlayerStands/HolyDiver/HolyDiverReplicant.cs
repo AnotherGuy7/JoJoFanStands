@@ -198,15 +198,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         public void ConsumeAsWarp()
         {
             Player owner = Main.player[Projectile.owner];
-
-            // Teleport the player here
             owner.Teleport(Projectile.Center - new Vector2(owner.width / 2f, owner.height / 2f),
                            TeleportationStyleID.DebugTeleport);
-
-            // Enter warp-death phase
             Projectile.ai[0] = 1f;
             Projectile.netUpdate = true;
-
             SoundEngine.PlaySound(SoundID.Item6, Projectile.Center);
         }
 
