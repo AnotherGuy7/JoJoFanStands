@@ -33,6 +33,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         // -------------------------------------------------------
         private const int WaterCannonDamage = 75;
         private const int WaterMissileDamage = 55;
+        private const int MineDamage = 120; // base; multiplied x3 by ModifyHitNPC in the mine itself
+        private const int MinePlaceCooldown = 90;
+        private int mineCooldownTimer = 0;
         private const float CannonSpeed = 18f;
         private const float MissileSpeed = 9f;
         /// <summary>Ticks the Special key must be held to trigger missiles instead of beam.</summary>
@@ -91,6 +94,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             if (waterCannonCooldownTimer > 0)
                 waterCannonCooldownTimer--;
+            if (mineCooldownTimer > 0)
+                mineCooldownTimer--;
 
             if (mPlayer.standOut)
                 Projectile.timeLeft = 2;
@@ -182,11 +187,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                     punchAnimationTimer = 0;
                 }
 
-                // ---- Special 2 - Hydro Symbiosis install form ----
-                if (SecondSpecialKeyPressed(false))
+                // ---- Special 2 - Scorching Hot Mine ----
+                if (SecondSpecialKeyPressed() && mineCooldownTimer <= 0)
                 {
-                    // TODO: Enter Hydro Symbiosis form
-                    currentAnimationState = AnimationState.HydroSymbiosis;
+                    PlaceMine(player);
+                    mineCooldownTimer = MinePlaceCooldown;
+                    Projectile.netUpdate = true;
                 }
             }
             else
@@ -204,6 +210,20 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         // -------------------------------------------------------
         // Scorching Hot Water Cannon
         // -------------------------------------------------------
+
+        private void PlaceMine(Player player)
+        {
+            int proj = Projectile.NewProjectile(
+                Projectile.GetSource_FromThis(),
+                Projectile.Center,
+                Vector2.Zero,
+                ModContent.ProjectileType<HolyDiverMine>(),
+                MineDamage,
+                2f,
+                Projectile.owner);
+            Main.projectile[proj].netUpdate = true;
+            SoundEngine.PlaySound(SoundID.Item4, player.Center);
+        }
 
         private void FireWaterCannon(Player player, bool missile)
         {
@@ -370,6 +390,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             writer.Write(specialHoldTimer);
             writer.Write(waterCannonCooldownTimer);
             writer.Write(beamTimer);
+            writer.Write(mineCooldownTimer);
         }
 
         public override void ReceiveExtraStates(BinaryReader reader)
@@ -378,6 +399,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             specialHoldTimer = reader.ReadInt32();
             waterCannonCooldownTimer = reader.ReadInt32();
             beamTimer = reader.ReadInt32();
+            mineCooldownTimer = reader.ReadInt32();
         }
 
         // -------------------------------------------------------
