@@ -82,6 +82,19 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private const int PassiveAccrualInterval = 90;
         private int passiveAccrualTimer = 0;
 
+        private int holyWaterBeamTimer = 0;
+        private int holyWaterFireRateTimer = 0;
+        private const int HolyWaterBeamDuration = 90;
+        private const int HolyWaterFireRate = 5;
+        private const int HolyWaterProjectileSpeed = 12;
+        private const int HolyWaterHoldMax = 120;
+        private const int HolyWaterBurnBonusMax = 600;
+        private const int HolyWaterHealAmount = 20;
+        private const int HolyWaterHealCooldown = 90;
+        private const int HolyWaterCooldown = 45;
+        private bool holyWaterActive => holyWaterBeamTimer > 0;
+        private int holyWaterCooldownTimer = 0;
+
         // -------------------------------------------------------
         // Replicant tracking
         // -------------------------------------------------------
@@ -100,7 +113,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         // -------------------------------------------------------
         // M2 mode
         // -------------------------------------------------------
-        public enum M2Mode { WaterReplicant, WaterCannon, Mine, WaterAbsorption }
+        public enum M2Mode { WaterReplicant, WaterCannon, Mine, WaterAbsorption, HolyWater }
         public M2Mode currentM2Mode = M2Mode.WaterReplicant;
 
         // -------------------------------------------------------
@@ -151,6 +164,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             SelectAnimation();
             UpdateStandInfo();
             TickTimers();
+            TickHolyWaterBeam(player);
 
             if (mPlayer.standOut)
                 Projectile.timeLeft = 2;
@@ -286,6 +300,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 case M2Mode.WaterAbsorption:
                     DoWaterAbsorption(player);
                     currentAnimationState = AnimationState.Idle;
+                    break;
+
+                case M2Mode.HolyWater:
+                    HandleHolyWater(player);
                     break;
             }
         }
@@ -433,7 +451,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                         M2Mode.Mine => M2Mode.WaterCannon,
                         M2Mode.WaterCannon => M2Mode.WaterReplicant,
                         M2Mode.WaterReplicant => M2Mode.WaterAbsorption,
-                        M2Mode.WaterAbsorption => M2Mode.Mine,
+                        M2Mode.WaterAbsorption => M2Mode.HolyWater,
+                        M2Mode.HolyWater => M2Mode.Mine,
                         _ => M2Mode.Mine
                     };
 
@@ -697,6 +716,82 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             return hit;
         }
 
+        private void HandleHolyWater(Player player)
+        {
+            // Start beam on press if not cooling down
+            if (!holyWaterActive && holyWaterCooldownTimer <= 0)
+            {
+                holyWaterBeamTimer = HolyWaterBeamDuration;
+                holyWaterFireRateTimer = 0;
+                Projectile.netUpdate = true;
+            }
+        }
+
+        private void TickHolyWaterBeam(Player player)
+        {
+            if (holyWaterCooldownTimer > 0) holyWaterCooldownTimer--;
+            if (!holyWaterActive) return;
+
+            // Stop if M2 released
+            if (!Main.mouseRight || currentM2Mode != M2Mode.HolyWater)
+            {
+                holyWaterBeamTimer = 0;
+                holyWaterCooldownTimer = HolyWaterCooldown;
+                currentAnimationState = AnimationState.Idle;
+                Projectile.netUpdate = true;
+                return;
+            }
+
+            holyWaterBeamTimer--;
+            holyWaterFireRateTimer--;
+            currentAnimationState = AnimationState.Secondary;
+
+            if (holyWaterFireRateTimer <= 0)
+            {
+                FireHolyWaterShot(player);
+                holyWaterFireRateTimer = HolyWaterFireRate;
+            }
+
+            // Refresh beam while held — keeps firing as long as button is down
+            if (holyWaterBeamTimer <= 0 && Main.mouseRight)
+            {
+                holyWaterBeamTimer = HolyWaterBeamDuration;
+            }
+
+            Projectile.netUpdate = true;
+        }
+
+        private void FireHolyWaterShot(Player player)
+        {
+            WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
+            if (!wgp.TrySpend(WaterCostHolyWater))
+            {
+                holyWaterBeamTimer = 0;
+                return;
+            }
+
+            // Also heal the owner on each shot tick
+            player.Heal(2);
+            player.AddBuff(BuffID.Ironskin, 300);
+
+            Vector2 toMouse = Main.MouseWorld - Projectile.Center;
+            if (toMouse == Vector2.Zero) toMouse = Vector2.UnitX;
+            toMouse.Normalize();
+            toMouse *= HolyWaterProjectileSpeed;
+
+            int proj = Projectile.NewProjectile(
+                Projectile.GetSource_FromThis(),
+                Projectile.Center,
+                toMouse,
+                ModContent.ProjectileType<HolyDiverHolyWater>(),
+                PunchDamage / 2,
+                2f,
+                Projectile.owner);
+            Main.projectile[proj].netUpdate = true;
+
+            SoundEngine.PlaySound(SoundID.Splash, player.Center);
+        }
+
         private void TickSalvo(Player player)
         {
             if (salvoRemaining <= 0) return;
@@ -861,6 +956,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             writer.Write(beamCharged);
             writer.Write(replicantProjIndex);
             writer.Write(replicantCooldown);
+            writer.Write(holyWaterBeamTimer);
+            writer.Write(holyWaterCooldownTimer);
         }
 
         public override void ReceiveExtraStates(BinaryReader reader)
@@ -877,6 +974,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             beamCharged = reader.ReadBoolean();
             replicantProjIndex = reader.ReadInt32();
             replicantCooldown = reader.ReadInt32();
+            holyWaterBeamTimer = reader.ReadInt32();
+            holyWaterCooldownTimer = reader.ReadInt32();
         }
 
 
