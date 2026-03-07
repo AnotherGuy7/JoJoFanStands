@@ -49,6 +49,30 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private const int ReplicantCooldown = 180;
 
         // -------------------------------------------------------
+        // Symbiosis sword constants
+        // -------------------------------------------------------
+        /// <summary>Base damage for a standard symbiosis swing.</summary>
+        private const int SymbiosisSwordDamage = 110;
+        /// <summary>Multiplier applied to damage for a fully charged swing.</summary>
+        private const float SymbiosisChargedDamageMultiplier = 2.2f;
+        /// <summary>Ticks between standard swing attacks.</summary>
+        private const int SymbiosisSwordCooldown = 22;
+        /// <summary>Ticks the player must hold M1 to produce a charged swing.</summary>
+        private const int SymbiosisChargeThreshold = 45;
+        /// <summary>How long (ticks) the charged projectile lives.</summary>
+        private const int SymbiosisChargedLifetime = 28;
+        /// <summary>How long (ticks) the standard projectile lives.</summary>
+        private const int SymbiosisSwingLifetime = 18;
+
+        // -------------------------------------------------------
+        // Symbiosis sword state
+        // -------------------------------------------------------
+        private int symbiosisSwordCooldown = 0;
+        private int symbiosisM1HoldTimer = 0;   // tracks how long M1 is held in symbiosis
+        private bool symbiosisM1WasHeld = false;
+        private bool symbiosisChargeReleased = false; // fired when released after threshold
+
+        // -------------------------------------------------------
         // Timers
         // -------------------------------------------------------
         private int mineCooldownTimer = 0;
@@ -174,7 +198,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 if (Projectile.owner == Main.myPlayer)
                 {
                     HandleHydroSymbiosis(player);
-                    if (hydroSymbiosisActive) return;
+                    if (hydroSymbiosisActive)
+                    {
+                        HandleSymbiosisM1(player);
+                        return;
+                    }
                     HandleM1();
                     HandleM2(player);
                     HandleSpecialToggle();
@@ -208,6 +236,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (mineCooldownTimer > 0) mineCooldownTimer--;
             if (beamFireRateTimer > 0) beamFireRateTimer--;
             if (replicantCooldown > 0) replicantCooldown--;
+            if (symbiosisSwordCooldown > 0) symbiosisSwordCooldown--;
         }
 
         private bool CanFireCannon => waterCannonCooldownTimer <= 0;
@@ -215,6 +244,122 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private bool BeamIsActive => beamTimer > 0;
         private bool IsChargingBeam => beamChargeTimer > 0 && !beamCharged;
         private bool CanUseReplicant => replicantCooldown <= 0;
+
+
+        // -------------------------------------------------------
+        // Symbiosis M1 — standard swing + charged swing
+        // -------------------------------------------------------
+
+        /// <summary>
+        /// Called every tick while Hydro Symbiosis is active (owner only).
+        /// • Tap / release before threshold → standard swing on release (cooldown gated).
+        /// • Hold past threshold        → charge animation; charged swing fires on release.
+        /// The swing projectile is a <see cref="HolyDiverSymbiosisSword"/> arc that stays
+        /// anchored to the stand/player center and sweeps in the direction of the cursor.
+        /// </summary>
+        private void HandleSymbiosisM1(Player player)
+        {
+            bool m1Held = Main.mouseLeft;
+
+            if (m1Held)
+            {
+                symbiosisM1HoldTimer++;
+
+                // Show charge animation once past threshold
+                if (symbiosisM1HoldTimer >= SymbiosisChargeThreshold)
+                    currentAnimationState = AnimationState.Attack; // reuse attack anim or add new one
+                else
+                    currentAnimationState = AnimationState.Idle;
+            }
+            else
+            {
+                // Released this frame
+                if (symbiosisM1WasHeld)
+                {
+                    bool wasCharged = symbiosisM1HoldTimer >= SymbiosisChargeThreshold;
+
+                    if (symbiosisSwordCooldown <= 0)
+                    {
+                        FireSymbiosisSword(player, wasCharged);
+                        symbiosisSwordCooldown = wasCharged
+                            ? SymbiosisSwordCooldown * 2   // longer recovery after charged swing
+                            : SymbiosisSwordCooldown;
+                    }
+
+                    symbiosisM1HoldTimer = 0;
+                    symbiosisM1WasHeld = false;
+                    currentAnimationState = AnimationState.Idle;
+                    Projectile.netUpdate = true;
+                    return;
+                }
+
+                symbiosisM1HoldTimer = 0;
+            }
+
+            symbiosisM1WasHeld = m1Held;
+        }
+
+        /// <summary>
+        /// Spawns a <see cref="HolyDiverSymbiosisSword"/> arc projectile aimed at the cursor.
+        /// ai[0]: 0 = standard, 1 = charged.
+        /// ai[1]: base angle of the swing.
+        /// </summary>
+        private void FireSymbiosisSword(Player player, bool charged)
+        {
+            Vector2 toMouse = Main.MouseWorld - Projectile.Center;
+            if (toMouse == Vector2.Zero) toMouse = Vector2.UnitX;
+            float baseAngle = toMouse.ToRotation();
+
+            int damage = charged
+                ? (int)(SymbiosisSwordDamage * SymbiosisChargedDamageMultiplier)
+                : SymbiosisSwordDamage;
+
+            int proj = Projectile.NewProjectile(
+                Projectile.GetSource_FromThis(),
+                Projectile.Center,
+                Vector2.Zero,   // position is managed by the sword projectile's AI
+                ModContent.ProjectileType<HolyDiverSymbiosisSword>(),
+                damage,
+                charged ? 8f : 5f,
+                Projectile.owner,
+                ai0: charged ? 1f : 0f,
+                ai1: baseAngle);
+
+            // Override timeLeft so the sword knows its own lifespan
+            Main.projectile[proj].timeLeft = charged ? SymbiosisChargedLifetime : SymbiosisSwingLifetime;
+            Main.projectile[proj].netUpdate = true;
+
+            // Guaranteed crit for charged swings (set crit chance artificially high)
+            if (charged)
+                Main.projectile[proj].CritChance = 100;
+
+            SoundEngine.PlaySound(charged ? SoundID.Item71 : SoundID.Item1, player.Center);
+
+            // Visual burst on charged release
+            if (charged)
+            {
+                for (int i = 0; i < 20; i++)
+                {
+                    float a = Main.rand.NextFloat(MathHelper.TwoPi);
+                    Vector2 vel = new Vector2(Main.rand.NextFloat(3f, 7f), 0f).RotatedBy(a);
+                    int d = Dust.NewDust(Projectile.Center, 4, 4, DustID.Water,
+                        vel.X, vel.Y, 0, Color.OrangeRed, 2.0f);
+                    Main.dust[d].noGravity = true;
+                }
+
+                for (int i = 0; i < 10; i++)
+                {
+                    float a = Main.rand.NextFloat(MathHelper.TwoPi);
+                    Vector2 vel = new Vector2(Main.rand.NextFloat(2f, 5f), 0f).RotatedBy(a);
+                    int sp = Dust.NewDust(Projectile.Center, 2, 2, DustID.Electric,
+                        vel.X, vel.Y, 0, Color.White, 1.4f);
+                    Main.dust[sp].noGravity = true;
+                }
+            }
+
+            currentAnimationState = AnimationState.Attack;
+            Projectile.netUpdate = true;
+        }
 
 
         // -------------------------------------------------------
@@ -314,12 +459,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         // Water Replicant M2 logic
         // -------------------------------------------------------
 
-        /// <summary>
-        /// Single tap M2 in Replicant mode:
-        ///   • If NO replicant exists → place one at the stand's current position.
-        ///   • If a replicant EXISTS → warp the player to it and destroy it.
-        /// Uses a dedicated bool for tap detection instead of sharing m2HoldTimer.
-        /// </summary>
         private void HandleReplicantM2(Player player)
         {
             if (replicantM2WasHeld)
@@ -592,11 +731,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Projectile.netUpdate = true;
         }
 
-        /// <summary>
-        /// Water Absorption: absorbs from nearby water tiles, then nearby enemies,
-        /// then passively accrues if nothing else is available.
-        /// Does NOT remove or lower tile water levels.
-        /// </summary>
         private void DoWaterAbsorption(Player player)
         {
             WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
@@ -649,9 +783,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Projectile.netUpdate = true;
         }
 
-        /// <summary>
-        /// Returns world-space center positions of up to MaxTileClusters water tiles near the player.
-        /// </summary>
         private List<Vector2> GetNearbyWaterTilePositions(Player player)
         {
             int radiusTiles = AbsorptionRadius / 16;
@@ -684,10 +815,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             return positions;
         }
 
-        /// <summary>
-        /// Hits up to MaxEnemyAbsorb enemies within radius for minor damage
-        /// and adds to totalRestored. Returns how many were hit.
-        /// </summary>
         private int AbsorbFromEnemies(Player player, ref int totalRestored)
         {
             int hit = 0;
@@ -720,7 +847,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         private void HandleHolyWater(Player player)
         {
-            // Start beam on press if not cooling down
             if (!holyWaterActive && holyWaterCooldownTimer <= 0)
             {
                 holyWaterBeamTimer = HolyWaterBeamDuration;
@@ -734,7 +860,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (holyWaterCooldownTimer > 0) holyWaterCooldownTimer--;
             if (!holyWaterActive) return;
 
-            // Stop if M2 released
             if (!Main.mouseRight || currentM2Mode != M2Mode.HolyWater)
             {
                 holyWaterBeamTimer = 0;
@@ -754,7 +879,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 holyWaterFireRateTimer = HolyWaterFireRate;
             }
 
-            // Refresh beam while held — keeps firing as long as button is down
             if (holyWaterBeamTimer <= 0 && Main.mouseRight)
             {
                 holyWaterBeamTimer = HolyWaterBeamDuration;
@@ -772,7 +896,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 return;
             }
 
-            // Also heal the owner on each shot tick
             player.Heal(2);
             player.AddBuff(BuffID.Ironskin, 300);
 
@@ -980,6 +1103,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             hydroSymbiosisActive = true;
             hydroDrainTimer = 0;
 
+            // Reset sword state on entry so there's no phantom held-charge
+            symbiosisM1HoldTimer = 0;
+            symbiosisM1WasHeld = false;
+            symbiosisSwordCooldown = 0;
+
             player.wingTimeMax = int.MaxValue / 2;
 
             player.AddBuff(BuffID.Ironskin, HydroSymbiosisBuffTime);
@@ -1058,6 +1186,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             hydroSymbiosisActive = false;
             hydroDrainTimer = 0;
 
+            // Clean up sword state
+            symbiosisM1HoldTimer = 0;
+            symbiosisM1WasHeld = false;
+
             FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
 
             fPlayer.customCameraOverride = false;
@@ -1128,6 +1260,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             writer.Write(replicantCooldown);
             writer.Write(holyWaterBeamTimer);
             writer.Write(holyWaterCooldownTimer);
+            writer.Write(symbiosisSwordCooldown);
+            writer.Write(symbiosisM1HoldTimer);
         }
 
         public override void ReceiveExtraStates(BinaryReader reader)
@@ -1146,6 +1280,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             replicantCooldown = reader.ReadInt32();
             holyWaterBeamTimer = reader.ReadInt32();
             holyWaterCooldownTimer = reader.ReadInt32();
+            symbiosisSwordCooldown = reader.ReadInt32();
+            symbiosisM1HoldTimer = reader.ReadInt32();
         }
 
 
