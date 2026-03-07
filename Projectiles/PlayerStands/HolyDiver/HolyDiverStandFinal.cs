@@ -939,21 +939,20 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
         }
 
-        #region Hydro Symbiosis — Install Form
+        #region Hydro Symbiosis
 
         private const int WaterDrainPerTick = 1;
         private const int HydroSymbiosisDrainInterval = 20;
         private const int HydroSymbiosisBuffTime = 2;
+
         private bool hydroSymbiosisActive = false;
         private bool secondSpecialWasHeld = false;
         private int hydroDrainTimer = 0;
-        private int savedPlayerWidth;
-        private int savedPlayerHeight;
-        private bool savedPlayerInvisible;
 
         private void HandleHydroSymbiosis(Player player)
         {
             bool keyHeld = SecondSpecialKeyCurrent();
+
             if (keyHeld && !secondSpecialWasHeld)
             {
                 secondSpecialWasHeld = true;
@@ -968,6 +967,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             if (!keyHeld)
                 secondSpecialWasHeld = false;
+
             if (hydroSymbiosisActive)
                 TickHydroSymbiosis(player);
         }
@@ -975,25 +975,19 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private void EnterHydroSymbiosis(Player player)
         {
             WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
-            if (wgp.CurrentWater <= 0) return;
+            if (wgp.IsEmpty) return;
+
             hydroSymbiosisActive = true;
             hydroDrainTimer = 0;
-            savedPlayerWidth = player.width;
-            savedPlayerHeight = player.height;
-            savedPlayerInvisible = player.invis;
 
-            player.invis = true;
-            player.immune = true;
-            player.immuneTime = 2;
-
-            TeleportPlayerToStand(player);
             player.wingTimeMax = int.MaxValue / 2;
+
             player.AddBuff(BuffID.Ironskin, HydroSymbiosisBuffTime);
             player.AddBuff(BuffID.Regeneration, HydroSymbiosisBuffTime);
             player.AddBuff(BuffID.Swiftness, HydroSymbiosisBuffTime);
             player.AddBuff(BuffID.Endurance, HydroSymbiosisBuffTime);
 
-            currentAnimationState = AnimationState.HydroSymbiosis;
+            currentAnimationState = AnimationState.Idle;
             Projectile.netUpdate = true;
 
             SoundEngine.PlaySound(SoundID.Item29, player.Center);
@@ -1003,19 +997,34 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private void TickHydroSymbiosis(Player player)
         {
             WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
-            TeleportPlayerToStand(player);
-            player.invis = true;
-            player.immuneTime = System.Math.Max(player.immuneTime, 2);
+            MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
+            FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
+
+            mPlayer.hideAllPlayerLayers = true;
+
+            player.immune = true;
+            player.immuneTime = System.Math.Max(player.immuneTime, 3);
+
+            player.position = Projectile.Center - new Vector2(player.width * 0.5f, player.height * 0.5f);
+
+            fPlayer.customCameraOverride = true;
+            fPlayer.customCameraPosition = Projectile.Center - new Vector2(
+                Main.screenWidth * 0.5f,
+                Main.screenHeight * 0.5f);
+
             player.wingTime = player.wingTimeMax;
-            player.velocity.Y = System.Math.Clamp(player.velocity.Y, -20f, 20f);
+
             player.AddBuff(BuffID.Ironskin, HydroSymbiosisBuffTime);
             player.AddBuff(BuffID.Regeneration, HydroSymbiosisBuffTime);
             player.AddBuff(BuffID.Swiftness, HydroSymbiosisBuffTime);
             player.AddBuff(BuffID.Endurance, HydroSymbiosisBuffTime);
+
             ClearAllDebuffs(player);
+
             Projectile.Center = player.Center;
             Projectile.velocity = player.velocity;
-            currentAnimationState = AnimationState.HydroSymbiosis;
+
+            currentAnimationState = AnimationState.Idle;
             hydroDrainTimer++;
             if (hydroDrainTimer >= HydroSymbiosisDrainInterval)
             {
@@ -1027,6 +1036,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                     return;
                 }
             }
+
             Projectile.netUpdate = true;
         }
 
@@ -1034,23 +1044,26 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         {
             hydroSymbiosisActive = false;
             hydroDrainTimer = 0;
-            player.invis = savedPlayerInvisible;
-            player.immuneTime = 0;
+
+            FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
+            fPlayer.customCameraOverride = false;
             player.Center = Projectile.Center;
+            player.immuneTime = 0;
             player.wingTimeMax = 0;
             currentAnimationState = AnimationState.Idle;
             Projectile.netUpdate = true;
 
             SoundEngine.PlaySound(SoundID.Item29, player.Center);
             SpawnInstallParticles(player);
+
+            // TODO: DoJudgementCutEnd(player);
         }
 
         // ── Helpers ───────────────────────────────────────────────────────────────────
-        private void TeleportPlayerToStand(Player player)
-        {
-            player.position = Projectile.Center - new Vector2(player.width * 0.5f, player.height * 0.5f);
-        }
 
+        /// <summary>
+        /// Strips every active debuff from the player each tick.
+        /// </summary>
         private void ClearAllDebuffs(Player player)
         {
             for (int i = 0; i < Player.MaxBuffs; i++)
@@ -1065,6 +1078,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
         }
 
+        /// <summary>
+        /// Burst of water + electric particles on enter/exit.
+        /// </summary>
         private void SpawnInstallParticles(Player player)
         {
             for (int i = 0; i < 40; i++)
