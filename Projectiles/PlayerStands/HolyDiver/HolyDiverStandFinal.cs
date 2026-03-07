@@ -65,12 +65,28 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private const int SymbiosisSwingLifetime = 18;
 
         // -------------------------------------------------------
+        // Symbiosis Iai Slash (M2) constants
+        // -------------------------------------------------------
+        /// <summary>Damage dealt to each enemy hit by the Iai Slash. Always crits.</summary>
+        private const int IaiSlashDamage = 200;
+        /// <summary>Half-width of the slash line (pixels). Keeps it a thin line, not a fat box.</summary>
+        private const float IaiSlashHalfWidth = 24f;
+        /// <summary>Maximum reach of the slash from the player (pixels).</summary>
+        private const float IaiSlashMaxRange = 1400f;
+        /// <summary>Cooldown between Iai Slashes (ticks).</summary>
+        private const int IaiSlashCooldown = 90;
+        /// <summary>Extra pixels past the last hit enemy where the player lands.</summary>
+        private const float IaiSlashOvershoot = 80f;
+
+        // -------------------------------------------------------
         // Symbiosis sword state
         // -------------------------------------------------------
         private int symbiosisSwordCooldown = 0;
         private int symbiosisM1HoldTimer = 0;   // tracks how long M1 is held in symbiosis
         private bool symbiosisM1WasHeld = false;
         private bool symbiosisChargeReleased = false; // fired when released after threshold
+        private int iaiSlashCooldown = 0;
+        private bool symbiosisM2WasHeld = false;
 
         // -------------------------------------------------------
         // Timers
@@ -237,6 +253,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (beamFireRateTimer > 0) beamFireRateTimer--;
             if (replicantCooldown > 0) replicantCooldown--;
             if (symbiosisSwordCooldown > 0) symbiosisSwordCooldown--;
+            if (iaiSlashCooldown > 0) iaiSlashCooldown--;
         }
 
         private bool CanFireCannon => waterCannonCooldownTimer <= 0;
@@ -257,8 +274,16 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         /// The swing projectile is a <see cref="HolyDiverSymbiosisSword"/> arc that stays
         /// anchored to the stand/player center and sweeps in the direction of the cursor.
         /// </summary>
+        /// <summary>
+        /// Handles ALL player input while Hydro Symbiosis is active (owner only).
+        /// M1 → standard/charged sword swing.
+        /// M2 → Iai Slash (tap; single-frame teleport dash through enemies).
+        /// </summary>
         private void HandleSymbiosisM1(Player player)
         {
+            // ---- M2: Iai Slash (tap detection) ----
+            HandleIaiSlash(player);
+
             bool m1Held = Main.mouseLeft;
 
             if (m1Held)
@@ -363,8 +388,145 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
 
         // -------------------------------------------------------
-        // Input handlers
+        // Ability: Iai Slash (Symbiosis M2)
         // -------------------------------------------------------
+        private void HandleIaiSlash(Player player)
+        {
+            bool m2Held = Main.mouseRight;
+
+            if (m2Held && !symbiosisM2WasHeld)
+            {
+                symbiosisM2WasHeld = true;
+
+                if (iaiSlashCooldown <= 0)
+                    PerformIaiSlash(player);
+            }
+            else if (!m2Held)
+            {
+                symbiosisM2WasHeld = false;
+            }
+        }
+
+        private void PerformIaiSlash(Player player)
+        {
+            Vector2 origin = player.Center;
+            Vector2 target = Main.MouseWorld;
+            Vector2 rawDir = target - origin;
+            float rawDist = rawDir.Length();
+
+            if (rawDist < 1f) rawDir = Vector2.UnitX;
+            else rawDir /= rawDist;
+
+            float slashLength = System.Math.Min(rawDist, IaiSlashMaxRange);
+            Vector2 slashEnd = origin + rawDir * slashLength;
+
+            float wallLimit = FindWallLimit(origin, rawDir, slashLength);
+            Vector2 safeEnd = origin + rawDir * wallLimit;
+
+            float furthestHitDist = -1f;
+
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC npc = Main.npc[i];
+                if (!npc.active || npc.friendly || npc.lifeMax <= 5 || npc.dontTakeDamage)
+                    continue;
+
+                float t = Vector2.Dot(npc.Center - origin, rawDir);
+                if (t < 0f || t > wallLimit) continue;
+
+                Vector2 closest = origin + rawDir * t;
+                float perp = Vector2.Distance(npc.Center, closest);
+
+                float hitRadius = IaiSlashHalfWidth + npc.width * 0.4f;
+                if (perp > hitRadius) continue;
+
+                if (Projectile.owner == Main.myPlayer)
+                {
+                    npc.SimpleStrikeNPC(
+                        damage: IaiSlashDamage,
+                        hitDirection: rawDir.X >= 0f ? 1 : -1,
+                        crit: true,
+                        noPlayerInteraction: false);
+
+                    for (int k = 0; k < 10; k++)
+                    {
+                        float a = Main.rand.NextFloat(MathHelper.TwoPi);
+                        Vector2 v = new Vector2(Main.rand.NextFloat(3f, 8f), 0f).RotatedBy(a);
+                        int d = Dust.NewDust(npc.Center, 4, 4, DustID.Water,
+                            v.X, v.Y, 0, Color.OrangeRed, 1.8f);
+                        Main.dust[d].noGravity = true;
+                    }
+                    for (int k = 0; k < 5; k++)
+                    {
+                        float a = Main.rand.NextFloat(MathHelper.TwoPi);
+                        Vector2 v = new Vector2(Main.rand.NextFloat(2f, 5f), 0f).RotatedBy(a);
+                        int sp = Dust.NewDust(npc.Center, 2, 2, DustID.Electric,
+                            v.X, v.Y, 0, Color.White, 1.2f);
+                        Main.dust[sp].noGravity = true;
+                    }
+                }
+
+                if (t > furthestHitDist)
+                    furthestHitDist = t;
+            }
+
+            float tpDist;
+            if (furthestHitDist >= 0f)
+                tpDist = System.Math.Min(furthestHitDist + IaiSlashOvershoot, wallLimit);
+            else
+                tpDist = wallLimit;
+
+            Vector2 tpPos = origin + rawDir * tpDist;
+
+            if (Projectile.owner == Main.myPlayer)
+            {
+                player.Center = tpPos;
+                Projectile.Center = tpPos;
+                player.velocity = rawDir * 6f;
+                player.immune = true;
+                player.immuneTime = System.Math.Max(player.immuneTime, 25);
+                SoundEngine.PlaySound(SoundID.Item71, tpPos);
+            }
+
+            int visual = Projectile.NewProjectile(
+                Projectile.GetSource_FromThis(),
+                safeEnd,
+                Vector2.Zero,
+                ModContent.ProjectileType<HolyDiverIaiSlashVisual>(),
+                0, 0f,
+                Projectile.owner,
+                ai0: origin.X,
+                ai1: origin.Y);
+            Main.projectile[visual].netUpdate = true;
+
+            iaiSlashCooldown = IaiSlashCooldown;
+            currentAnimationState = AnimationState.Secondary;
+            Projectile.netUpdate = true;
+        }
+
+        private float FindWallLimit(Vector2 origin, Vector2 dir, float maxDist)
+        {
+            const float StepSize = 8f;
+            int steps = (int)(maxDist / StepSize);
+
+            for (int s = 1; s <= steps; s++)
+            {
+                Vector2 check = origin + dir * (s * StepSize);
+                int tx = (int)(check.X / 16f);
+                int ty = (int)(check.Y / 16f);
+
+                if (tx < 0 || ty < 0 || tx >= Main.maxTilesX || ty >= Main.maxTilesY)
+                    return s * StepSize;
+
+                Tile tile = Main.tile[tx, ty];
+                if (tile != null && tile.HasTile && Main.tileSolid[tile.TileType] && !Main.tileSolidTop[tile.TileType])
+                    return (s - 1) * StepSize;
+            }
+
+            return maxDist;
+        }
+
+
 
         private void HandleM1()
         {
@@ -1107,6 +1269,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             symbiosisM1HoldTimer = 0;
             symbiosisM1WasHeld = false;
             symbiosisSwordCooldown = 0;
+            symbiosisM2WasHeld = false;
+            iaiSlashCooldown = 0;
 
             player.wingTimeMax = int.MaxValue / 2;
 
@@ -1189,6 +1353,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             // Clean up sword state
             symbiosisM1HoldTimer = 0;
             symbiosisM1WasHeld = false;
+            symbiosisM2WasHeld = false;
 
             FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
 
@@ -1262,6 +1427,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             writer.Write(holyWaterCooldownTimer);
             writer.Write(symbiosisSwordCooldown);
             writer.Write(symbiosisM1HoldTimer);
+            writer.Write(iaiSlashCooldown);
         }
 
         public override void ReceiveExtraStates(BinaryReader reader)
@@ -1282,6 +1448,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             holyWaterCooldownTimer = reader.ReadInt32();
             symbiosisSwordCooldown = reader.ReadInt32();
             symbiosisM1HoldTimer = reader.ReadInt32();
+            iaiSlashCooldown = reader.ReadInt32();
         }
 
 
