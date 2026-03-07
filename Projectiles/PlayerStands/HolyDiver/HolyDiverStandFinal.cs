@@ -1012,7 +1012,19 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 Main.screenWidth * 0.5f,
                 Main.screenHeight * 0.5f);
 
-            player.wingTime = player.wingTimeMax;
+            player.noFallDmg = true;
+            player.gravity = 0f;
+
+            const float FlyMaxSpeed = 14f;
+            const float FlyAccel = 0.6f;
+            const float FlyFriction = 0.85f;
+
+            if (player.controlJump)
+                player.velocity.Y = System.Math.Max(player.velocity.Y - FlyAccel, -FlyMaxSpeed);
+            else if (player.controlDown)
+                player.velocity.Y = System.Math.Min(player.velocity.Y + FlyAccel, FlyMaxSpeed);
+            else
+                player.velocity.Y *= FlyFriction;
 
             player.AddBuff(BuffID.Ironskin, HydroSymbiosisBuffTime);
             player.AddBuff(BuffID.Regeneration, HydroSymbiosisBuffTime);
@@ -1025,6 +1037,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Projectile.velocity = player.velocity;
 
             currentAnimationState = AnimationState.Idle;
+
             hydroDrainTimer++;
             if (hydroDrainTimer >= HydroSymbiosisDrainInterval)
             {
@@ -1046,24 +1059,21 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             hydroDrainTimer = 0;
 
             FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
+
             fPlayer.customCameraOverride = false;
+
             player.Center = Projectile.Center;
             player.immuneTime = 0;
+
             player.wingTimeMax = 0;
+
             currentAnimationState = AnimationState.Idle;
             Projectile.netUpdate = true;
 
             SoundEngine.PlaySound(SoundID.Item29, player.Center);
             SpawnInstallParticles(player);
-
-            // TODO: DoJudgementCutEnd(player);
         }
 
-        // ── Helpers ───────────────────────────────────────────────────────────────────
-
-        /// <summary>
-        /// Strips every active debuff from the player each tick.
-        /// </summary>
         private void ClearAllDebuffs(Player player)
         {
             for (int i = 0; i < Player.MaxBuffs; i++)
@@ -1078,9 +1088,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
         }
 
-        /// <summary>
-        /// Burst of water + electric particles on enter/exit.
-        /// </summary>
         private void SpawnInstallParticles(Player player)
         {
             for (int i = 0; i < 40; i++)
@@ -1099,6 +1106,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         }
 
         #endregion
+
 
         // -------------------------------------------------------
         // Networking
