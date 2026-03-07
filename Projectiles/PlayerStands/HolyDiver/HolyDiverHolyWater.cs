@@ -21,20 +21,23 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         public override void SetDefaults()
         {
-            Projectile.width = 20;
-            Projectile.height = 20;
+            Projectile.width = 14;
+            Projectile.height = 14;
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.tileCollide = true;
             Projectile.ignoreWater = true;
             Projectile.timeLeft = BeamLifetime;
-            Projectile.penetrate = 5;
-            Projectile.extraUpdates = 6;
+            Projectile.penetrate = 3;
+            Projectile.extraUpdates = 2;
         }
 
         public override void AI()
         {
-            Projectile.rotation += 0.3f;
+            // Manual gravity arc
+            Projectile.velocity.Y += 0.18f;
+
+            Projectile.rotation = Projectile.velocity.ToRotation();
 
             Vector2 vel = Projectile.velocity;
             Vector2 perp = new Vector2(-vel.Y, vel.X);
@@ -73,7 +76,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 Main.dust[g].velocity = Vector2.Zero;
             }
 
-            // Gold shimmer (holy identity)
+            // Gold shimmer
             if (Main.rand.NextBool(4))
             {
                 int gold = Dust.NewDust(
@@ -83,9 +86,36 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                     120, Color.Gold, Main.rand.NextFloat(0.5f, 1.0f));
                 Main.dust[gold].noGravity = true;
             }
+
+            if (Projectile.owner == Main.myPlayer)
+            {
+                for (int i = 0; i < Main.maxNPCs; i++)
+                {
+                    NPC npc = Main.npc[i];
+                    if (!npc.active || !npc.friendly || npc.lifeMax <= 5) continue;
+                    if (!Projectile.Hitbox.Intersects(npc.Hitbox)) continue;
+
+                    npc.life = System.Math.Min(npc.life + 3, npc.lifeMax);
+                    npc.HealEffect(3);
+                    npc.AddBuff(BuffID.Ironskin, 300);
+
+                    for (int j = 0; j < 5; j++)
+                    {
+                        int h = Dust.NewDust(npc.Center, npc.width, npc.height,
+                            DustID.GoldFlame,
+                            Main.rand.NextFloat(-2f, 2f), Main.rand.NextFloat(-3f, 0f),
+                            0, Color.Gold, Main.rand.NextFloat(0.8f, 1.4f));
+                        Main.dust[h].noGravity = true;
+                    }
+
+                    SoundEngine.PlaySound(SoundID.Item4, npc.Center);
+                    Projectile.Kill();
+                    break;
+                }
+            }
         }
 
-        // Enemies: damage + burn
+        // Enemies: damage + burn , Friendly NPCs: heal + ironskin, don't deal damage
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             target.AddBuff(BuffID.OnFire, BurnDuration);
@@ -100,31 +130,17 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
         }
 
-        // Friendly NPCs: heal + ironskin, don't deal damage
         public override bool? CanHitNPC(NPC target)
         {
             if (target.friendly && target.lifeMax > 5)
-            {
-                if (Projectile.owner == Main.myPlayer)
-                {
-                    target.life = System.Math.Min(target.life + 3, target.lifeMax);
-                    target.HealEffect(3);
-                    target.AddBuff(BuffID.Ironskin, 300);
-
-                    for (int i = 0; i < 5; i++)
-                    {
-                        int h = Dust.NewDust(target.Center, target.width, target.height,
-                            DustID.GoldFlame,
-                            Main.rand.NextFloat(-2f, 2f), Main.rand.NextFloat(-3f, 0f),
-                            0, Color.Gold, Main.rand.NextFloat(0.8f, 1.4f));
-                        Main.dust[h].noGravity = true;
-                    }
-
-                    SoundEngine.PlaySound(SoundID.Item4, target.Center);
-                }
-                return false; // never deal damage to friendlies
-            }
+                return false;
             return null;
+        }
+
+        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+        {
+            if (target.friendly)
+                modifiers.FinalDamage.Base -= modifiers.FinalDamage.Base;
         }
 
         public override void OnKill(int timeLeft)

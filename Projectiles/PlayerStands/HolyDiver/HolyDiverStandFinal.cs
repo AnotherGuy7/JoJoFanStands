@@ -69,7 +69,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private const int WaterCostBeamShot = 10;
         private const int WaterCostMissiles = 20;
         private const int WaterCostMine = 5;
-        private const int WaterCostHolyWater = 8;
+        private const int WaterCostHolyWater = 1;
         private const int WaterRestoreAbsorb = 25;
         private const int WaterCostSymbiosis = 1;
         private const int WaterPerTileCluster = 1;
@@ -85,8 +85,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private int holyWaterBeamTimer = 0;
         private int holyWaterFireRateTimer = 0;
         private const int HolyWaterBeamDuration = 90;
-        private const int HolyWaterFireRate = 5;
-        private const int HolyWaterProjectileSpeed = 12;
+        private const int HolyWaterFireRate = 9;
+        private const float HolyWaterProjectileSpeed = 9f;
         private const int HolyWaterHoldMax = 120;
         private const int HolyWaterBurnBonusMax = 600;
         private const int HolyWaterHealAmount = 20;
