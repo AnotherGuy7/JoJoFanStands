@@ -173,6 +173,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             {
                 if (Projectile.owner == Main.myPlayer)
                 {
+                    HandleHydroSymbiosis(player);
+                    if (hydroSymbiosisActive) return;
                     HandleM1();
                     HandleM2(player);
                     HandleSpecialToggle();
@@ -937,6 +939,150 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
         }
 
+        #region Hydro Symbiosis — Install Form
+
+        private const int WaterDrainPerTick = 1;
+        private const int HydroSymbiosisDrainInterval = 20;
+        private const int HydroSymbiosisBuffTime = 2;
+        private bool hydroSymbiosisActive = false;
+        private bool secondSpecialWasHeld = false;
+        private int hydroDrainTimer = 0;
+        private int savedPlayerWidth;
+        private int savedPlayerHeight;
+        private bool savedPlayerInvisible;
+
+        private void HandleHydroSymbiosis(Player player)
+        {
+            bool keyHeld = SecondSpecialKeyCurrent();
+            if (keyHeld && !secondSpecialWasHeld)
+            {
+                secondSpecialWasHeld = true;
+
+                if (!hydroSymbiosisActive)
+                    EnterHydroSymbiosis(player);
+                else
+                    ExitHydroSymbiosis(player, manual: true);
+
+                return;
+            }
+
+            if (!keyHeld)
+                secondSpecialWasHeld = false;
+            if (hydroSymbiosisActive)
+                TickHydroSymbiosis(player);
+        }
+
+        private void EnterHydroSymbiosis(Player player)
+        {
+            WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
+            if (wgp.CurrentWater <= 0) return;
+            hydroSymbiosisActive = true;
+            hydroDrainTimer = 0;
+            savedPlayerWidth = player.width;
+            savedPlayerHeight = player.height;
+            savedPlayerInvisible = player.invis;
+
+            player.invis = true;
+            player.immune = true;
+            player.immuneTime = 2;
+
+            TeleportPlayerToStand(player);
+            player.wingTimeMax = int.MaxValue / 2;
+            player.AddBuff(BuffID.Ironskin, HydroSymbiosisBuffTime);
+            player.AddBuff(BuffID.Regeneration, HydroSymbiosisBuffTime);
+            player.AddBuff(BuffID.Swiftness, HydroSymbiosisBuffTime);
+            player.AddBuff(BuffID.Endurance, HydroSymbiosisBuffTime);
+
+            currentAnimationState = AnimationState.HydroSymbiosis;
+            Projectile.netUpdate = true;
+
+            SoundEngine.PlaySound(SoundID.Item29, player.Center);
+            SpawnInstallParticles(player);
+        }
+
+        private void TickHydroSymbiosis(Player player)
+        {
+            WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
+            TeleportPlayerToStand(player);
+            player.invis = true;
+            player.immuneTime = System.Math.Max(player.immuneTime, 2);
+            player.wingTime = player.wingTimeMax;
+            player.velocity.Y = System.Math.Clamp(player.velocity.Y, -20f, 20f);
+            player.AddBuff(BuffID.Ironskin, HydroSymbiosisBuffTime);
+            player.AddBuff(BuffID.Regeneration, HydroSymbiosisBuffTime);
+            player.AddBuff(BuffID.Swiftness, HydroSymbiosisBuffTime);
+            player.AddBuff(BuffID.Endurance, HydroSymbiosisBuffTime);
+            ClearAllDebuffs(player);
+            Projectile.Center = player.Center;
+            Projectile.velocity = player.velocity;
+            currentAnimationState = AnimationState.HydroSymbiosis;
+            hydroDrainTimer++;
+            if (hydroDrainTimer >= HydroSymbiosisDrainInterval)
+            {
+                hydroDrainTimer = 0;
+
+                if (!wgp.TrySpend(WaterDrainPerTick))
+                {
+                    ExitHydroSymbiosis(player, manual: false);
+                    return;
+                }
+            }
+            Projectile.netUpdate = true;
+        }
+
+        private void ExitHydroSymbiosis(Player player, bool manual)
+        {
+            hydroSymbiosisActive = false;
+            hydroDrainTimer = 0;
+            player.invis = savedPlayerInvisible;
+            player.immuneTime = 0;
+            player.Center = Projectile.Center;
+            player.wingTimeMax = 0;
+            currentAnimationState = AnimationState.Idle;
+            Projectile.netUpdate = true;
+
+            SoundEngine.PlaySound(SoundID.Item29, player.Center);
+            SpawnInstallParticles(player);
+        }
+
+        // ── Helpers ───────────────────────────────────────────────────────────────────
+        private void TeleportPlayerToStand(Player player)
+        {
+            player.position = Projectile.Center - new Vector2(player.width * 0.5f, player.height * 0.5f);
+        }
+
+        private void ClearAllDebuffs(Player player)
+        {
+            for (int i = 0; i < Player.MaxBuffs; i++)
+            {
+                if (player.buffTime[i] <= 0) continue;
+                int type = player.buffType[i];
+                if (type > 0 && Main.debuff[type])
+                {
+                    player.DelBuff(i);
+                    i--;
+                }
+            }
+        }
+
+        private void SpawnInstallParticles(Player player)
+        {
+            for (int i = 0; i < 40; i++)
+            {
+                float angle = Main.rand.NextFloat(MathHelper.TwoPi);
+                float speed = Main.rand.NextFloat(2f, 7f);
+                Vector2 vel = new Vector2(speed, 0f).RotatedBy(angle);
+
+                int dustType = (i % 3 == 0) ? DustID.Electric : DustID.Water;
+                Color color = (i % 3 == 0) ? Color.White : Color.DeepSkyBlue;
+
+                int d = Dust.NewDust(player.Center, 4, 4, dustType,
+                    vel.X, vel.Y, 0, color, Main.rand.NextFloat(1.2f, 2.2f));
+                Main.dust[d].noGravity = true;
+            }
+        }
+
+        #endregion
 
         // -------------------------------------------------------
         // Networking
