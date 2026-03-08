@@ -18,7 +18,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 {
     public class HolyDiverStandFinal : StandClass
     {
-        public override int HalfStandHeight => 37;
+        public override int HalfStandHeight => 50;
         public override int PunchDamage => 60;
         public override int AltDamage => 90;
         public override int PunchTime => 5;
