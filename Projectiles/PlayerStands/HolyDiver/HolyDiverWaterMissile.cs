@@ -7,25 +7,15 @@ using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 {
-    /// <summary>
-    /// Homing water missile spawned by the Water Cannon ability when Right Click is held.
-    /// Locks onto a specific NPC index passed via Projectile.ai[0].
-    /// If the target dies mid-flight, falls back to nearest hostile NPC.
-    ///
-    /// Projectile.ai[0] = target NPC whoAmI  (-1 = use nearest fallback)
-    /// Projectile.ai[1] = unused / reserved
-    /// </summary>
     public class HolyDiverWaterMissile : ModProjectile
     {
-        // -------------------------------------------------------
-        // Tuning constants
-        // -------------------------------------------------------
-        private const float HomingRange = 900f;   // pixels — fallback detection radius
-        private const float MissileAcceleration = 0.18f;  // velocity nudge per tick (like TrackerBubble's BubbleAcceleration)
-        private const float TravelSpeed = 10f;    // max speed cap
-        private const int MissileLifetime = 180;    // ticks (~3 s)
-        private const int BurnChance = 80;     // out of 100
+        private const float HomingRange = 900f;
+        private const float MissileAcceleration = 0.18f;
+        private const float TravelSpeed = 10f;
+        private const int MissileLifetime = 180;
+        private const int BurnChance = 80;
         private const int BurnDuration = 360;
+        private const float DrawScale = 0.62f;
 
         private int TargetNPCIndex
         {
@@ -35,7 +25,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         public override void SetStaticDefaults()
         {
-            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 8;
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 14;
             ProjectileID.Sets.TrailingMode[Projectile.type] = 0;
         }
 
@@ -53,13 +43,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         public override void AI()
         {
-            // ---- Resolve target — prefer assigned, fall back to nearest ----
             NPC target = ResolveTarget();
 
             if (target != null)
             {
-                // Same nudge pattern as TrackerBubble: add a small step toward target each tick,
-                // clamp each axis if we're already wildly past MaxSpeed, then soft-cap total length.
                 Vector2 nudge = target.Center - Projectile.Center;
                 nudge.Normalize();
                 nudge *= MissileAcceleration;
@@ -74,29 +61,74 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 if (Projectile.velocity.Length() >= TravelSpeed)
                     Projectile.velocity *= 0.98f;
             }
-
-            // ---- Rotation ----
             Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
-
-            // ---- Dust trail — watery + hot ----
             if (Main.rand.NextBool(2))
             {
-                int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height,
-                    DustID.Cloud, 0f, 0f, 120, Color.CornflowerBlue, Main.rand.NextFloat(0.5f, 1.2f));
+                int d = Dust.NewDust(
+                    Projectile.position, Projectile.width, Projectile.height,
+                    DustID.Water,
+                    Main.rand.NextFloat(-1.2f, 1.2f),
+                    Main.rand.NextFloat(-1.2f, 1.2f),
+                    140, Color.CornflowerBlue,
+                    Main.rand.NextFloat(0.55f, 1.1f));
                 Main.dust[d].noGravity = true;
-                Main.dust[d].velocity = Projectile.velocity * -0.3f;
+                Main.dust[d].velocity = Projectile.velocity * -0.45f
+                                      + new Vector2(Main.rand.NextFloat(-0.4f, 0.4f),
+                                                    Main.rand.NextFloat(-0.4f, 0.4f));
+            }
+            if (Main.rand.NextBool(3))
+            {
+                int m = Dust.NewDust(
+                    Projectile.position, Projectile.width, Projectile.height,
+                    DustID.Cloud,
+                    0f, 0f,
+                    160, new Color(80, 160, 255, 60),
+                    Main.rand.NextFloat(0.3f, 0.75f));
+                Main.dust[m].noGravity = true;
+                Main.dust[m].velocity = Projectile.velocity * -0.25f;
             }
             if (Main.rand.NextBool(4))
             {
-                int f = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height,
-                    DustID.Torch, 0f, 0f, 0, default, Main.rand.NextFloat(0.4f, 0.9f));
+                Vector2 perp = new Vector2(-Projectile.velocity.Y, Projectile.velocity.X);
+                perp.Normalize();
+                float side = Main.rand.NextBool() ? 1f : -1f;
+
+                int s = Dust.NewDust(
+                    Projectile.position, Projectile.width, Projectile.height,
+                    DustID.SparksMech,
+                    perp.X * side * Main.rand.NextFloat(1.5f, 3f),
+                    perp.Y * side * Main.rand.NextFloat(1.5f, 3f),
+                    0, Color.White,
+                    Main.rand.NextFloat(0.4f, 0.9f));
+                Main.dust[s].noGravity = true;
+            }
+            if (Main.rand.NextBool(5))
+            {
+                int f = Dust.NewDust(
+                    Projectile.Center.ToPoint().ToVector2() + Projectile.velocity * 1.5f,
+                    0, 0,
+                    DustID.Torch,
+                    Projectile.velocity.X * 0.2f,
+                    Projectile.velocity.Y * 0.2f,
+                    0, default,
+                    Main.rand.NextFloat(0.35f, 0.7f));
                 Main.dust[f].noGravity = true;
+            }
+            if (Main.rand.NextBool(8))
+            {
+                int b = Dust.NewDust(
+                    Projectile.position, Projectile.width, Projectile.height,
+                    DustID.SilverFlame,
+                    Main.rand.NextFloat(-0.5f, 0.5f),
+                    Main.rand.NextFloat(-1.5f, -0.5f),
+                    180, new Color(100, 200, 255, 80),
+                    Main.rand.NextFloat(0.6f, 1.1f));
+                Main.dust[b].noGravity = false;
             }
         }
 
         private NPC ResolveTarget()
         {
-            // Check pre-assigned target first
             if (TargetNPCIndex >= 0 && TargetNPCIndex < Main.maxNPCs)
             {
                 NPC npc = Main.npc[TargetNPCIndex];
@@ -104,7 +136,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                     return npc;
             }
 
-            // Target gone — find nearest hostile within range as fallback
             NPC best = null;
             float bestD = HomingRange;
             for (int i = 0; i < Main.maxNPCs; i++)
@@ -125,33 +156,76 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         {
             if (Main.rand.Next(0, 101) < BurnChance)
                 target.AddBuff(BuffID.OnFire, BurnDuration);
-
-            // Small water explosion on impact
-            for (int i = 0; i < 12; i++)
+            for (int i = 0; i < 18; i++)
             {
-                int d = Dust.NewDust(Projectile.Center, 0, 0, DustID.Cloud,
-                    Main.rand.NextFloat(-4f, 4f), Main.rand.NextFloat(-4f, 4f),
-                    100, Color.DeepSkyBlue, Main.rand.NextFloat(1f, 1.8f));
+                float angle = MathHelper.TwoPi / 18f * i + Main.rand.NextFloat(-0.15f, 0.15f);
+                float speed = Main.rand.NextFloat(2.5f, 5.5f);
+                Vector2 vel = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * speed;
+                int d = Dust.NewDust(Projectile.Center, 0, 0, DustID.Water,
+                    vel.X, vel.Y,
+                    100, Color.DeepSkyBlue,
+                    Main.rand.NextFloat(0.9f, 1.8f));
                 Main.dust[d].noGravity = true;
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                int m = Dust.NewDust(Projectile.Center, 0, 0, DustID.Cloud,
+                    Main.rand.NextFloat(-3f, 3f),
+                    Main.rand.NextFloat(-3f, 3f),
+                    80, Color.AliceBlue,
+                    Main.rand.NextFloat(1.2f, 2f));
+                Main.dust[m].noGravity = true;
+            }
+            for (int i = 0; i < 6; i++)
+            {
+                int g = Dust.NewDust(Projectile.Center, 0, 0, DustID.SparksMech,
+                    Main.rand.NextFloat(-4f, 4f),
+                    Main.rand.NextFloat(-4f, 4f),
+                    0, Color.White, 1.2f);
+                Main.dust[g].noGravity = true;
             }
         }
 
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-
+            Vector2 origin = tex.Size() / 2f;
             for (int i = 0; i < Projectile.oldPos.Length; i++)
             {
                 float t = 1f - i / (float)Projectile.oldPos.Length;
-                Color color = Color.Lerp(Color.DeepSkyBlue, Color.Transparent, 1f - t) * 0.55f;
-                Vector2 pos = Projectile.oldPos[i] - Main.screenPosition + new Vector2(Projectile.width / 2f, Projectile.height / 2f);
-                Main.EntitySpriteDraw(tex, pos, null, color, Projectile.rotation,
-                    tex.Size() / 2f, Projectile.scale * t, SpriteEffects.None, 0);
+                Color trailColor = Color.Lerp(
+                    new Color(160, 230, 255, 200),
+                    new Color(20, 80, 200, 0),
+                    i / (float)Projectile.oldPos.Length)
+                    * 0.6f;
+                Vector2 pos = Projectile.oldPos[i] - Main.screenPosition
+                            + new Vector2(Projectile.width / 2f, Projectile.height / 2f);
+                Main.EntitySpriteDraw(
+                    tex, pos, null, trailColor,
+                    Projectile.rotation, origin,
+                    DrawScale * t,
+                    SpriteEffects.None, 0);
             }
-
-            Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null,
-                lightColor, Projectile.rotation, tex.Size() / 2f, Projectile.scale, SpriteEffects.None, 0);
-
+            Main.EntitySpriteDraw(
+                tex,
+                Projectile.Center - Main.screenPosition,
+                null,
+                lightColor,
+                Projectile.rotation,
+                origin,
+                DrawScale,
+                SpriteEffects.None,
+                0);
+            Main.EntitySpriteDraw(
+                tex,
+                Projectile.Center - Main.screenPosition,
+                null,
+                new Color(80, 180, 255, 0) * 0.45f,
+                Projectile.rotation,
+                origin,
+                DrawScale * 1.35f,
+                SpriteEffects.None,
+                0);
             return false;
         }
     }
