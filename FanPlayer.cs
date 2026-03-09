@@ -42,7 +42,6 @@ namespace JoJoFanStands
         public int blurStage = 0;
         public Vector2 customCameraPosition;
         public int metempsychosisPoints = 0;
-        public bool boostingExistingHook = false;
 
         public override void ResetEffects()
         {
@@ -170,8 +169,6 @@ namespace JoJoFanStands
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
             if (mPlayer.standOut && mPlayer.standName == "Metempsychosis" && Player.whoAmI == Main.myPlayer)
                 player.statDefense += (int)(metempsychosisPoints * (4 * mPlayer.standTier) / 100f);
-            if (boostingExistingHook)
-                Player.numHooks++;
         }
 
         public override bool FreeDodge(Player.HurtInfo info)
