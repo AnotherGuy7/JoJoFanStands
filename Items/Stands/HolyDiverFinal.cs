@@ -16,14 +16,11 @@ namespace JoJoFanStands.Items.Stands
         public override Color StandTierDisplayColor => HolyDiverStandTierColor;
         public override bool FanStandItem => true;
         public override string Texture => Mod.Name + "/Items/Stands/HolyDiverT1";
-
         public static readonly Color HolyDiverStandTierColor = new Color(30, 100, 180);
 
-        public override void SetStaticDefaults()
-        {
-            // DisplayName.SetDefault("Holy Diver (Tier 4)");
-            // Tooltip.SetDefault("Left-click to unleash a scorching torrent barrage.\nUser Name: Some long name\nReference: Holy Diver by Ronnie James Dio");
-        }
+        private Item _waterKatana;
+
+        public override void SetStaticDefaults() { }
 
         public override void SetDefaults()
         {
@@ -34,6 +31,58 @@ namespace JoJoFanStands.Items.Stands
             Item.value = 0;
             Item.noUseGraphic = true;
             Item.rare = ItemRarityID.LightPurple;
+        }
+
+        public override void OnEquip(Player player)
+        {
+            for (int i = 0; i < player.inventory.Length; i++)
+            {
+                if (player.inventory[i].IsAir)
+                {
+                    _waterKatana = new Item();
+                    _waterKatana.SetDefaults(ModContent.ItemType<WaterKatanaFinal>());
+                    player.inventory[i] = _waterKatana;
+                    return;
+                }
+            }
+            player.QuickSpawnItem(player.GetSource_FromThis(), ModContent.ItemType<WaterKatanaFinal>());
+            FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
+            if (!player.armor[HookSlotIndex].IsAir)
+            {
+                hPlayer.boostingExistingHook = true;
+                _waterHook = null;
+            }
+            else
+            {
+                _waterHook = new Item();
+                _waterHook.SetDefaults(ModContent.ItemType<WaterHook>());
+                player.armor[HookSlotIndex] = _waterHook;
+            }
+        }
+
+        public override void OnUnequip(Player player)
+        {
+            if (_waterKatana == null)
+                return;
+            _waterKatana.TurnToAir();
+            _waterKatana = null;
+            HolyDiverPlayer hPlayer = player.GetModPlayer<HolyDiverPlayer>();
+            hPlayer.boostingExistingHook = false;
+
+            if (_waterHook == null)
+            {
+                return;
+            }
+            Item currentHookSlot = player.armor[HookSlotIndex];
+            if (currentHookSlot == _waterHook)
+                _waterHook.TurnToAir();
+            else if (currentHookSlot.IsAir)
+            {
+
+            }
+            else
+                _waterHook.TurnToAir();
+            _waterHook = null;
         }
 
         public override bool ManualStandSpawning(Player player)
