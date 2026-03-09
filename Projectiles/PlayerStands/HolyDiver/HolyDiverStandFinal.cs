@@ -1173,7 +1173,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         {
             standTexture = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/HolyDiver/HolyDiver_" + animationName).Value;
 
-            if (animationName == "Idle") AnimateStand(animationName, 4, 8, true);
+            if (animationName == "Idle") AnimateStand(animationName, 7, 8, true);
             else if (animationName == "Attack") AnimateStand(animationName, 4, PunchTime / 2, true);
             else if (animationName == "Secondary") AnimateStand(animationName, 2, 10, true);
             else if (animationName == "WaterCannon") AnimateStand(animationName, 3, 6, true);
