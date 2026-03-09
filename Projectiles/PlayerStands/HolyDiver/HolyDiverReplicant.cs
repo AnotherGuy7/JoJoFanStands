@@ -248,8 +248,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Texture2D tex = ModContent.Request<Texture2D>(
                 "JoJoFanStands/Projectiles/PlayerStands/HolyDiver/HolyDiver_Idle").Value;
 
-            // Full sheet frame count assumed 4; pick current idle frame
-            int frameHeight = tex.Height / 4;
+            int frameHeight = tex.Height / 7;
             int frame = (int)(Main.GameUpdateCount / 8 % 4);
             Rectangle src = new Rectangle(0, frame * frameHeight, tex.Width, frameHeight);
 
