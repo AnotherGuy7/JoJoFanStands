@@ -551,12 +551,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
                 if (currentM2Mode == M2Mode.WaterCannon)
                 {
+                    // Only start beam charge on release if we were genuinely charging
+                    // (not if missiles just fired and reset m2HoldTimer to 0)
                     if (m2HoldTimer > 0 && m2HoldTimer < MissileChargeThreshold)
                     {
                         if (!beamCharged && !BeamIsActive && CanFireCannon)
                             beamChargeTimer = 1;
-                        m2HoldTimer = 0;
                     }
+
+                    m2HoldTimer = 0;
 
                     if (beamCharged && !BeamIsActive && CanFireCannon)
                     {
@@ -577,31 +580,31 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             switch (currentM2Mode)
             {
-                // ---- Mine ----
                 case M2Mode.Mine:
                     currentAnimationState = AnimationState.Idle;
                     if (CanPlaceMine) DoMine(player);
                     break;
 
-                // ---- Water Cannon ----
                 case M2Mode.WaterCannon:
                     if (beamCharged || BeamIsActive) break;
-                    if (!CanFireCannon) break;
+                    if (!CanFireCannon)
+                    {
+                        m2HoldTimer = 0;
+                        StayBehind();
+                        currentAnimationState = AnimationState.Idle;
+                        break;
+                    }
 
                     m2HoldTimer++;
                     if (m2HoldTimer >= MissileChargeThreshold)
-                    {
-                        beamChargeTimer = 0;
-                        beamCharged = false;
                         DoMissiles(player);
-                    }
                     else
                     {
+                        StayBehind();
                         currentAnimationState = AnimationState.Idle;
                     }
                     break;
 
-                // ---- Water Replicant ----
                 case M2Mode.WaterReplicant:
                     HandleReplicantM2(player);
                     break;
@@ -617,9 +620,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
         }
 
-        // -------------------------------------------------------
-        // Water Replicant M2 logic
-        // -------------------------------------------------------
 
         private void HandleReplicantM2(Player player)
         {
@@ -874,22 +874,18 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             SoundEngine.PlaySound(SoundID.Splash, player.Center);
         }
 
-
-        // -------------------------------------------------------
-        // Ability: Missiles
-        // -------------------------------------------------------
-
         private void DoMissiles(Player player)
         {
             WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
             if (!wgp.TrySpend(WaterCostMissiles)) return;
-
             salvoTargets = FindMissileTargets(player);
             salvoDirection = Main.MouseWorld - Projectile.Center;
             salvoRemaining = MissileSalvoCount;
             salvoTimer = 0;
             waterCannonCooldownTimer = WaterCannonCooldown;
             m2HoldTimer = 0;
+            beamChargeTimer = 0;
+            beamCharged = false;
             Projectile.netUpdate = true;
         }
 
