@@ -163,7 +163,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         {
             Idle,
             Attack,
-            KnifeThrow,
+            CannonShot,
             Secondary,
             HydroSymbiosis,
             Pose
@@ -586,21 +586,20 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                     break;
 
                 case M2Mode.WaterCannon:
+                    currentAnimationState = AnimationState.CannonShot;
                     if (beamCharged || BeamIsActive) break;
                     if (!CanFireCannon)
                     {
                         m2HoldTimer = 0;
                         StayBehind();
-                        currentAnimationState = AnimationState.Idle;
                         break;
                     }
-
+                    StayBehind();
                     m2HoldTimer++;
                     if (m2HoldTimer >= MissileChargeThreshold)
                         DoMissiles(player);
                     else
                     {
-                        StayBehind();
                         currentAnimationState = AnimationState.Idle;
                     }
                     break;
@@ -833,7 +832,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (!BeamIsActive) return;
 
             beamTimer--;
-            currentAnimationState = AnimationState.Idle;
+            currentAnimationState = AnimationState.CannonShot;
 
             if (beamFireRateTimer <= 0)
             {
@@ -842,7 +841,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
 
             if (!BeamIsActive)
-                currentAnimationState = AnimationState.Idle;
+                currentAnimationState = AnimationState.CannonShot;
 
             Projectile.netUpdate = true;
         }
@@ -1165,6 +1164,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (currentAnimationState == AnimationState.Idle) PlayAnimation("Idle");
             else if (currentAnimationState == AnimationState.Attack) PlayAnimation("Attack");
             else if (currentAnimationState == AnimationState.Secondary) PlayAnimation("Secondary");
+            else if (currentAnimationState == AnimationState.CannonShot) PlayAnimation("CannonShot");
             else if (currentAnimationState == AnimationState.HydroSymbiosis) PlayAnimation("HydroSymbiosis");
             else if (currentAnimationState == AnimationState.Pose) PlayAnimation("Pose");
         }
@@ -1176,7 +1176,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (animationName == "Idle") AnimateStand(animationName, 7, 8, true);
             else if (animationName == "Attack") AnimateStand(animationName, 4, PunchTime / 2, true);
             else if (animationName == "Secondary") AnimateStand(animationName, 2, 10, true);
-            else if (animationName == "WaterCannon") AnimateStand(animationName, 3, 6, true);
+            else if (animationName == "CannonShot") AnimateStand(animationName, 1, 6, true);
             else if (animationName == "HydroSymbiosis") AnimateStand(animationName, 4, 8, true);
             else if (animationName == "Pose") AnimateStand(animationName, 1, 600, true);
         }
