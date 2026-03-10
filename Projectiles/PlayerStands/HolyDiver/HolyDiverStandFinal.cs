@@ -164,7 +164,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Idle,
             Attack,
             CannonShot,
-            Secondary,
+            HydroSymbiosisIaiSlash,
             HydroSymbiosisIdle,
             HydroSymbiosisSwordAttack,
             HydroSymbiosisSwordCharge,
@@ -475,7 +475,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Main.projectile[visual].netUpdate = true;
 
             iaiSlashCooldown = IaiSlashCooldown;
-            currentAnimationState = AnimationState.Secondary;
+            currentAnimationState = AnimationState.HydroSymbiosisIaiSlash;
             Projectile.netUpdate = true;
         }
 
@@ -506,53 +506,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (Main.mouseLeft)
             {
                 attacking = true;
-                Punch();
+                Punch(playPunchSound: false);
                 currentAnimationState = AnimationState.Idle;
                 Projectile.netUpdate = true;
             }
             else
             {
                 attacking = false;
-            }
-        }
-
-        private void Punch()
-        {
-            Punch(Main.MouseWorld, afterImages: CanUseAfterImagePunches);
-            currentAnimationState = AnimationState.Idle;
-            if (shootCount == newPunchTime)
-            {
-                Vector2 toMouse = Main.MouseWorld - Projectile.Center;
-                if (toMouse == Vector2.Zero) toMouse = Vector2.UnitX;
-                toMouse.Normalize();
-                Vector2 burstOrigin = Projectile.Center + toMouse * 36f;
-                for (int i = 0; i < 14; i++)
-                {
-                    float angle = toMouse.ToRotation() + MathHelper.ToRadians(Main.rand.NextFloat(-55f, 55f));
-                    float speed = Main.rand.NextFloat(3.5f, 8f);
-                    Vector2 vel = new Vector2(speed, 0f).RotatedBy(angle);
-                    int d = Dust.NewDust(burstOrigin, 6, 6, DustID.Water,
-                        vel.X, vel.Y, 80, Color.DeepSkyBlue, Main.rand.NextFloat(1.2f, 2.0f));
-                    Main.dust[d].noGravity = true;
-                }
-                for (int i = 0; i < 6; i++)
-                {
-                    float angle = toMouse.ToRotation() + MathHelper.ToRadians(Main.rand.NextFloat(-40f, 40f));
-                    float speed = Main.rand.NextFloat(2f, 5f);
-                    Vector2 vel = new Vector2(speed, 0f).RotatedBy(angle);
-                    int sp = Dust.NewDust(burstOrigin, 4, 4, DustID.Electric,
-                        vel.X, vel.Y, 0, Color.White, 1.3f);
-                    Main.dust[sp].noGravity = true;
-                }
-                int dropCount = 8;
-                for (int i = 0; i < dropCount; i++)
-                {
-                    float angle = MathHelper.TwoPi * i / dropCount;
-                    Vector2 vel = new Vector2(Main.rand.NextFloat(2.5f, 5f), 0f).RotatedBy(angle);
-                    int d = Dust.NewDust(burstOrigin, 2, 2, DustID.Water,
-                        vel.X, vel.Y, 120, Color.CornflowerBlue, 1.1f);
-                    Main.dust[d].noGravity = true;
-                }
             }
         }
 
@@ -1176,7 +1136,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             if (currentAnimationState == AnimationState.Idle) PlayAnimation("Idle");
             else if (currentAnimationState == AnimationState.Attack) PlayAnimation("Attack");
-            else if (currentAnimationState == AnimationState.Secondary) PlayAnimation("Secondary");
+            else if (currentAnimationState == AnimationState.HydroSymbiosisIaiSlash) PlayAnimation("HydroSymbiosisIaiSlash");
             else if (currentAnimationState == AnimationState.CannonShot) PlayAnimation("CannonShot");
             else if (currentAnimationState == AnimationState.HydroSymbiosisIdle) PlayAnimation("HydroSymbiosisIdle");
             else if (currentAnimationState == AnimationState.HydroSymbiosisSwordAttack) PlayAnimation("HydroSymbiosisSwordAttack");
@@ -1190,7 +1150,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             if (animationName == "Idle") AnimateStand(animationName, 7, 8, true);
             else if (animationName == "Attack") AnimateStand(animationName, 4, PunchTime / 2, true);
-            else if (animationName == "Secondary") AnimateStand(animationName, 2, 10, true);
+            else if (animationName == "HydroSymbiosisIaiSlash") AnimateStand(animationName, 8, 10, true);
             else if (animationName == "CannonShot") AnimateStand(animationName, 1, 6, true);
             else if (animationName == "HydroSymbiosisIdle") AnimateStand(animationName, 7, 8, true);
             else if (animationName == "HydroSymbiosisSwordAttack") AnimateStand(animationName, 7, 8, true);
@@ -1277,8 +1237,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             hydroSymbiosisActive = true;
             hydroDrainTimer = 0;
-
-            // Reset sword state on entry so there's no phantom held-charge
             symbiosisM1HoldTimer = 0;
             symbiosisM1WasHeld = false;
             symbiosisSwordCooldown = 0;
@@ -1362,12 +1320,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         {
             hydroSymbiosisActive = false;
             hydroDrainTimer = 0;
-
-            // Clean up sword state
             symbiosisM1HoldTimer = 0;
             symbiosisM1WasHeld = false;
             symbiosisM2WasHeld = false;
-
             FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
 
             fPlayer.customCameraOverride = false;
@@ -1418,10 +1373,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         #endregion
 
 
-        // -------------------------------------------------------
-        // Networking
-        // -------------------------------------------------------
-
         public override void SendExtraStates(BinaryWriter writer)
         {
             writer.Write(secondaryAbility);
@@ -1464,10 +1415,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             iaiSlashCooldown = reader.ReadInt32();
         }
 
-
-        // -------------------------------------------------------
-        // Draw
-        // -------------------------------------------------------
 
         public override bool PreDrawExtras() => false;
 
