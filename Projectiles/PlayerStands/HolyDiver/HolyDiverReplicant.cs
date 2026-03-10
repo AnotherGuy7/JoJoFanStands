@@ -9,43 +9,28 @@ using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 {
-    /// <summary>
-    /// Water Replicant — a defensive sentry copy of Holy Diver.
-    ///
-    /// ai[0] : phase  (0 = sentry, 1 = warp-consumed / dying)
-    /// ai[1] : unused / reserved
-    ///
-    /// Behaviour:
-    ///   • Stands still at the placement spot.
-    ///   • If a hostile NPC enters SentryRange it fires HolyDiverWaterCannon bolts.
-    ///   • If a hostile NPC enters MeleeRange it rapidly punches with HolyDiverMeleeHit.
-    ///   • Only one Replicant can exist per player at a time (enforced on spawn by the stand).
-    ///   • When the stand owner activates the ability again the Replicant teleports the
-    ///     player to its position, plays a warp effect, then self-destructs.
-    /// </summary>
     public class HolyDiverWaterReplicant : ModProjectile
     {
-        // -------------------------------------------------------
-        // Tuning
-        // -------------------------------------------------------
         private const float SentryRange = 700f;
         private const float MeleeRange = 120f;
         private const int ShotDamage = 55;
         private const int MeleeDamage = 40;
         private const float ShotSpeed = 16f;
-        private const int ShotCooldown = 30;   // ticks between ranged shots
-        private const int MeleeCooldown = 8;    // ticks between punches
-        private const int Lifetime = 1800; // 30 s max
+        private const int ShotCooldown = 30;
+        private const int MeleeCooldown = 8;
+        private const int Lifetime = 1800;
 
-        // -------------------------------------------------------
-        // Local state
-        // -------------------------------------------------------
+        private const int PunchFrameCount = 8;
+        private const int ShotFrameCount = 1;
+        private const int IdleFrameCount = 7;
+        private const int AnimTicksPerFrame = 4;
+
         private int shotTimer = 0;
         private int meleeTimer = 0;
 
-        // -------------------------------------------------------
-        // Setup
-        // -------------------------------------------------------
+        private string drawMode = "idle";
+        private int animFrame = 0;
+        private int animTick = 0;
 
         public override void SetDefaults()
         {
@@ -58,19 +43,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Projectile.timeLeft = Lifetime;
             Projectile.penetrate = -1;
             Projectile.netImportant = true;
-            // No damage from the sentry body itself
             Projectile.damage = 0;
         }
-
-        // -------------------------------------------------------
-        // AI
-        // -------------------------------------------------------
 
         public override void AI()
         {
             Player owner = Main.player[Projectile.owner];
 
-            // Consumed by warp — brief flash then die
             if (Projectile.ai[0] == 1f)
             {
                 SpawnWarpParticles();
@@ -79,14 +58,27 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 return;
             }
 
-            // Keep velocity at zero — we are a sentry, not a flying projectile
             Projectile.velocity = Vector2.Zero;
 
-            // Tick cooldowns
             if (shotTimer > 0) shotTimer--;
             if (meleeTimer > 0) meleeTimer--;
 
-            // Face toward nearest enemy (or owner if none)
+            if (drawMode != "idle")
+            {
+                animTick++;
+                if (animTick >= AnimTicksPerFrame)
+                {
+                    animTick = 0;
+                    animFrame++;
+                    int maxFrames = drawMode == "punch" ? PunchFrameCount : ShotFrameCount;
+                    if (animFrame >= maxFrames)
+                    {
+                        animFrame = 0;
+                        drawMode = "idle";
+                    }
+                }
+            }
+
             NPC target = FindTarget();
             if (target != null)
             {
@@ -105,11 +97,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
             else
             {
-                // No enemy — face the owner
                 Projectile.spriteDirection = owner.Center.X > Projectile.Center.X ? 1 : -1;
             }
 
-            // Ambient water particle breath
             if (Main.rand.NextBool(12))
             {
                 int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height,
@@ -117,10 +107,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 Main.dust[d].noGravity = true;
             }
         }
-
-        // -------------------------------------------------------
-        // Target finding
-        // -------------------------------------------------------
 
         private NPC FindTarget()
         {
@@ -143,10 +129,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             return best;
         }
 
-        // -------------------------------------------------------
-        // Ranged attack
-        // -------------------------------------------------------
-
         private void DoShot(NPC target)
         {
             Vector2 dir = (target.Center - Projectile.Center).SafeNormalize(Vector2.UnitX) * ShotSpeed;
@@ -163,16 +145,19 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             SoundEngine.PlaySound(SoundID.Splash, Projectile.Center);
             shotTimer = ShotCooldown;
+
+            if (drawMode != "punch")
+            {
+                drawMode = "shot";
+                animFrame = 0;
+                animTick = 0;
+            }
+
             Projectile.netUpdate = true;
         }
 
-        // -------------------------------------------------------
-        // Melee attack — spawns a short-lived hitbox projectile
-        // -------------------------------------------------------
-
         private void DoPunch(NPC target)
         {
-            // Direction toward the target for the punch hitbox
             Vector2 dir = (target.Center - Projectile.Center).SafeNormalize(Vector2.UnitX) * 6f;
 
             int proj = Projectile.NewProjectile(
@@ -187,14 +172,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             SoundEngine.PlaySound(SoundID.Item1, Projectile.Center);
             meleeTimer = MeleeCooldown;
+
+            drawMode = "punch";
+            animFrame = 0;
+            animTick = 0;
+
             Projectile.netUpdate = true;
         }
 
-        // -------------------------------------------------------
-        // Warp consumption
-        // -------------------------------------------------------
-
-        /// <summary>Called by the stand when the owner wants to warp to this Replicant.</summary>
         public void ConsumeAsWarp()
         {
             Player owner = Main.player[Projectile.owner];
@@ -223,33 +208,56 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
         }
 
-        // -------------------------------------------------------
-        // Networking
-        // -------------------------------------------------------
-
         public override void SendExtraAI(System.IO.BinaryWriter writer)
         {
             writer.Write(shotTimer);
             writer.Write(meleeTimer);
+            writer.Write(animFrame);
+            writer.Write(animTick);
+            // Encode drawMode as byte: 0=idle, 1=punch, 2=shot
+            byte modeId = drawMode == "punch" ? (byte)1 : drawMode == "shot" ? (byte)2 : (byte)0;
+            writer.Write(modeId);
         }
 
         public override void ReceiveExtraAI(System.IO.BinaryReader reader)
         {
             shotTimer = reader.ReadInt32();
             meleeTimer = reader.ReadInt32();
+            animFrame = reader.ReadInt32();
+            animTick = reader.ReadInt32();
+            byte modeId = reader.ReadByte();
+            drawMode = modeId == 1 ? "punch" : modeId == 2 ? "shot" : "idle";
         }
-
-        // -------------------------------------------------------
-        // Drawing  — mirrors the stand sprite with a blue tint
-        // -------------------------------------------------------
 
         public override bool PreDraw(ref Color lightColor)
         {
-            Texture2D tex = ModContent.Request<Texture2D>(
-                "JoJoFanStands/Projectiles/PlayerStands/HolyDiver/HolyDiver_Idle").Value;
+            string texPath;
+            int frameCount;
 
-            int frameHeight = tex.Height / 7;
-            int frame = (int)(Main.GameUpdateCount / 8 % 4);
+            switch (drawMode)
+            {
+                case "punch":
+                    texPath = "JoJoFanStands/Projectiles/PlayerStands/HolyDiver/HolyDiver_Punch";
+                    frameCount = PunchFrameCount;
+                    break;
+                case "shot":
+                    texPath = "JoJoFanStands/Projectiles/PlayerStands/HolyDiver/HolyDiver_CannonShot";
+                    frameCount = ShotFrameCount;
+                    break;
+                default:
+                    texPath = "JoJoFanStands/Projectiles/PlayerStands/HolyDiver/HolyDiver_Idle";
+                    frameCount = IdleFrameCount;
+                    break;
+            }
+
+            Texture2D tex = ModContent.Request<Texture2D>(texPath).Value;
+            int frameHeight = tex.Height / frameCount;
+
+            int frame = drawMode == "idle"
+                ? (int)(Main.GameUpdateCount / 8 % IdleFrameCount)
+                : animFrame;
+
+            frame = Math.Clamp(frame, 0, frameCount - 1);
             Rectangle src = new Rectangle(0, frame * frameHeight, tex.Width, frameHeight);
 
             Color tint = Color.Lerp(lightColor, Color.DeepSkyBlue, 0.55f) * 0.85f;

@@ -504,13 +504,53 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (Main.mouseLeft)
             {
                 attacking = true;
-                Punch(playPunchSound: false);
+                Punch();
                 currentAnimationState = AnimationState.Idle;
                 Projectile.netUpdate = true;
             }
             else
             {
                 attacking = false;
+            }
+        }
+
+        private void Punch()
+        {
+            Punch(Main.MouseWorld, afterImages: CanUseAfterImagePunches, playPunchSound: false);
+            currentAnimationState = AnimationState.Idle;
+            if (shootCount == newPunchTime)
+            {
+                Vector2 toMouse = Main.MouseWorld - Projectile.Center;
+                if (toMouse == Vector2.Zero) toMouse = Vector2.UnitX;
+                toMouse.Normalize();
+                Vector2 burstOrigin = Projectile.Center + toMouse * 36f;
+                for (int i = 0; i < 14; i++)
+                {
+                    float angle = toMouse.ToRotation() + MathHelper.ToRadians(Main.rand.NextFloat(-55f, 55f));
+                    float speed = Main.rand.NextFloat(3.5f, 8f);
+                    Vector2 vel = new Vector2(speed, 0f).RotatedBy(angle);
+                    int d = Dust.NewDust(burstOrigin, 6, 6, DustID.Water,
+                        vel.X, vel.Y, 80, Color.DeepSkyBlue, Main.rand.NextFloat(1.2f, 2.0f));
+                    Main.dust[d].noGravity = true;
+                }
+                for (int i = 0; i < 6; i++)
+                {
+                    float angle = toMouse.ToRotation() + MathHelper.ToRadians(Main.rand.NextFloat(-40f, 40f));
+                    float speed = Main.rand.NextFloat(2f, 5f);
+                    Vector2 vel = new Vector2(speed, 0f).RotatedBy(angle);
+                    int sp = Dust.NewDust(burstOrigin, 4, 4, DustID.Electric,
+                        vel.X, vel.Y, 0, Color.White, 1.3f);
+                    Main.dust[sp].noGravity = true;
+                }
+                int dropCount = 8;
+                for (int i = 0; i < dropCount; i++)
+                {
+                    float angle = MathHelper.TwoPi * i / dropCount;
+                    Vector2 vel = new Vector2(Main.rand.NextFloat(2.5f, 5f), 0f).RotatedBy(angle);
+                    int d = Dust.NewDust(burstOrigin, 2, 2, DustID.Water,
+                        vel.X, vel.Y, 120, Color.CornflowerBlue, 1.1f);
+                    Main.dust[d].noGravity = true;
+                }
             }
         }
 
