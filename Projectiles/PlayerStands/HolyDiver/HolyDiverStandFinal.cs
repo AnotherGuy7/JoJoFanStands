@@ -277,7 +277,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 if (symbiosisM1HoldTimer >= SymbiosisChargeThreshold)
                     currentAnimationState = AnimationState.HydroSymbiosisSwordCharge;
                 else
-                    currentAnimationState = AnimationState.Idle;
+                    currentAnimationState = AnimationState.HydroSymbiosisSwordCharge;
             }
             else
             {
@@ -292,8 +292,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                             ? SymbiosisSwordCooldown * 2
                             : SymbiosisSwordCooldown;
                     }
-                    else
-                        currentAnimationState = AnimationState.Idle;
 
                     symbiosisM1HoldTimer = 0;
                     symbiosisM1WasHeld = false;
@@ -1312,6 +1310,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                     return;
                 }
             }
+
+            if (player.velocity.X != 0f)
+                Projectile.spriteDirection = player.velocity.X > 0f ? 1 : -1;
+            else
+                Projectile.spriteDirection = Main.MouseWorld.X > Projectile.Center.X ? 1 : -1;
+
+            Projectile.direction = Projectile.spriteDirection;
 
             Projectile.netUpdate = true;
         }
