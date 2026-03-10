@@ -48,6 +48,18 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private const int BeamChargeTime = 60;
         private const int ReplicantCooldown = 180;
 
+        private const int JCEDamage = 350;
+        private const float JCERadius = 2400f;
+        private const int JCESlashCount = 24;
+        private const int JCESlashStagger = 2;
+        private const int JCEFreezeTime = 40;
+        private const int JCEImmunityTime = 90;
+
+        private bool jcePending = false;
+        private int jceFreezeTimer = 0;
+        private int jceSlashSpawned = 0;
+        private int jceSlashTimer = 0;
+
         // -------------------------------------------------------
         // Symbiosis sword constants
         // -------------------------------------------------------
@@ -207,6 +219,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             UpdateStandInfo();
             TickTimers();
             TickHolyWaterBeam(player);
+            TickJCE(player);
 
             if (mPlayer.standOut)
                 Projectile.timeLeft = 2;
@@ -1374,14 +1387,128 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             player.Center = Projectile.Center;
             player.immuneTime = 0;
-
             player.wingTimeMax = 0;
 
             currentAnimationState = AnimationState.Idle;
             Projectile.netUpdate = true;
 
-            SoundEngine.PlaySound(SoundID.Item29, player.Center);
-            SpawnInstallParticles(player);
+            TriggerJCE(player);
+        }
+
+        private void TriggerJCE(Player player)
+        {
+            jcePending = true;
+            jceFreezeTimer = JCEFreezeTime;
+            jceSlashSpawned = 0;
+            jceSlashTimer = 0;
+
+            player.immune = true;
+            player.immuneTime = JCEImmunityTime;
+
+            SoundEngine.PlaySound(SoundID.Item71, player.Center);
+            SoundEngine.PlaySound(SoundID.Roar, player.Center);
+
+            Projectile.netUpdate = true;
+        }
+
+        private void TickJCE(Player player)
+        {
+            if (!jcePending) return;
+
+            if (jceSlashSpawned < JCESlashCount)
+            {
+                jceSlashTimer++;
+                if (jceSlashTimer >= JCESlashStagger)
+                {
+                    jceSlashTimer = 0;
+
+                    float angle = Main.rand.NextFloat(MathHelper.TwoPi);
+                    float dist = Main.rand.NextFloat(0f, JCERadius * 0.9f);
+                    Vector2 slashPos = player.Center + new Vector2(dist, 0f).RotatedBy(angle);
+
+                    int vis = Projectile.NewProjectile(
+                        Projectile.GetSource_FromThis(),
+                        slashPos,
+                        Vector2.Zero,
+                        ModContent.ProjectileType<HolyDiverIaiSlashVisual>(),
+                        0, 0f,
+                        Projectile.owner,
+                        ai0: slashPos.X + Main.rand.NextFloat(-120f, 120f),
+                        ai1: slashPos.Y + Main.rand.NextFloat(-120f, 120f));
+                    Main.projectile[vis].netUpdate = true;
+
+                    jceSlashSpawned++;
+                }
+            }
+
+            if (jceFreezeTimer > 0)
+            {
+                jceFreezeTimer--;
+
+                if (Main.rand.NextBool(2))
+                {
+                    float a = Main.rand.NextFloat(MathHelper.TwoPi);
+                    float r = Main.rand.NextFloat(60f, 260f);
+                    Vector2 p = player.Center + new Vector2(r, 0f).RotatedBy(a);
+                    Vector2 v = (player.Center - p) * 0.06f;
+                    int dustType = Main.rand.NextBool(3) ? DustID.Electric : DustID.Water;
+                    Color col = Main.rand.NextBool(3) ? Color.White : Color.DeepSkyBlue;
+                    int d = Dust.NewDust(p, 2, 2, dustType, v.X, v.Y, 0, col, 1.8f);
+                    Main.dust[d].noGravity = true;
+                }
+
+                if (jceFreezeTimer > 0) return;
+            }
+
+            if (Projectile.owner == Main.myPlayer)
+                ApplyJCEDamage(player);
+
+            for (int i = 0; i < 80; i++)
+            {
+                float a = Main.rand.NextFloat(MathHelper.TwoPi);
+                float speed = Main.rand.NextFloat(4f, 14f);
+                Vector2 vel = new Vector2(speed, 0f).RotatedBy(a);
+                int dustType = (i % 4 == 0) ? DustID.Electric : DustID.Water;
+                Color col = (i % 4 == 0) ? Color.White : Color.OrangeRed;
+                int d = Dust.NewDust(player.Center, 6, 6, dustType, vel.X, vel.Y, 0, col, 2.2f);
+                Main.dust[d].noGravity = true;
+            }
+
+            SoundEngine.PlaySound(SoundID.Item62, player.Center);
+
+            jcePending = false;
+            Projectile.netUpdate = true;
+        }
+
+        private void ApplyJCEDamage(Player player)
+        {
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC npc = Main.npc[i];
+
+                if (!npc.active) continue;
+                if (npc.friendly) continue;
+                if (npc.lifeMax <= 5) continue;
+                if (npc.dontTakeDamage) continue;
+
+                float dist = Vector2.Distance(player.Center, npc.Center);
+                if (dist > JCERadius) continue;
+
+                npc.SimpleStrikeNPC(
+                    damage: JCEDamage,
+                    hitDirection: npc.Center.X >= player.Center.X ? 1 : -1,
+                    crit: true,
+                    noPlayerInteraction: false);
+
+                for (int k = 0; k < 12; k++)
+                {
+                    float a = Main.rand.NextFloat(MathHelper.TwoPi);
+                    Vector2 v = new Vector2(Main.rand.NextFloat(3f, 9f), 0f).RotatedBy(a);
+                    int d = Dust.NewDust(npc.Center, 4, 4, DustID.Water,
+                        v.X, v.Y, 0, Color.OrangeRed, 2.0f);
+                    Main.dust[d].noGravity = true;
+                }
+            }
         }
 
         private void ClearAllDebuffs(Player player)
