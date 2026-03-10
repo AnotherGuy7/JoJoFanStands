@@ -165,7 +165,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Attack,
             CannonShot,
             Secondary,
-            HydroSymbiosis,
+            HydroSymbiosisIdle,
+            HydroSymbiosisSwordAttack,
+            HydroSymbiosisSwordCharge,
             Pose
         }
 
@@ -262,26 +264,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private bool IsChargingBeam => beamChargeTimer > 0 && !beamCharged;
         private bool CanUseReplicant => replicantCooldown <= 0;
 
-
-        // -------------------------------------------------------
-        // Symbiosis M1 — standard swing + charged swing
-        // -------------------------------------------------------
-
-        /// <summary>
-        /// Called every tick while Hydro Symbiosis is active (owner only).
-        /// • Tap / release before threshold → standard swing on release (cooldown gated).
-        /// • Hold past threshold        → charge animation; charged swing fires on release.
-        /// The swing projectile is a <see cref="HolyDiverSymbiosisSword"/> arc that stays
-        /// anchored to the stand/player center and sweeps in the direction of the cursor.
-        /// </summary>
-        /// <summary>
-        /// Handles ALL player input while Hydro Symbiosis is active (owner only).
-        /// M1 → standard/charged sword swing.
-        /// M2 → Iai Slash (tap; single-frame teleport dash through enemies).
-        /// </summary>
         private void HandleSymbiosisM1(Player player)
         {
-            // ---- M2: Iai Slash (tap detection) ----
             HandleIaiSlash(player);
 
             bool m1Held = Main.mouseLeft;
@@ -290,15 +274,13 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             {
                 symbiosisM1HoldTimer++;
 
-                // Show charge animation once past threshold
                 if (symbiosisM1HoldTimer >= SymbiosisChargeThreshold)
-                    currentAnimationState = AnimationState.Attack; // reuse attack anim or add new one
+                    currentAnimationState = AnimationState.HydroSymbiosisSwordCharge;
                 else
                     currentAnimationState = AnimationState.Idle;
             }
             else
             {
-                // Released this frame
                 if (symbiosisM1WasHeld)
                 {
                     bool wasCharged = symbiosisM1HoldTimer >= SymbiosisChargeThreshold;
@@ -307,13 +289,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                     {
                         FireSymbiosisSword(player, wasCharged);
                         symbiosisSwordCooldown = wasCharged
-                            ? SymbiosisSwordCooldown * 2   // longer recovery after charged swing
+                            ? SymbiosisSwordCooldown * 2
                             : SymbiosisSwordCooldown;
                     }
+                    else
+                        currentAnimationState = AnimationState.Idle;
 
                     symbiosisM1HoldTimer = 0;
                     symbiosisM1WasHeld = false;
-                    currentAnimationState = AnimationState.Idle;
                     Projectile.netUpdate = true;
                     return;
                 }
@@ -324,11 +307,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             symbiosisM1WasHeld = m1Held;
         }
 
-        /// <summary>
-        /// Spawns a <see cref="HolyDiverSymbiosisSword"/> arc projectile aimed at the cursor.
-        /// ai[0]: 0 = standard, 1 = charged.
-        /// ai[1]: base angle of the swing.
-        /// </summary>
         private void FireSymbiosisSword(Player player, bool charged)
         {
             Vector2 toMouse = Main.MouseWorld - Projectile.Center;
@@ -342,7 +320,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             int proj = Projectile.NewProjectile(
                 Projectile.GetSource_FromThis(),
                 Projectile.Center,
-                Vector2.Zero,   // position is managed by the sword projectile's AI
+                Vector2.Zero,
                 ModContent.ProjectileType<HolyDiverSymbiosisSword>(),
                 damage,
                 charged ? 8f : 5f,
@@ -350,17 +328,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 ai0: charged ? 1f : 0f,
                 ai1: baseAngle);
 
-            // Override timeLeft so the sword knows its own lifespan
             Main.projectile[proj].timeLeft = charged ? SymbiosisChargedLifetime : SymbiosisSwingLifetime;
             Main.projectile[proj].netUpdate = true;
 
-            // Guaranteed crit for charged swings (set crit chance artificially high)
             if (charged)
                 Main.projectile[proj].CritChance = 100;
 
             SoundEngine.PlaySound(charged ? SoundID.Item71 : SoundID.Item1, player.Center);
 
-            // Visual burst on charged release
             if (charged)
             {
                 for (int i = 0; i < 20; i++)
@@ -382,7 +357,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 }
             }
 
-            currentAnimationState = AnimationState.Attack;
+            currentAnimationState = AnimationState.HydroSymbiosisSwordAttack;
             Projectile.netUpdate = true;
         }
 
@@ -526,8 +501,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             return maxDist;
         }
 
-
-
         private void HandleM1()
         {
             if (Main.mouseLeft)
@@ -540,6 +513,46 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             else
             {
                 attacking = false;
+            }
+        }
+
+        private void Punch()
+        {
+            Punch(Main.MouseWorld, afterImages: CanUseAfterImagePunches);
+            currentAnimationState = AnimationState.Idle;
+            if (shootCount == newPunchTime)
+            {
+                Vector2 toMouse = Main.MouseWorld - Projectile.Center;
+                if (toMouse == Vector2.Zero) toMouse = Vector2.UnitX;
+                toMouse.Normalize();
+                Vector2 burstOrigin = Projectile.Center + toMouse * 36f;
+                for (int i = 0; i < 14; i++)
+                {
+                    float angle = toMouse.ToRotation() + MathHelper.ToRadians(Main.rand.NextFloat(-55f, 55f));
+                    float speed = Main.rand.NextFloat(3.5f, 8f);
+                    Vector2 vel = new Vector2(speed, 0f).RotatedBy(angle);
+                    int d = Dust.NewDust(burstOrigin, 6, 6, DustID.Water,
+                        vel.X, vel.Y, 80, Color.DeepSkyBlue, Main.rand.NextFloat(1.2f, 2.0f));
+                    Main.dust[d].noGravity = true;
+                }
+                for (int i = 0; i < 6; i++)
+                {
+                    float angle = toMouse.ToRotation() + MathHelper.ToRadians(Main.rand.NextFloat(-40f, 40f));
+                    float speed = Main.rand.NextFloat(2f, 5f);
+                    Vector2 vel = new Vector2(speed, 0f).RotatedBy(angle);
+                    int sp = Dust.NewDust(burstOrigin, 4, 4, DustID.Electric,
+                        vel.X, vel.Y, 0, Color.White, 1.3f);
+                    Main.dust[sp].noGravity = true;
+                }
+                int dropCount = 8;
+                for (int i = 0; i < dropCount; i++)
+                {
+                    float angle = MathHelper.TwoPi * i / dropCount;
+                    Vector2 vel = new Vector2(Main.rand.NextFloat(2.5f, 5f), 0f).RotatedBy(angle);
+                    int d = Dust.NewDust(burstOrigin, 2, 2, DustID.Water,
+                        vel.X, vel.Y, 120, Color.CornflowerBlue, 1.1f);
+                    Main.dust[d].noGravity = true;
+                }
             }
         }
 
@@ -1028,7 +1041,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             holyWaterBeamTimer--;
             holyWaterFireRateTimer--;
-            currentAnimationState = AnimationState.Secondary;
+            currentAnimationState = AnimationState.CannonShot;
 
             if (holyWaterFireRateTimer <= 0)
             {
@@ -1165,7 +1178,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             else if (currentAnimationState == AnimationState.Attack) PlayAnimation("Attack");
             else if (currentAnimationState == AnimationState.Secondary) PlayAnimation("Secondary");
             else if (currentAnimationState == AnimationState.CannonShot) PlayAnimation("CannonShot");
-            else if (currentAnimationState == AnimationState.HydroSymbiosis) PlayAnimation("HydroSymbiosis");
+            else if (currentAnimationState == AnimationState.HydroSymbiosisIdle) PlayAnimation("HydroSymbiosisIdle");
+            else if (currentAnimationState == AnimationState.HydroSymbiosisSwordAttack) PlayAnimation("HydroSymbiosisSwordAttack");
+            else if (currentAnimationState == AnimationState.HydroSymbiosisSwordCharge) PlayAnimation("HydroSymbiosisSwordCharge");
             else if (currentAnimationState == AnimationState.Pose) PlayAnimation("Pose");
         }
 
@@ -1177,7 +1192,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             else if (animationName == "Attack") AnimateStand(animationName, 4, PunchTime / 2, true);
             else if (animationName == "Secondary") AnimateStand(animationName, 2, 10, true);
             else if (animationName == "CannonShot") AnimateStand(animationName, 1, 6, true);
-            else if (animationName == "HydroSymbiosis") AnimateStand(animationName, 4, 8, true);
+            else if (animationName == "HydroSymbiosisIdle") AnimateStand(animationName, 7, 8, true);
+            else if (animationName == "HydroSymbiosisSwordAttack") AnimateStand(animationName, 7, 8, true);
+            else if (animationName == "HydroSymbiosisSwordCharge") AnimateStand(animationName, 1, 8, true);
             else if (animationName == "Pose") AnimateStand(animationName, 1, 600, true);
         }
 
@@ -1324,7 +1341,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Projectile.Center = player.Center;
             Projectile.velocity = player.velocity;
 
-            currentAnimationState = AnimationState.Idle;
+            currentAnimationState = AnimationState.HydroSymbiosisIdle;
 
             hydroDrainTimer++;
             if (hydroDrainTimer >= HydroSymbiosisDrainInterval)
