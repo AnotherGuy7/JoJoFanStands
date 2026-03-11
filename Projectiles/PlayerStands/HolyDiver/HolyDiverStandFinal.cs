@@ -356,7 +356,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                     Main.dust[sp].noGravity = true;
                 }
             }
-
             currentAnimationState = AnimationState.HydroSymbiosisSwordAttack;
             Projectile.netUpdate = true;
         }
@@ -1190,12 +1189,24 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             if (animationName == "Idle") AnimateStand(animationName, 7, 8, true);
             else if (animationName == "Attack") AnimateStand(animationName, 4, PunchTime / 2, true);
-            else if (animationName == "HydroSymbiosisIaiSlash") AnimateStand(animationName, 8, 2, true);
+            else if (animationName == "HydroSymbiosisIaiSlash") AnimateStand(animationName, 8, 2, false);
             else if (animationName == "CannonShot") AnimateStand(animationName, 1, 6, true);
             else if (animationName == "HydroSymbiosisIdle") AnimateStand(animationName, 7, 8, true);
-            else if (animationName == "HydroSymbiosisSwordAttack") AnimateStand(animationName, 7, 2, true);
-            else if (animationName == "HydroSymbiosisSwordCharge") AnimateStand(animationName, 1, 2, true);
+            else if (animationName == "HydroSymbiosisSwordAttack") AnimateStand(animationName, 7, 2, false);
+            else if (animationName == "HydroSymbiosisSwordCharge") AnimateStand(animationName, 1, 2, false);
             else if (animationName == "Pose") AnimateStand(animationName, 1, 600, true);
+        }
+
+        public override void AnimationCompleted(string animationName)
+        {
+            if (animationName == "HydroSymbiosisIaiSlash" ||
+                animationName == "HydroSymbiosisSwordAttack" ||
+                animationName == "HydroSymbiosisSwordCharge")
+            {
+                currentAnimationState = hydroSymbiosisActive
+                    ? AnimationState.HydroSymbiosisIdle
+                    : AnimationState.Idle;
+            }
         }
 
         private void ShowAbsorbParticles(Vector2 center, Color color, int count)
