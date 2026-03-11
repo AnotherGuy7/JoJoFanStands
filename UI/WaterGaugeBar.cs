@@ -20,16 +20,18 @@ namespace JoJoFanStands.UI
         public DragableUIPanel waterBar;
         public UIText waterEnergyText;
 
-        private const int BarWidth = 48;
-        private const int BarHeight = 100;
+        private const int BarWidth = 32;
+        private const int BarHeight = 64;
+        private const int DisplayWidth = 64;
+        private const int DisplayHeight = 128;
 
         public override void OnInitialize()
         {
             waterBar = new DragableUIPanel();
             waterBar.Left.Set(Main.screenWidth * 0.90f, 0f);
             waterBar.Top.Set(Main.screenHeight * 0.88f, 0f);
-            waterBar.Width.Set(BarWidth, 0f);
-            waterBar.Height.Set(BarHeight, 0f);
+            waterBar.Width.Set(DisplayWidth, 0f);
+            waterBar.Height.Set(DisplayHeight, 0f);
             waterBar.BackgroundColor = new Color(0, 0, 0, 0);
             waterBar.BorderColor = new Color(0, 0, 0, 0);
 
@@ -60,23 +62,22 @@ namespace JoJoFanStands.UI
         {
             Player player = Main.player[Main.myPlayer];
             WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
-
             Rectangle dest = UITools.ReformatRectangle(waterBar.GetClippingRectangle(spriteBatch));
 
-            if (WaterGaugeFillTexture != null)
+            float fillRatio = WaterGaugePlayer.MaxWater > 0
+                ? (float)wgp.CurrentWater / WaterGaugePlayer.MaxWater
+                : 0f;
+            int fillHeight = (int)(dest.Height * fillRatio);
+            int emptyHeight = dest.Height - fillHeight;
+
+            int srcEmptyHeight = (int)(emptyHeight * ((float)BarHeight / dest.Height));
+            int srcFillHeight = BarHeight - srcEmptyHeight;
+
+            if (WaterGaugeFillTexture != null && fillHeight > 0)
             {
-                float fillRatio = WaterGaugePlayer.MaxWater > 0
-                    ? (float)wgp.CurrentWater / WaterGaugePlayer.MaxWater
-                    : 0f;
-
-                int fillHeight = (int)(BarHeight * fillRatio);
-                int emptyHeight = BarHeight - fillHeight;
-
-                Rectangle fillSrc = new Rectangle(0, emptyHeight, BarWidth, fillHeight);
+                Rectangle fillSrc = new Rectangle(0, srcEmptyHeight, BarWidth, srcFillHeight);
                 Rectangle fillDest = new Rectangle(dest.X, dest.Y + emptyHeight, dest.Width, fillHeight);
-
-                if (fillHeight > 0)
-                    spriteBatch.Draw(WaterGaugeFillTexture, fillDest, fillSrc, Color.White);
+                spriteBatch.Draw(WaterGaugeFillTexture, fillDest, fillSrc, Color.White);
             }
 
             if (WaterGaugeBarTexture != null)
