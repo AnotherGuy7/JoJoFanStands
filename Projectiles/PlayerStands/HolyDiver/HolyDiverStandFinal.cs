@@ -167,6 +167,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             CannonShot,
             HydroSymbiosisIaiSlash,
             HydroSymbiosisIdle,
+            HydroSymbiosisSwim,
             HydroSymbiosisSwordAttack,
             HydroSymbiosisSwordCharge,
             Pose
@@ -1176,6 +1177,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (currentAnimationState == AnimationState.Idle) PlayAnimation("Idle");
             else if (currentAnimationState == AnimationState.Attack) PlayAnimation("Attack");
             else if (currentAnimationState == AnimationState.HydroSymbiosisIaiSlash) PlayAnimation("HydroSymbiosisIaiSlash");
+            else if (currentAnimationState == AnimationState.HydroSymbiosisSwim) PlayAnimation("HydroSymbiosisSwim");
             else if (currentAnimationState == AnimationState.CannonShot) PlayAnimation("CannonShot");
             else if (currentAnimationState == AnimationState.HydroSymbiosisIdle) PlayAnimation("HydroSymbiosisIdle");
             else if (currentAnimationState == AnimationState.HydroSymbiosisSwordAttack) PlayAnimation("HydroSymbiosisSwordAttack");
@@ -1190,6 +1192,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (animationName == "Idle") AnimateStand(animationName, 7, 8, true);
             else if (animationName == "Attack") AnimateStand(animationName, 4, PunchTime / 2, true);
             else if (animationName == "HydroSymbiosisIaiSlash") AnimateStand(animationName, 8, 2, false);
+            else if (animationName == "HydroSymbiosisSwim") AnimateStand(animationName, 8, 8, true);
             else if (animationName == "CannonShot") AnimateStand(animationName, 1, 6, true);
             else if (animationName == "HydroSymbiosisIdle") AnimateStand(animationName, 7, 8, true);
             else if (animationName == "HydroSymbiosisSwordAttack") AnimateStand(animationName, 7, 2, false);
@@ -1353,7 +1356,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (currentAnimationState != AnimationState.HydroSymbiosisSwordAttack &&
                 currentAnimationState != AnimationState.HydroSymbiosisSwordCharge &&
                 currentAnimationState != AnimationState.HydroSymbiosisIaiSlash)
-                currentAnimationState = AnimationState.HydroSymbiosisIdle;
+            {
+                bool isMoving = player.velocity.LengthSquared() > 0.5f;
+                currentAnimationState = isMoving
+                    ? AnimationState.HydroSymbiosisSwim
+                    : AnimationState.HydroSymbiosisIdle;
+            }
 
             hydroDrainTimer++;
             if (hydroDrainTimer >= HydroSymbiosisDrainInterval)
