@@ -1273,7 +1273,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private void EnterHydroSymbiosis(Player player)
         {
             WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
-            if (wgp.IsEmpty) return;
+            if (wgp.CurrentWater < wgp.MaxWater * 0.2f) return;
 
             hydroSymbiosisActive = true;
             hydroDrainTimer = 0;
@@ -1371,16 +1371,18 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             symbiosisM1WasHeld = false;
             symbiosisM2WasHeld = false;
             FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
-
             fPlayer.customCameraOverride = false;
-
             player.Center = Projectile.Center;
             player.immuneTime = 0;
             player.wingTimeMax = 0;
-
+            if (manual)
+            {
+                WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
+                int penalty = (int)(wgp.MaxWater * 0.1f);
+                wgp.TrySpend(penalty);
+            }
             currentAnimationState = AnimationState.Idle;
             Projectile.netUpdate = true;
-
             TriggerJCE(player);
         }
 
