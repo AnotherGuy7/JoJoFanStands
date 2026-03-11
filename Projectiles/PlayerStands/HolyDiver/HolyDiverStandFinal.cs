@@ -1250,7 +1250,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         #region Hydro Symbiosis
 
-        private const int WaterDrainPerTick = 1;
+        private const int WaterDrainPerTick = 2;
         private const int HydroSymbiosisDrainInterval = 20;
         private const int HydroSymbiosisBuffTime = 2;
 
