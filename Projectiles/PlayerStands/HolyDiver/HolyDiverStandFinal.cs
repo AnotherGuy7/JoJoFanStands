@@ -50,8 +50,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         private const int JCEDamage = 350;
         private const float JCERadius = 2400f;
-        private const int JCESlashCount = 24;
-        private const int JCESlashStagger = 2;
+        private const int JCESlashCount = 40;
+        private const int JCESlashStagger = 1;
         private const int JCEFreezeTime = 40;
         private const int JCEImmunityTime = 90;
 
@@ -63,40 +63,29 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         // -------------------------------------------------------
         // Symbiosis sword constants
         // -------------------------------------------------------
-        /// <summary>Base damage for a standard symbiosis swing.</summary>
         private const int SymbiosisSwordDamage = 110;
-        /// <summary>Multiplier applied to damage for a fully charged swing.</summary>
         private const float SymbiosisChargedDamageMultiplier = 2.2f;
-        /// <summary>Ticks between standard swing attacks.</summary>
         private const int SymbiosisSwordCooldown = 22;
-        /// <summary>Ticks the player must hold M1 to produce a charged swing.</summary>
         private const int SymbiosisChargeThreshold = 45;
-        /// <summary>How long (ticks) the charged projectile lives.</summary>
         private const int SymbiosisChargedLifetime = 28;
-        /// <summary>How long (ticks) the standard projectile lives.</summary>
         private const int SymbiosisSwingLifetime = 18;
 
         // -------------------------------------------------------
         // Symbiosis Iai Slash (M2) constants
         // -------------------------------------------------------
-        /// <summary>Damage dealt to each enemy hit by the Iai Slash. Always crits.</summary>
         private const int IaiSlashDamage = 200;
-        /// <summary>Half-width of the slash line (pixels). Keeps it a thin line, not a fat box.</summary>
         private const float IaiSlashHalfWidth = 24f;
-        /// <summary>Maximum reach of the slash from the player (pixels).</summary>
         private const float IaiSlashMaxRange = 1400f;
-        /// <summary>Cooldown between Iai Slashes (ticks).</summary>
         private const int IaiSlashCooldown = 90;
-        /// <summary>Extra pixels past the last hit enemy where the player lands.</summary>
         private const float IaiSlashOvershoot = 80f;
 
         // -------------------------------------------------------
         // Symbiosis sword state
         // -------------------------------------------------------
         private int symbiosisSwordCooldown = 0;
-        private int symbiosisM1HoldTimer = 0;   // tracks how long M1 is held in symbiosis
+        private int symbiosisM1HoldTimer = 0;
         private bool symbiosisM1WasHeld = false;
-        private bool symbiosisChargeReleased = false; // fired when released after threshold
+        private bool symbiosisChargeReleased = false;
         private int iaiSlashCooldown = 0;
         private bool symbiosisM2WasHeld = false;
 
@@ -123,7 +112,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private const int WaterCostMine = 5;
         private const int WaterCostHolyWater = 1;
         private const int WaterRestoreAbsorb = 25;
-        private const int WaterCostSymbiosis = 1;
+        private const int WaterCostSymbiosis = 2;
         private const int WaterPerTileCluster = 1;
         private const int MaxTileClusters = 5;
         private const int WaterAbsorbFromEnemy = 3;
