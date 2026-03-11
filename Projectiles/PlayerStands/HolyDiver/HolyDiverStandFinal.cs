@@ -1190,11 +1190,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             if (animationName == "Idle") AnimateStand(animationName, 7, 8, true);
             else if (animationName == "Attack") AnimateStand(animationName, 4, PunchTime / 2, true);
-            else if (animationName == "HydroSymbiosisIaiSlash") AnimateStand(animationName, 8, 10, true);
+            else if (animationName == "HydroSymbiosisIaiSlash") AnimateStand(animationName, 8, 2, true);
             else if (animationName == "CannonShot") AnimateStand(animationName, 1, 6, true);
             else if (animationName == "HydroSymbiosisIdle") AnimateStand(animationName, 7, 8, true);
-            else if (animationName == "HydroSymbiosisSwordAttack") AnimateStand(animationName, 7, 8, true);
-            else if (animationName == "HydroSymbiosisSwordCharge") AnimateStand(animationName, 1, 8, true);
+            else if (animationName == "HydroSymbiosisSwordAttack") AnimateStand(animationName, 7, 2, true);
+            else if (animationName == "HydroSymbiosisSwordCharge") AnimateStand(animationName, 1, 2, true);
             else if (animationName == "Pose") AnimateStand(animationName, 1, 600, true);
         }
 
@@ -1273,7 +1273,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private void EnterHydroSymbiosis(Player player)
         {
             WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
-            if (wgp.CurrentWater < wgp.MaxWater * 0.2f) return;
+            if (wgp.CurrentWater < WaterGaugePlayer.MaxWater * 0.2f) return;
 
             hydroSymbiosisActive = true;
             hydroDrainTimer = 0;
@@ -1339,7 +1339,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Projectile.Center = player.Center;
             Projectile.velocity = player.velocity;
 
-            currentAnimationState = AnimationState.HydroSymbiosisIdle;
+            if (currentAnimationState != AnimationState.HydroSymbiosisSwordAttack &&
+                currentAnimationState != AnimationState.HydroSymbiosisSwordCharge &&
+                currentAnimationState != AnimationState.HydroSymbiosisIaiSlash)
+                currentAnimationState = AnimationState.HydroSymbiosisIdle;
 
             hydroDrainTimer++;
             if (hydroDrainTimer >= HydroSymbiosisDrainInterval)
@@ -1378,7 +1381,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (manual)
             {
                 WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
-                int penalty = (int)(wgp.MaxWater * 0.1f);
+                int penalty = (int)(WaterGaugePlayer.MaxWater * 0.1f);
                 wgp.TrySpend(penalty);
             }
             currentAnimationState = AnimationState.Idle;
