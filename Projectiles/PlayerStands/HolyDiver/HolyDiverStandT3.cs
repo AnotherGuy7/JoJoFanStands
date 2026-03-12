@@ -18,6 +18,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 {
     public class HolyDiverStandT3 : StandClass
     {
+        public static readonly SoundStyle GlassShatter = new SoundStyle("JoJoFanStands/Sounds/StandLines/GlassShatterSoundEffect")
+        {
+            Volume = JoJoStands.JoJoStands.ModSoundsVolume
+        };
         public override int HalfStandHeight => 50;
         public override int PunchDamage => 45;
         public override int AltDamage => 70;
@@ -1318,7 +1322,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             player.immuneTime = JCEImmunityTime;
 
             SoundEngine.PlaySound(SoundID.Item71, player.Center);
-            SoundEngine.PlaySound(SoundID.GlassShatter, player.Center);
+            SoundEngine.PlaySound(GlassShatter, player.Center);
 
             Projectile.netUpdate = true;
         }
