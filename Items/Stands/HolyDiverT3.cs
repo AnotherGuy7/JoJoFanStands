@@ -89,14 +89,14 @@ namespace JoJoFanStands.Items.Stands
 
         public override void AddRecipes()
         {
-            // TODO: Replace HolyDiverT3 with actual T3 item type once created
-            // CreateRecipe()
-            //     .AddIngredient(ModContent.ItemType<HolyDiverT3>())
-            //     .AddIngredient(ItemID.SharkFin, 12)
-            //     .AddIngredient(ItemID.IronBar, 12)
-            //     .AddIngredient(ModContent.ItemType<DeterminedLifeforce>())
-            //     .AddTile(ModContent.TileType<RemixTableTile>())
-            //     .Register();
+            CreateRecipe()
+                .AddIngredient(ModContent.ItemType<HolyDiverT2>())
+                .AddIngredient(ItemID.SharkFin, 12)
+                .AddIngredient(ItemID.SoulofNight, 12)
+                .AddIngredient(ModContent.ItemType<WillToFight>())
+                .AddIngredient(ModContent.ItemType<WillToProtect>())
+                .AddTile(ModContent.TileType<RemixTableTile>())
+                .Register();
         }
 
         public override void SaveData(TagCompound tag)

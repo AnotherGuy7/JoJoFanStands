@@ -5,6 +5,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using JoJoStands.Items;
 
 namespace JoJoFanStands.Items.Stands
 {
@@ -89,13 +90,12 @@ namespace JoJoFanStands.Items.Stands
 
         public override void AddRecipes()
         {
-            // CreateRecipe()
-            //     .AddIngredient(ModContent.ItemType<HolyDiverT3>())
-            //     .AddIngredient(ItemID.SharkFin, 12)
-            //     .AddIngredient(ItemID.IronBar, 12)
-            //     .AddIngredient(ModContent.ItemType<DeterminedLifeforce>())
-            //     .AddTile(ModContent.TileType<RemixTableTile>())
-            //     .Register();
+            CreateRecipe()
+                .AddIngredient(ModContent.ItemType<StandArrow>())
+                .AddIngredient(ItemID.SharkFin, 1)
+                .AddIngredient(ItemID.Coral, 5)
+                .AddTile(ModContent.TileType<RemixTableTile>())
+                .Register();
         }
 
         public override void SaveData(TagCompound tag)
