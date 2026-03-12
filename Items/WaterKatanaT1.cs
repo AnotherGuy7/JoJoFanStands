@@ -5,16 +5,16 @@ using Terraria.ModLoader;
 
 namespace JoJoFanStands.Items
 {
-    public class WaterKatanaFinal : ModItem
+    public class WaterKatanaT1 : ModItem
     {
         public override void SetDefaults()
         {
-            Item.damage = 180;
+            Item.damage = 25;
             Item.DamageType = DamageClass.Melee;
-            Item.width = 60;
-            Item.height = 60;
-            Item.useTime = 5;
-            Item.useAnimation = 5;
+            Item.width = 40;
+            Item.height = 40;
+            Item.useTime = 25;
+            Item.useAnimation = 25;
             Item.useStyle = ItemUseStyleID.Swing;
             Item.knockBack = 4f;
             Item.value = 0;

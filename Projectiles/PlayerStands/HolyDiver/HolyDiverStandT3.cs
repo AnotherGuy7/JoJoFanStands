@@ -16,13 +16,13 @@ using Terraria.ModLoader;
 
 namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 {
-    public class HolyDiverStandFinal : StandClass
+    public class HolyDiverStandT3 : StandClass
     {
         public override int HalfStandHeight => 50;
-        public override int PunchDamage => 60;
-        public override int AltDamage => 90;
+        public override int PunchDamage => 45;
+        public override int AltDamage => 70;
         public override int PunchTime => 5;
-        public override int TierNumber => 4;
+        public override int TierNumber => 3;
         public override Vector2 StandOffset => new Vector2(-2 * 2, 0f);
         public override bool CanUseAfterImagePunches => false;
         public override StandAttackType StandType => StandAttackType.Melee;
@@ -30,12 +30,9 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         public new AnimationState currentAnimationState;
         public new AnimationState oldAnimationState;
 
-        // -------------------------------------------------------
-        // Tuning constants
-        // -------------------------------------------------------
-        private const int WaterCannonDamage = 75;
-        private const int WaterMissileDamage = 55;
-        private const int MineDamage = 120;
+        private const int WaterCannonDamage = 58;
+        private const int WaterMissileDamage = 42;
+        private const int MineDamage = 90;
         private const int MinePlaceCooldown = 90;
         private const float CannonSpeed = 18f;
         private const float MissileSpeed = 9f;
@@ -43,14 +40,47 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private const int WaterCannonCooldown = 45;
         private const int BeamDuration = 90;
         private const int BeamFireRate = 5;
-        private const int MissileSalvoCount = 5;
+        private const int MissileSalvoCount = 3;
         private const int MissileSalvoInterval = 6;
         private const int BeamChargeTime = 60;
         private const int ReplicantCooldown = 180;
 
-        private const int JCEDamage = 350;
-        private const float JCERadius = 2400f;
-        private const int JCESlashCount = 40;
+        private const int SymbiosisSwordDamage = 82;
+        private const float SymbiosisChargedDamageMultiplier = 2.0f;
+        private const int SymbiosisSwordCooldown = 22;
+        private const int SymbiosisChargeThreshold = 45;
+        private const int SymbiosisChargedLifetime = 28;
+        private const int SymbiosisSwingLifetime = 18;
+
+        private const int IaiSlashDamage = 150;
+        private const float IaiSlashHalfWidth = 20f;
+        private const float IaiSlashMaxRange = 1100f;
+        private const int IaiSlashCooldown = 90;
+        private const float IaiSlashOvershoot = 60f;
+
+        private const int WaterCostBarrage = 2;
+        private const int WaterCostBeamShot = 10;
+        private const int WaterCostMissiles = 20;
+        private const int WaterCostMine = 5;
+        private const int WaterCostHolyWater = 1;
+        private const int WaterCostSymbiosis = 2;
+        private const int WaterPerTileCluster = 1;
+        private const int MaxTileClusters = 5;
+        private const int WaterAbsorbFromEnemy = 3;
+        private const int WaterAbsorbPassive = 1;
+        private const int AbsorbEnemyDamage = 10;
+        private const int MaxEnemyAbsorb = 2;
+        private const int AbsorptionRadius = 28 * 16;
+        private const int PassiveAccrualInterval = 110;
+
+        private const int HolyWaterBeamDuration = 90;
+        private const int HolyWaterFireRate = 10;
+        private const float HolyWaterProjectileSpeed = 9f;
+        private const int HolyWaterCooldown = 45;
+
+        private const int JCEDamage = 260;
+        private const float JCERadius = 1800f;
+        private const int JCESlashCount = 28;
         private const int JCESlashStagger = 1;
         private const int JCEFreezeTime = 40;
         private const int JCEImmunityTime = 90;
@@ -60,38 +90,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private int jceSlashSpawned = 0;
         private int jceSlashTimer = 0;
 
-        // -------------------------------------------------------
-        // Symbiosis sword constants
-        // -------------------------------------------------------
-        private const int SymbiosisSwordDamage = 110;
-        private const float SymbiosisChargedDamageMultiplier = 2.2f;
-        private const int SymbiosisSwordCooldown = 22;
-        private const int SymbiosisChargeThreshold = 45;
-        private const int SymbiosisChargedLifetime = 28;
-        private const int SymbiosisSwingLifetime = 18;
-
-        // -------------------------------------------------------
-        // Symbiosis Iai Slash (M2) constants
-        // -------------------------------------------------------
-        private const int IaiSlashDamage = 200;
-        private const float IaiSlashHalfWidth = 24f;
-        private const float IaiSlashMaxRange = 1400f;
-        private const int IaiSlashCooldown = 90;
-        private const float IaiSlashOvershoot = 80f;
-
-        // -------------------------------------------------------
-        // Symbiosis sword state
-        // -------------------------------------------------------
         private int symbiosisSwordCooldown = 0;
         private int symbiosisM1HoldTimer = 0;
         private bool symbiosisM1WasHeld = false;
-        private bool symbiosisChargeReleased = false;
         private int iaiSlashCooldown = 0;
         private bool symbiosisM2WasHeld = false;
 
-        // -------------------------------------------------------
-        // Timers
-        // -------------------------------------------------------
         private int mineCooldownTimer = 0;
         private int waterCannonCooldownTimer = 0;
         private int m2HoldTimer = 0;
@@ -106,42 +110,15 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         private int[] salvoTargets = null;
         private Vector2 salvoDirection;
 
-        private const int WaterCostBarrage = 2;
-        private const int WaterCostBeamShot = 10;
-        private const int WaterCostMissiles = 20;
-        private const int WaterCostMine = 5;
-        private const int WaterCostHolyWater = 1;
-        private const int WaterRestoreAbsorb = 25;
-        private const int WaterCostSymbiosis = 2;
-        private const int WaterPerTileCluster = 1;
-        private const int MaxTileClusters = 5;
-        private const int WaterAbsorbFromEnemy = 3;
-        private const int WaterAbsorbPassive = 1;
-        private const int AbsorbEnemyDamage = 12;
-        private const int MaxEnemyAbsorb = 3;
-        private const int AbsorptionRadius = 30 * 16;
-        private const int PassiveAccrualInterval = 90;
         private int passiveAccrualTimer = 0;
 
         private int holyWaterBeamTimer = 0;
         private int holyWaterFireRateTimer = 0;
-        private const int HolyWaterBeamDuration = 90;
-        private const int HolyWaterFireRate = 9;
-        private const float HolyWaterProjectileSpeed = 9f;
-        private const int HolyWaterHoldMax = 120;
-        private const int HolyWaterBurnBonusMax = 600;
-        private const int HolyWaterHealAmount = 20;
-        private const int HolyWaterHealCooldown = 90;
-        private const int HolyWaterCooldown = 45;
         private bool holyWaterActive => holyWaterBeamTimer > 0;
         private int holyWaterCooldownTimer = 0;
 
-        // -------------------------------------------------------
-        // Replicant tracking
-        // -------------------------------------------------------
         private int replicantProjIndex = -1;
         private int replicantCooldown = 0;
-
         private bool replicantM2WasHeld = false;
 
         private bool HasActiveReplicant => replicantProjIndex >= 0
@@ -149,17 +126,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             && Main.projectile[replicantProjIndex].active
             && Main.projectile[replicantProjIndex].type == ModContent.ProjectileType<HolyDiverWaterReplicant>();
 
-        private int MaxMissileTargets => TierNumber >= 4 ? 3 : TierNumber >= 3 ? 2 : 1;
+        private int MaxMissileTargets => 2;
 
-        // -------------------------------------------------------
-        // M2 mode
-        // -------------------------------------------------------
         public enum M2Mode { WaterReplicant, WaterCannon, Mine, WaterAbsorption, HolyWater }
         public M2Mode currentM2Mode = M2Mode.WaterReplicant;
 
-        // -------------------------------------------------------
-        // Animation
-        // -------------------------------------------------------
         public new enum AnimationState
         {
             Idle,
@@ -173,16 +144,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Pose
         }
 
-
-        // -------------------------------------------------------
-        // Spawn / Kill
-        // -------------------------------------------------------
-
         public override void ExtraSpawnEffects()
         {
             if (Projectile.owner != Main.myPlayer) return;
             WaterGaugeBar.ShowWaterGaugeBar();
-            WaterGaugePlayer.MaxWater = 200;
+            WaterGaugePlayer.MaxWater = 150;
         }
 
         public override void StandKillEffects()
@@ -195,11 +161,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             WaterGaugeBar.HideWaterGaugeBar();
             HolyDiverAbilityWheel.CloseAbilityWheel();
         }
-
-
-        // -------------------------------------------------------
-        // Main AI
-        // -------------------------------------------------------
 
         public override void AI()
         {
@@ -245,11 +206,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (mPlayer.posing)
                 currentAnimationState = AnimationState.Pose;
         }
-
-
-        // -------------------------------------------------------
-        // Timer helpers
-        // -------------------------------------------------------
 
         private void TickTimers()
         {
@@ -325,7 +281,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 Vector2.Zero,
                 ModContent.ProjectileType<HolyDiverSymbiosisSword>(),
                 damage,
-                charged ? 8f : 5f,
+                charged ? 6f : 4f,
                 Projectile.owner,
                 ai0: charged ? 1f : 0f,
                 ai1: baseAngle);
@@ -340,32 +296,28 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             if (charged)
             {
-                for (int i = 0; i < 20; i++)
+                for (int i = 0; i < 14; i++)
                 {
                     float a = Main.rand.NextFloat(MathHelper.TwoPi);
-                    Vector2 vel = new Vector2(Main.rand.NextFloat(3f, 7f), 0f).RotatedBy(a);
+                    Vector2 vel = new Vector2(Main.rand.NextFloat(3f, 6f), 0f).RotatedBy(a);
                     int d = Dust.NewDust(Projectile.Center, 4, 4, DustID.Water,
-                        vel.X, vel.Y, 0, Color.OrangeRed, 2.0f);
+                        vel.X, vel.Y, 0, Color.OrangeRed, 1.8f);
                     Main.dust[d].noGravity = true;
                 }
-
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 7; i++)
                 {
                     float a = Main.rand.NextFloat(MathHelper.TwoPi);
-                    Vector2 vel = new Vector2(Main.rand.NextFloat(2f, 5f), 0f).RotatedBy(a);
+                    Vector2 vel = new Vector2(Main.rand.NextFloat(2f, 4f), 0f).RotatedBy(a);
                     int sp = Dust.NewDust(Projectile.Center, 2, 2, DustID.Electric,
-                        vel.X, vel.Y, 0, Color.White, 1.4f);
+                        vel.X, vel.Y, 0, Color.White, 1.2f);
                     Main.dust[sp].noGravity = true;
                 }
             }
+
             currentAnimationState = AnimationState.HydroSymbiosisSwordAttack;
             Projectile.netUpdate = true;
         }
 
-
-        // -------------------------------------------------------
-        // Ability: Iai Slash (Symbiosis M2)
-        // -------------------------------------------------------
         private void HandleIaiSlash(Player player)
         {
             bool m2Held = Main.mouseRight;
@@ -394,8 +346,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             else rawDir /= rawDist;
 
             float slashLength = System.Math.Min(rawDist, IaiSlashMaxRange);
-            Vector2 slashEnd = origin + rawDir * slashLength;
-
             float wallLimit = FindWallLimit(origin, rawDir, slashLength);
             Vector2 safeEnd = origin + rawDir * wallLimit;
 
@@ -424,20 +374,20 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                         crit: true,
                         noPlayerInteraction: false);
 
-                    for (int k = 0; k < 10; k++)
+                    for (int k = 0; k < 8; k++)
                     {
                         float a = Main.rand.NextFloat(MathHelper.TwoPi);
-                        Vector2 v = new Vector2(Main.rand.NextFloat(3f, 8f), 0f).RotatedBy(a);
+                        Vector2 v = new Vector2(Main.rand.NextFloat(3f, 7f), 0f).RotatedBy(a);
                         int d = Dust.NewDust(npc.Center, 4, 4, DustID.Water,
-                            v.X, v.Y, 0, Color.OrangeRed, 1.8f);
+                            v.X, v.Y, 0, Color.OrangeRed, 1.6f);
                         Main.dust[d].noGravity = true;
                     }
-                    for (int k = 0; k < 5; k++)
+                    for (int k = 0; k < 4; k++)
                     {
                         float a = Main.rand.NextFloat(MathHelper.TwoPi);
-                        Vector2 v = new Vector2(Main.rand.NextFloat(2f, 5f), 0f).RotatedBy(a);
+                        Vector2 v = new Vector2(Main.rand.NextFloat(2f, 4f), 0f).RotatedBy(a);
                         int sp = Dust.NewDust(npc.Center, 2, 2, DustID.Electric,
-                            v.X, v.Y, 0, Color.White, 1.2f);
+                            v.X, v.Y, 0, Color.White, 1.0f);
                         Main.dust[sp].noGravity = true;
                     }
                 }
@@ -460,7 +410,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 Projectile.Center = tpPos;
                 player.velocity = rawDir * 6f;
                 player.immune = true;
-                player.immuneTime = System.Math.Max(player.immuneTime, 25);
+                player.immuneTime = System.Math.Max(player.immuneTime, 20);
                 SoundEngine.PlaySound(SoundID.Item71, tpPos);
             }
 
@@ -526,32 +476,32 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 Vector2 toMouse = Main.MouseWorld - Projectile.Center;
                 if (toMouse == Vector2.Zero) toMouse = Vector2.UnitX;
                 toMouse.Normalize();
-                Vector2 burstOrigin = Projectile.Center + toMouse * 36f;
-                for (int i = 0; i < 14; i++)
+                Vector2 burstOrigin = Projectile.Center + toMouse * 30f;
+                for (int i = 0; i < 10; i++)
                 {
                     float angle = toMouse.ToRotation() + MathHelper.ToRadians(Main.rand.NextFloat(-55f, 55f));
-                    float speed = Main.rand.NextFloat(3.5f, 8f);
+                    float speed = Main.rand.NextFloat(3f, 7f);
                     Vector2 vel = new Vector2(speed, 0f).RotatedBy(angle);
                     int d = Dust.NewDust(burstOrigin, 6, 6, DustID.Water,
-                        vel.X, vel.Y, 80, Color.DeepSkyBlue, Main.rand.NextFloat(1.2f, 2.0f));
+                        vel.X, vel.Y, 80, Color.DeepSkyBlue, Main.rand.NextFloat(1.0f, 1.8f));
                     Main.dust[d].noGravity = true;
                 }
-                for (int i = 0; i < 6; i++)
+                for (int i = 0; i < 4; i++)
                 {
                     float angle = toMouse.ToRotation() + MathHelper.ToRadians(Main.rand.NextFloat(-40f, 40f));
-                    float speed = Main.rand.NextFloat(2f, 5f);
+                    float speed = Main.rand.NextFloat(2f, 4f);
                     Vector2 vel = new Vector2(speed, 0f).RotatedBy(angle);
                     int sp = Dust.NewDust(burstOrigin, 4, 4, DustID.Electric,
-                        vel.X, vel.Y, 0, Color.White, 1.3f);
+                        vel.X, vel.Y, 0, Color.White, 1.1f);
                     Main.dust[sp].noGravity = true;
                 }
-                int dropCount = 8;
+                int dropCount = 6;
                 for (int i = 0; i < dropCount; i++)
                 {
                     float angle = MathHelper.TwoPi * i / dropCount;
-                    Vector2 vel = new Vector2(Main.rand.NextFloat(2.5f, 5f), 0f).RotatedBy(angle);
+                    Vector2 vel = new Vector2(Main.rand.NextFloat(2f, 4f), 0f).RotatedBy(angle);
                     int d = Dust.NewDust(burstOrigin, 2, 2, DustID.Water,
-                        vel.X, vel.Y, 120, Color.CornflowerBlue, 1.1f);
+                        vel.X, vel.Y, 120, Color.CornflowerBlue, 1.0f);
                     Main.dust[d].noGravity = true;
                 }
             }
@@ -565,8 +515,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
                 if (currentM2Mode == M2Mode.WaterCannon)
                 {
-                    // Only start beam charge on release if we were genuinely charging
-                    // (not if missiles just fired and reset m2HoldTimer to 0)
                     if (m2HoldTimer > 0 && m2HoldTimer < MissileChargeThreshold)
                     {
                         if (!beamCharged && !BeamIsActive && CanFireCannon)
@@ -613,9 +561,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                     if (m2HoldTimer >= MissileChargeThreshold)
                         DoMissiles(player);
                     else
-                    {
                         currentAnimationState = AnimationState.Idle;
-                    }
                     break;
 
                 case M2Mode.WaterReplicant:
@@ -633,7 +579,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
         }
 
-
         private void HandleReplicantM2(Player player)
         {
             if (replicantM2WasHeld)
@@ -649,7 +594,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
             else
             {
-                WarpToReplicant(player);
+                KillReplicant();
             }
         }
 
@@ -668,12 +613,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             replicantCooldown = ReplicantCooldown;
             Main.projectile[proj].netUpdate = true;
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 16; i++)
             {
                 float a = Main.rand.NextFloat(MathHelper.TwoPi);
                 Vector2 dustVel = new Vector2(3f, 0f).RotatedBy(a);
                 int d = Dust.NewDust(Projectile.Center, 4, 4, DustID.Water,
-                    dustVel.X, dustVel.Y, 100, Color.DeepSkyBlue, 1.4f);
+                    dustVel.X, dustVel.Y, 100, Color.DeepSkyBlue, 1.2f);
                 Main.dust[d].noGravity = true;
             }
 
@@ -682,34 +627,25 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Projectile.netUpdate = true;
         }
 
-        private void WarpToReplicant(Player player)
+        private void KillReplicant()
         {
-            HolyDiverWaterReplicant replicant =
-                Main.projectile[replicantProjIndex].ModProjectile as HolyDiverWaterReplicant;
-
-            if (replicant != null)
-                replicant.ConsumeAsWarp();
+            if (HasActiveReplicant)
+                Main.projectile[replicantProjIndex].Kill();
 
             replicantProjIndex = -1;
-            replicantCooldown = ReplicantCooldown;
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 12; i++)
             {
                 float a = Main.rand.NextFloat(MathHelper.TwoPi);
-                Vector2 dustVel = new Vector2(3f, 0f).RotatedBy(a);
+                Vector2 dustVel = new Vector2(2f, 0f).RotatedBy(a);
                 int d = Dust.NewDust(Projectile.Center, 4, 4, DustID.Water,
-                    dustVel.X, dustVel.Y, 0, Color.White, 1.6f);
+                    dustVel.X, dustVel.Y, 0, Color.LightBlue, 1.2f);
                 Main.dust[d].noGravity = true;
             }
 
-            SoundEngine.PlaySound(SoundID.Item6, player.Center);
+            SoundEngine.PlaySound(SoundID.Item6, Main.player[Projectile.owner].Center);
             Projectile.netUpdate = true;
         }
-
-
-        // -------------------------------------------------------
-        // Beam charge particles
-        // -------------------------------------------------------
 
         private void SpawnBeamChargeParticles(Player player)
         {
@@ -719,23 +655,23 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             currentAnimationState = AnimationState.Idle;
 
             float chargeProgress = (float)beamChargeTimer / BeamChargeTime;
-            int particleCount = (int)MathHelper.Lerp(1f, 4f, chargeProgress);
+            int particleCount = (int)MathHelper.Lerp(1f, 3f, chargeProgress);
 
             for (int i = 0; i < particleCount; i++)
             {
                 float angle = Main.rand.NextFloat(MathHelper.TwoPi);
-                float radius = MathHelper.Lerp(20f, 60f, chargeProgress);
+                float radius = MathHelper.Lerp(16f, 50f, chargeProgress);
                 Vector2 offset = new Vector2(radius, 0f).RotatedBy(angle);
                 Vector2 vel = new Vector2(-offset.Y, offset.X) * 0.05f;
 
                 int d = Dust.NewDust(Projectile.Center + offset, 1, 1, DustID.Water,
-                    vel.X, vel.Y, 0, Color.DeepSkyBlue, MathHelper.Lerp(1f, 2.5f, chargeProgress));
+                    vel.X, vel.Y, 0, Color.DeepSkyBlue, MathHelper.Lerp(1f, 2.2f, chargeProgress));
                 Main.dust[d].noGravity = true;
 
                 if (Main.rand.NextBool(3))
                 {
                     int spark = Dust.NewDust(Projectile.Center + offset * 0.5f, 1, 1, DustID.Electric,
-                        vel.X * 2f, vel.Y * 2f, 0, Color.White, 1.2f);
+                        vel.X * 2f, vel.Y * 2f, 0, Color.White, 1.0f);
                     Main.dust[spark].noGravity = true;
                 }
             }
@@ -751,10 +687,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 Projectile.netUpdate = true;
             }
         }
-
-        // -------------------------------------------------------
-        // Special key — cycle through all three modes
-        // -------------------------------------------------------
 
         private void HandleSpecialToggle()
         {
@@ -799,11 +731,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
         }
 
-
-        // -------------------------------------------------------
-        // Ability: Mine
-        // -------------------------------------------------------
-
         private void DoMine(Player player)
         {
             WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
@@ -826,11 +753,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Main.projectile[proj].netUpdate = true;
             SoundEngine.PlaySound(SoundID.Item4, player.Center);
         }
-
-
-        // -------------------------------------------------------
-        // Ability: Beam
-        // -------------------------------------------------------
 
         private void StartBeam()
         {
@@ -1051,9 +973,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
 
             if (holyWaterBeamTimer <= 0 && Main.mouseRight)
-            {
                 holyWaterBeamTimer = HolyWaterBeamDuration;
-            }
 
             Projectile.netUpdate = true;
         }
@@ -1067,8 +987,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 return;
             }
 
-            player.Heal(2);
-            player.AddBuff(BuffID.Ironskin, 300);
+            player.Heal(1);
+            player.AddBuff(BuffID.Ironskin, 240);
 
             Vector2 toMouse = Main.MouseWorld - Projectile.Center;
             if (toMouse == Vector2.Zero) toMouse = Vector2.UnitX;
@@ -1121,7 +1041,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         private int[] FindMissileTargets(Player player)
         {
-            const float ScanRange = 1200f;
+            const float ScanRange = 1000f;
             int cap = MaxMissileTargets;
             int[] ids = new int[cap];
             float[] dists = new float[cap];
@@ -1150,11 +1070,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             return result.Length == 0 ? new int[] { -1 } : result;
         }
-
-
-        // -------------------------------------------------------
-        // Misc overrides
-        // -------------------------------------------------------
 
         public override bool PreKill(int timeLeft)
         {
@@ -1225,26 +1140,11 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             }
         }
 
-        private void ShowAbsorbPullParticles(Player player)
-        {
-            for (int i = 0; i < 12; i++)
-            {
-                float a = Main.rand.NextFloat(MathHelper.TwoPi);
-                float radius = Main.rand.NextFloat(32f, 80f);
-                Vector2 spawnPos = player.Center + new Vector2(radius, 0f).RotatedBy(a);
-                Vector2 vel = (player.Center - spawnPos) * 0.12f;
-
-                int d = Dust.NewDust(spawnPos, 2, 2, DustID.Water,
-                    vel.X, vel.Y, 80, Color.CornflowerBlue, 1.2f);
-                Main.dust[d].noGravity = true;
-            }
-        }
-
         private void ShowAbsorbPullParticlesFrom(Vector2 from, Vector2 to)
         {
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 5; i++)
             {
-                Vector2 t = (float)i / 6f * (to - from) + from;
+                Vector2 t = (float)i / 5f * (to - from) + from;
                 Vector2 vel = (to - from) * 0.08f;
                 int d = Dust.NewDust(t, 2, 2, DustID.Water,
                     vel.X, vel.Y, 60, Color.Aquamarine, 1.0f);
@@ -1303,7 +1203,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             player.AddBuff(BuffID.Ironskin, HydroSymbiosisBuffTime);
             player.AddBuff(BuffID.Regeneration, HydroSymbiosisBuffTime);
             player.AddBuff(BuffID.Swiftness, HydroSymbiosisBuffTime);
-            player.AddBuff(BuffID.Endurance, HydroSymbiosisBuffTime);
 
             currentAnimationState = AnimationState.Idle;
             Projectile.netUpdate = true;
@@ -1333,8 +1232,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             player.noFallDmg = true;
             player.gravity = 0f;
 
-            const float FlyMaxSpeed = 14f;
-            const float FlyAccel = 0.6f;
+            const float FlyMaxSpeed = 12f;
+            const float FlyAccel = 0.5f;
             const float FlyFriction = 0.85f;
 
             if (player.controlJump)
@@ -1347,7 +1246,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             player.AddBuff(BuffID.Ironskin, HydroSymbiosisBuffTime);
             player.AddBuff(BuffID.Regeneration, HydroSymbiosisBuffTime);
             player.AddBuff(BuffID.Swiftness, HydroSymbiosisBuffTime);
-            player.AddBuff(BuffID.Endurance, HydroSymbiosisBuffTime);
 
             ClearAllDebuffs(player);
 
@@ -1447,8 +1345,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                         ModContent.ProjectileType<HolyDiverIaiSlashVisual>(),
                         0, 0f,
                         Projectile.owner,
-                        ai0: slashPos.X + Main.rand.NextFloat(-120f, 120f),
-                        ai1: slashPos.Y + Main.rand.NextFloat(-120f, 120f));
+                        ai0: slashPos.X + Main.rand.NextFloat(-100f, 100f),
+                        ai1: slashPos.Y + Main.rand.NextFloat(-100f, 100f));
                     Main.projectile[vis].netUpdate = true;
 
                     jceSlashSpawned++;
@@ -1462,12 +1360,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 if (Main.rand.NextBool(2))
                 {
                     float a = Main.rand.NextFloat(MathHelper.TwoPi);
-                    float r = Main.rand.NextFloat(60f, 260f);
+                    float r = Main.rand.NextFloat(50f, 200f);
                     Vector2 p = player.Center + new Vector2(r, 0f).RotatedBy(a);
                     Vector2 v = (player.Center - p) * 0.06f;
                     int dustType = Main.rand.NextBool(3) ? DustID.Electric : DustID.Water;
                     Color col = Main.rand.NextBool(3) ? Color.White : Color.DeepSkyBlue;
-                    int d = Dust.NewDust(p, 2, 2, dustType, v.X, v.Y, 0, col, 1.8f);
+                    int d = Dust.NewDust(p, 2, 2, dustType, v.X, v.Y, 0, col, 1.6f);
                     Main.dust[d].noGravity = true;
                 }
 
@@ -1477,14 +1375,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (Projectile.owner == Main.myPlayer)
                 ApplyJCEDamage(player);
 
-            for (int i = 0; i < 80; i++)
+            for (int i = 0; i < 60; i++)
             {
                 float a = Main.rand.NextFloat(MathHelper.TwoPi);
-                float speed = Main.rand.NextFloat(4f, 14f);
+                float speed = Main.rand.NextFloat(3f, 11f);
                 Vector2 vel = new Vector2(speed, 0f).RotatedBy(a);
                 int dustType = (i % 4 == 0) ? DustID.Electric : DustID.Water;
                 Color col = (i % 4 == 0) ? Color.White : Color.OrangeRed;
-                int d = Dust.NewDust(player.Center, 6, 6, dustType, vel.X, vel.Y, 0, col, 2.2f);
+                int d = Dust.NewDust(player.Center, 6, 6, dustType, vel.X, vel.Y, 0, col, 2.0f);
                 Main.dust[d].noGravity = true;
             }
 
@@ -1514,12 +1412,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                     crit: true,
                     noPlayerInteraction: false);
 
-                for (int k = 0; k < 12; k++)
+                for (int k = 0; k < 9; k++)
                 {
                     float a = Main.rand.NextFloat(MathHelper.TwoPi);
-                    Vector2 v = new Vector2(Main.rand.NextFloat(3f, 9f), 0f).RotatedBy(a);
+                    Vector2 v = new Vector2(Main.rand.NextFloat(3f, 8f), 0f).RotatedBy(a);
                     int d = Dust.NewDust(npc.Center, 4, 4, DustID.Water,
-                        v.X, v.Y, 0, Color.OrangeRed, 2.0f);
+                        v.X, v.Y, 0, Color.OrangeRed, 1.8f);
                     Main.dust[d].noGravity = true;
                 }
             }
@@ -1541,23 +1439,22 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         private void SpawnInstallParticles(Player player)
         {
-            for (int i = 0; i < 40; i++)
+            for (int i = 0; i < 30; i++)
             {
                 float angle = Main.rand.NextFloat(MathHelper.TwoPi);
-                float speed = Main.rand.NextFloat(2f, 7f);
+                float speed = Main.rand.NextFloat(2f, 6f);
                 Vector2 vel = new Vector2(speed, 0f).RotatedBy(angle);
 
                 int dustType = (i % 3 == 0) ? DustID.Electric : DustID.Water;
                 Color color = (i % 3 == 0) ? Color.White : Color.DeepSkyBlue;
 
                 int d = Dust.NewDust(player.Center, 4, 4, dustType,
-                    vel.X, vel.Y, 0, color, Main.rand.NextFloat(1.2f, 2.2f));
+                    vel.X, vel.Y, 0, color, Main.rand.NextFloat(1.0f, 1.8f));
                 Main.dust[d].noGravity = true;
             }
         }
 
         #endregion
-
 
         public override void SendExtraStates(BinaryWriter writer)
         {
@@ -1601,12 +1498,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             iaiSlashCooldown = reader.ReadInt32();
         }
 
-
         public override bool PreDrawExtras() => false;
 
         public override void PostDrawExtras()
         {
-            // TODO: Draw current M2 mode indicator (Mine / Water Cannon / Water Replicant)
         }
     }
 }

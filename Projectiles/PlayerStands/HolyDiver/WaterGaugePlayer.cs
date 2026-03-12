@@ -20,7 +20,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         // -------------------------------------------------------
         // Tuning
         // -------------------------------------------------------
-        public const int MaxWater = 100;
+        public static int MaxWater = 100;
 
         /// <summary>Passive ticks between +1 water drops when no source is nearby.</summary>
         private const int PassiveRegenInterval = 30;
