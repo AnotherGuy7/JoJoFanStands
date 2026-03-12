@@ -153,6 +153,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (Projectile.owner != Main.myPlayer) return;
             WaterGaugeBar.ShowWaterGaugeBar();
             WaterGaugePlayer.MaxWater = 75;
+            if (WaterGaugePlayer.CurrentWater > MaxWater)
+                WaterGaugePlayer.CurrentWater = MaxWater;
         }
 
         public override void StandKillEffects()
