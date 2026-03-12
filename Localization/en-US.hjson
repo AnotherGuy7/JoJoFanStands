@@ -786,6 +786,31 @@ Mods: {
 					User Name: Power Guy
 					'''
 			}
+
+			WaterHook: {
+				DisplayName: Water Hook
+				Tooltip: ""
+			}
+
+			WaterKatanaFinal: {
+				DisplayName: Water Katana Final
+				Tooltip: ""
+			}
+
+			WaterKatanaT1: {
+				DisplayName: Water Katana T1
+				Tooltip: ""
+			}
+
+			WaterKatanaT2: {
+				DisplayName: Water Katana T2
+				Tooltip: ""
+			}
+
+			WaterKatanaT3: {
+				DisplayName: Water Katana T3
+				Tooltip: ""
+			}
 		}
 
 		NPCs.Pao.DisplayName: Pao
@@ -878,6 +903,19 @@ Mods: {
 			VirtualInsanityStandT2.DisplayName: Virtual Insanity Stand T2
 			VirtualInsanityStandT3.DisplayName: Virtual Insanity Stand T3
 			VirtualInsanityStandT1.DisplayName: Virtual Insanity Stand T1
+			WaterHookProjectile.DisplayName: Water Hook Projectile
+			HolyDiverHolyWater.DisplayName: Holy Diver Holy Water
+			HolyDiverIaiSlashVisual.DisplayName: Holy Diver Iai Slash Visual
+			HolyDiverMine.DisplayName: Holy Diver Mine
+			HolyDiverReplicantPunch.DisplayName: Holy Diver Replicant Punch
+			HolyDiverStandFinal.DisplayName: Holy Diver Stand Final
+			HolyDiverStandT1.DisplayName: Holy Diver Stand T1
+			HolyDiverStandT2.DisplayName: Holy Diver Stand T2
+			HolyDiverStandT3.DisplayName: Holy Diver Stand T3
+			HolyDiverSymbiosisSword.DisplayName: Holy Diver Symbiosis Sword
+			HolyDiverWaterCannon.DisplayName: Holy Diver Water Cannon
+			HolyDiverWaterMissile.DisplayName: Holy Diver Water Missile
+			HolyDiverWaterReplicant.DisplayName: Holy Diver Water Replicant
 		}
 
 		Configs: {
