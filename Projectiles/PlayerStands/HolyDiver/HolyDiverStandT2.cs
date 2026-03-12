@@ -23,7 +23,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Volume = JoJoStands.JoJoStands.ModSoundsVolume
         };
         public override int HalfStandHeight => 50;
-        public override int PunchDamage => 32;
+        public override int PunchDamage => 28;
         public override int AltDamage => 52;
         public override int PunchTime => 6;
         public override int TierNumber => 2;
