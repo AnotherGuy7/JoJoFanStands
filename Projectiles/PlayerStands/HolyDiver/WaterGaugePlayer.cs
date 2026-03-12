@@ -92,5 +92,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                 ? tag.GetInt("currentWater")
                 : MaxWater;
         }
+
+        public void SetWater(int value) => CurrentWater = System.Math.Clamp(value, 0, MaxWater);
     }
 }
