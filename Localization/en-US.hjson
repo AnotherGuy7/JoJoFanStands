@@ -587,6 +587,66 @@ Mods: {
 					'''
 			}
 
+			HolyDiverT1: {
+				DisplayName: Holy Diver (Tier 1)
+				Tooltip:
+					'''
+					Left-click to create water pushes on a location!
+					Right-click to use your selected abilities!
+					Special: Switch your abilities!
+					Second Special: Remote Mode
+					Passive: Perfect Imitation
+					Note: Comes with the Water Katana and the Water Hook.
+					User Name: ZebastianVT
+					Reference: Holy Diver by Dio
+					'''
+			}
+
+			HolyDiverT2: {
+				DisplayName: Holy Diver (Tier 2)
+				Tooltip:
+					'''
+					Left-click to create water pushes on a location!
+					Right-click to use your selected abilities!
+					Special: Switch your abilities!
+					Second Special: Remote Mode
+					Passive: Perfect Imitation
+					Note: Comes with the Water Katana and the Water Hook.
+					User Name: ZebastianVT
+					Reference: Holy Diver by Dio
+					'''
+			}
+
+			HolyDiverT3: {
+				DisplayName: Holy Diver (Tier 3)
+				Tooltip:
+					'''
+					Left-click to create water pushes on a location!
+					Right-click to use your selected abilities!
+					Special: Switch your abilities!
+					Second Special: Remote Mode
+					Passive: Perfect Imitation
+					Note: Comes with the Water Katana and the Water Hook.
+					User Name: ZebastianVT
+					Reference: Holy Diver by Dio
+					'''
+			}
+
+			HolyDiverFinal: {
+				DisplayName: Holy Diver (Final)
+				Tooltip:
+					'''
+					Left-click to create water pushes on a location!
+					Right-click to use your selected abilities!
+					Special: Switch your abilities!
+					Second Special: Become absorbed in the stand and be one with it.
+					Passive: Perfect Imitation
+					Note: Comes with the Water Katana and the Water Hook.
+					User Name: ZebastianVT
+					Reference: Holy Diver by Dio
+					'''
+			}
+
 			DIOOHBoots: {
 				DisplayName: Heavenly Boots
 				Tooltip: Boots made for conquering multiple realities.
