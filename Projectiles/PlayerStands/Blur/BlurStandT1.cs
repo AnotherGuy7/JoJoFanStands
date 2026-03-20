@@ -13,15 +13,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
     public class BlurStandT1 : StandClass
     {
         public override int HalfStandHeight => 37;
-        public override int PunchDamage => 98;
-        public override int AltDamage => 112;
+        public override int PunchDamage => 9;
         public override int PunchTime => 8;
         public override int TierNumber => 1;
         public override float MaxDistance => 25 * 16;
         public override Vector2 StandOffset => new Vector2(-2 * 2, 0f);
         public override bool CanUseAfterImagePunches => false;
         public override StandAttackType StandType => StandAttackType.Melee;
-        public static Texture2D[] punchTextures;
+        public new static Texture2D[] punchTextures;
 
         private int punchAnimationTimer = 0;
         private int afterImageTimer = 0;
@@ -80,7 +79,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
             UpdateStandInfo();
             if (shootCount > 0)
                 shootCount--;
-
 
             if (mPlayer.standOut)
                 Projectile.timeLeft = 2;

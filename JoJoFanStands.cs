@@ -33,7 +33,6 @@ namespace JoJoFanStands
             JoJoStandsMod = ModLoader.GetMod("JoJoStands");
             SoundsLoaded = ModLoader.TryGetMod("JoJoStandsSounds", out JoJoStandsSoundsMod);
 
-
             BlurStandT1.punchTextures = new Texture2D[2];
             BlurStandT1.punchTextures[0] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Blur/Blur_Punch_1", AssetRequestMode.ImmediateLoad).Value;
             BlurStandT1.punchTextures[1] = ModContent.Request<Texture2D>("JoJoFanStands/Projectiles/PlayerStands/Blur/Blur_Punch_2", AssetRequestMode.ImmediateLoad).Value;
