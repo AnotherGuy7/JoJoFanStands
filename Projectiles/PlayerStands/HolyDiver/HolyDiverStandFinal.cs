@@ -189,6 +189,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
             if (wgp.CurrentWater > WaterGaugePlayer.MaxWater)
                 wgp.SetWater(System.Math.Min(wgp.CurrentWater, WaterGaugePlayer.MaxWater));
+            HolyDiverAbilityWheel.OpenAbilityWheel(player.GetModPlayer<MyPlayer>(), 5);
         }
 
         public override void StandKillEffects()
@@ -766,6 +767,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         {
             if (SpecialKeyCurrent())
             {
+                //HolyDiverAbilityWheel.OpenAbilityWheel(player.GetModPlayer<MyPlayer>(), 5);
                 if (!specialKeyWasHeld)
                 {
                     currentM2Mode = currentM2Mode switch
