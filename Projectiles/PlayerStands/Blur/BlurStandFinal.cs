@@ -46,7 +46,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
         private readonly float MaxPercentageGain = 0.35f;
         private readonly int KnifeThrowTime = 6;
 
-        public struct PunchFrame
+        public new struct PunchFrame
         {
             public Vector2 offset;
             public Vector2 targetOffset;
@@ -87,6 +87,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
                 Main.player[Projectile.owner].GetModPlayer<FanPlayer>().amountOfBlurEnergy = 0;
             BlurBar.ShowBlurBar();
             Main.player[Projectile.owner].GetModPlayer<MyPlayer>().immuneToTimestopEffects = true;
+            BlurAbilityWheel.OpenAbilityWheel(Main.player[Projectile.owner].GetModPlayer<MyPlayer>(), 3);
         }
 
         public override void AI()
@@ -195,6 +196,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
                     }
                     else
                     {
+                        attacking = false;
                         secondaryAbility = false;
                         if (dashChargeTimer == 0)
                         {
@@ -452,7 +454,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
             BlurBar.HideBlurBar();
             BlurAbilityWheel.CloseAbilityWheel();
         }
-
 
         public override bool PreDrawExtras()
         {

@@ -157,6 +157,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
                     }
                     else
                     {
+                        attacking = false;
                         if (dashChargeTimer == 0)
                         {
                             StayBehind();

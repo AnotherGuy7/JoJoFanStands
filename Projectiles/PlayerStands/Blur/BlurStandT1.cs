@@ -125,6 +125,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.Blur
                     }
                     else
                     {
+                        attacking = false;
                         StayBehind();
                         punchAnimationTimer = 0;
                         backPunchFrames.Clear();
