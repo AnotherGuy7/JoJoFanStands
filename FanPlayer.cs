@@ -43,6 +43,8 @@ namespace JoJoFanStands
         public Vector2 customCameraPosition;
         public int metempsychosisPoints = 0;
 
+        public bool holyDiverDiversIntuition = false;
+
         public override void ResetEffects()
         {
             spinBoost = false;
@@ -50,6 +52,7 @@ namespace JoJoFanStands
             blurLightningFastReflexes = false;
             blurInfiniteVelocity = false;
             customCameraOverride = false;
+            holyDiverDiversIntuition = false;
         }
 
         public override void ProcessTriggers(TriggersSet triggersSet)
@@ -163,6 +166,38 @@ namespace JoJoFanStands
             }
         }
 
+        public override void PreUpdateMovement()
+        {
+            if (!holyDiverDiversIntuition) return;
+            Player player = Main.player[Main.myPlayer];
+            if (player.wet)
+            {
+                player.maxRunSpeed = System.Math.Max(player.maxRunSpeed, 8f);
+                player.runAcceleration = System.Math.Max(player.runAcceleration, 0.3f);
+                player.accMerman = true;
+            }
+        }
+
+        public override void PostUpdate()
+        {
+            if (!holyDiverDiversIntuition) return;
+            Player player = Main.player[Main.myPlayer];
+
+            if (!player.wet) return;
+
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC npc = Main.npc[i];
+                if (!npc.active || npc.friendly) continue;
+                if (npc.wet) continue;
+                if (npc.target == player.whoAmI)
+                {
+                    npc.target = 255;
+                    npc.targetRect = new Rectangle(0, 0, 0, 0);
+                }
+            }
+        }
+
         public override void UpdateEquips()
         {
             Player player = Player;
@@ -177,6 +212,19 @@ namespace JoJoFanStands
                 return true;
 
             return false;
+        }
+
+        public override void PostUpdateBuffs()
+        {
+            if (!holyDiverDiversIntuition) return;
+            Player player = Main.player[Main.myPlayer];
+
+            if (player.wet)
+            {
+                player.gills = true;
+                player.nightVision = true;
+                player.dangerSense = false;
+            }
         }
 
         public void SpawnFanStand()

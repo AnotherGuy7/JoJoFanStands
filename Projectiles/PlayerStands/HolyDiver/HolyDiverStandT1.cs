@@ -171,6 +171,12 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             HolyDiverAbilityWheel.CloseAbilityWheel();
         }
 
+        private void ApplyDiversIntuition(Player player)
+        {
+            FanPlayer fPlayer = player.GetModPlayer<FanPlayer>();
+            fPlayer.holyDiverDiversIntuition = true;
+        }
+
         public override void AI()
         {
             Player player = Main.player[Projectile.owner];
@@ -214,6 +220,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             if (mPlayer.posing)
                 currentAnimationState = AnimationState.Pose;
+
+            ApplyDiversIntuition(player);
         }
 
         private void TickTimers()
