@@ -1,17 +1,16 @@
-﻿using JoJoStands.Items.CraftingMaterials;
+﻿using JoJoStands.Items;
 using JoJoStands.Tiles;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
-using JoJoStands.Items;
 
 namespace JoJoFanStands.Items.Stands
 {
     public class HolyDiverT1 : FanStandItemClass
     {
-        public override int StandSpeed => 5;
+        public override int StandSpeed => 10;
         public override int StandType => 1;
         public override string StandIdentifierName => "HolyDiver";
         public override int StandTier => 1;
@@ -29,7 +28,7 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetDefaults()
         {
-            Item.damage = 30;
+            Item.damage = 18;
             Item.width = 38;
             Item.height = 46;
             Item.maxStack = 1;

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static Terraria.ModLoader.ModContent;
 
 namespace JoJoFanStands.Items.Stands
 {
@@ -46,6 +47,7 @@ namespace JoJoFanStands.Items.Stands
         public override void AddRecipes()
         {
             CreateRecipe()
+                .AddIngredient(ItemType<SlavesOfFearT3>())
                 .AddIngredient(ItemID.AsphaltBlock, 10)
                 .AddIngredient(ItemID.HallowedBar, 10)
                 .AddIngredient(ItemID.TopHat)

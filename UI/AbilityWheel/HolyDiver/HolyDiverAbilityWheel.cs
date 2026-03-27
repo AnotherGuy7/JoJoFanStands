@@ -19,28 +19,28 @@ namespace JoJoFanStands.UI.AbilityWheel.HolyDiver
         public override string[] abilityNames => new string[AmountOfAbilities]
         {
             "  Water Replicant",
-            "     Holy Water",
             "Scorching Water Cannon",
             " Scorching Water Mine",
-            " Water Absorption"
+            " Water Absorption",
+            "     Holy Water"
         };
 
         public override string[] abilityTextureNames => new string[AmountOfAbilities]
         {
             "WaterReplicant",
-            "HolyWater",
             "ScorchingWaterCannon",
             "ScorchingWaterMine",
-            "WaterAbsorption"
+            "WaterAbsorption",
+            "HolyWater"
         };
 
         public override string[] abilityDescriptions => new string[AmountOfAbilities]
         {
             "Summon a water replicant that acts as a defensive sentry, shooting enemies from range and brawling up close.",
-            "[Special]\nUse stored water to heal yourself or allies. Damages enemies and applies Burning.",
-            "[Special]\nFire a scorching hydro pump. Hold M2 to convert it into homing water missiles targeting up to 3 enemies.",
-            "[Special]\nPlace a water mine that homes in on nearby enemies, dealing extreme damage and applying Burning.",
-            "[Special]\nAbsorb water from the environment or enemies to refill your liquid gauge."
+            "Fire a scorching hydro pump. Hold M2 to convert it into homing water missiles targeting up to 3 enemies.",
+            "Place a water mine that homes in on nearby enemies, dealing extreme damage and applying Burning.",
+            "Absorb water from the environment or enemies to refill your liquid gauge.",
+            "Use stored water to heal yourself or allies. Damages enemies and applies Burning."
         };
 
         public override void ExtraInitialize()

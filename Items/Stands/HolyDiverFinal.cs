@@ -10,7 +10,7 @@ namespace JoJoFanStands.Items.Stands
 {
     public class HolyDiverFinal : FanStandItemClass
     {
-        public override int StandSpeed => 5;
+        public override int StandSpeed => 7;
         public override int StandType => 1;
         public override string StandIdentifierName => "HolyDiver";
         public override int StandTier => 4;
@@ -28,7 +28,7 @@ namespace JoJoFanStands.Items.Stands
 
         public override void SetDefaults()
         {
-            Item.damage = 60;
+            Item.damage = 56;
             Item.width = 38;
             Item.height = 46;
             Item.maxStack = 1;

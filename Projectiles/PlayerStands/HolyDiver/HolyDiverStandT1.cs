@@ -1,13 +1,10 @@
-﻿using JoJoFanStands.Buffs;
+﻿using JoJoFanStands.UI;
 using JoJoFanStands.UI.AbilityWheel.HolyDiver;
-using JoJoFanStands.UI;
-using System.Collections.Generic;
 using JoJoStands;
-using JoJoStands.Buffs.Debuffs;
 using JoJoStands.Projectiles.PlayerStands;
-using JoJoStands.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 using System.IO;
 using Terraria;
 using Terraria.Audio;
@@ -18,14 +15,10 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 {
     public class HolyDiverStandT1 : StandClass
     {
-        public static readonly SoundStyle GlassShatter = new SoundStyle("JoJoFanStands/Sounds/StandLines/GlassShatterSoundEffect")
-        {
-            Volume = JoJoStands.JoJoStands.ModSoundsVolume
-        };
         public override int HalfStandHeight => 50;
         public override int PunchDamage => 18;
         public override int AltDamage => 38;
-        public override int PunchTime => 6;
+        public override int PunchTime => 10;
         public override int TierNumber => 1;
         public override Vector2 StandOffset => new Vector2(-2 * 2, 0f);
         public override bool CanUseAfterImagePunches => false;
@@ -132,8 +125,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         private int MaxMissileTargets => 1;
 
-        public enum M2Mode { WaterReplicant, WaterCannon, Mine, WaterAbsorption, HolyWater }
-        public M2Mode currentM2Mode = M2Mode.WaterReplicant;
+        public enum SpecialAbility { WaterReplicant, WaterCannon, Mine, WaterAbsorption, HolyWater }
+        public SpecialAbility currentAbility = SpecialAbility.WaterReplicant;
 
         public new enum AnimationState
         {
@@ -158,6 +151,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             WaterGaugePlayer wgp = player.GetModPlayer<WaterGaugePlayer>();
             if (wgp.CurrentWater > WaterGaugePlayer.MaxWater)
                 wgp.SetWater(System.Math.Min(wgp.CurrentWater, WaterGaugePlayer.MaxWater));
+            HolyDiverAbilityWheel.OpenAbilityWheel(player.GetModPlayer<MyPlayer>(), 5);
         }
 
         public override void StandKillEffects()
@@ -207,6 +201,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                     HandleBeamTick(player);
                     TickSalvo(player);
                     SpawnBeamChargeParticles(player);
+
+                    if (SpecialKeyPressed())
+                    {
+                        if (HolyDiverAbilityWheel.Visible)
+                            HolyDiverAbilityWheel.CloseAbilityWheel();
+                        else
+                            HolyDiverAbilityWheel.OpenAbilityWheel(player.GetModPlayer<MyPlayer>(), 5);
+                    }
                 }
 
                 HandleIdleState();
@@ -526,11 +528,23 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
         private void HandleM2(Player player)
         {
+            if ((int)currentAbility != player.GetModPlayer<MyPlayer>().chosenAbility)
+            {
+                currentAbility = (SpecialAbility)player.GetModPlayer<MyPlayer>().chosenAbility;
+
+                beamChargeTimer = 0;
+                beamCharged = false;
+                m2HoldTimer = 0;
+                replicantM2WasHeld = false;
+
+                Projectile.netUpdate = true;
+            }
+
             if (!Main.mouseRight)
             {
                 secondaryAbility = false;
 
-                if (currentM2Mode == M2Mode.WaterCannon)
+                if (currentAbility == SpecialAbility.WaterCannon)
                 {
                     if (m2HoldTimer > 0 && m2HoldTimer < MissileChargeThreshold)
                     {
@@ -557,14 +571,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             secondaryAbility = true;
 
-            switch (currentM2Mode)
+            switch (currentAbility)
             {
-                case M2Mode.Mine:
+                case SpecialAbility.Mine:
                     currentAnimationState = AnimationState.Idle;
                     if (CanPlaceMine) DoMine(player);
                     break;
 
-                case M2Mode.WaterCannon:
+                case SpecialAbility.WaterCannon:
                     currentAnimationState = AnimationState.CannonShot;
                     if (beamCharged || BeamIsActive) break;
                     if (!CanFireCannon)
@@ -581,16 +595,16 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
                         currentAnimationState = AnimationState.Idle;
                     break;
 
-                case M2Mode.WaterReplicant:
+                case SpecialAbility.WaterReplicant:
                     HandleReplicantM2(player);
                     break;
 
-                case M2Mode.WaterAbsorption:
+                case SpecialAbility.WaterAbsorption:
                     DoWaterAbsorption(player);
                     currentAnimationState = AnimationState.Idle;
                     break;
 
-                case M2Mode.HolyWater:
+                case SpecialAbility.HolyWater:
                     HandleHolyWater(player);
                     break;
             }
@@ -711,14 +725,14 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             {
                 if (!specialKeyWasHeld)
                 {
-                    currentM2Mode = currentM2Mode switch
+                    currentAbility = currentAbility switch
                     {
-                        M2Mode.Mine => M2Mode.WaterCannon,
-                        M2Mode.WaterCannon => M2Mode.WaterReplicant,
-                        M2Mode.WaterReplicant => M2Mode.WaterAbsorption,
-                        M2Mode.WaterAbsorption => M2Mode.HolyWater,
-                        M2Mode.HolyWater => M2Mode.Mine,
-                        _ => M2Mode.Mine
+                        SpecialAbility.Mine => SpecialAbility.WaterCannon,
+                        SpecialAbility.WaterCannon => SpecialAbility.WaterReplicant,
+                        SpecialAbility.WaterReplicant => SpecialAbility.WaterAbsorption,
+                        SpecialAbility.WaterAbsorption => SpecialAbility.HolyWater,
+                        SpecialAbility.HolyWater => SpecialAbility.Mine,
+                        _ => SpecialAbility.Mine
                     };
 
                     specialKeyWasHeld = true;
@@ -970,7 +984,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             if (holyWaterCooldownTimer > 0) holyWaterCooldownTimer--;
             if (!holyWaterActive) return;
 
-            if (!Main.mouseRight || currentM2Mode != M2Mode.HolyWater)
+            if (!Main.mouseRight || currentAbility != SpecialAbility.HolyWater)
             {
                 holyWaterBeamTimer = 0;
                 holyWaterCooldownTimer = HolyWaterCooldown;
@@ -1337,7 +1351,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             player.immuneTime = JCEImmunityTime;
 
             SoundEngine.PlaySound(SoundID.Item71, player.Center);
-            SoundEngine.PlaySound(GlassShatter, player.Center);
+            SoundEngine.PlaySound(HolyDiverStandFinal.GlassShatter, player.Center);
 
             Projectile.netUpdate = true;
         }
@@ -1478,7 +1492,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         public override void SendExtraStates(BinaryWriter writer)
         {
             writer.Write(secondaryAbility);
-            writer.Write((byte)currentM2Mode);
+            writer.Write((byte)currentAbility);
             writer.Write(waterCannonCooldownTimer);
             writer.Write(beamTimer);
             writer.Write(m2HoldTimer);
@@ -1499,7 +1513,7 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
         public override void ReceiveExtraStates(BinaryReader reader)
         {
             secondaryAbility = reader.ReadBoolean();
-            currentM2Mode = (M2Mode)reader.ReadByte();
+            currentAbility = (SpecialAbility)reader.ReadByte();
             waterCannonCooldownTimer = reader.ReadInt32();
             beamTimer = reader.ReadInt32();
             m2HoldTimer = reader.ReadInt32();
