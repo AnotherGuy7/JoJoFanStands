@@ -176,6 +176,8 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
             Player player = Main.player[Projectile.owner];
             MyPlayer mPlayer = player.GetModPlayer<MyPlayer>();
 
+            ApplyDiversIntuition(player);
+
             SelectAnimation();
             UpdateStandInfo();
             TickTimers();
@@ -222,8 +224,6 @@ namespace JoJoFanStands.Projectiles.PlayerStands.HolyDiver
 
             if (mPlayer.posing)
                 currentAnimationState = AnimationState.Pose;
-
-            ApplyDiversIntuition(player);
         }
 
         private void TickTimers()

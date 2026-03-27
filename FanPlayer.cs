@@ -2,6 +2,7 @@ using JoJoFanStands.Buffs;
 using JoJoFanStands.Items.Stands;
 using JoJoFanStands.Mounts;
 using JoJoFanStands.Projectiles;
+using JoJoFanStands.Projectiles.PlayerStands.HolyDiver;
 using JoJoStands;
 using JoJoStands.Items.Hamon;
 using JoJoStands.Projectiles;
@@ -52,7 +53,6 @@ namespace JoJoFanStands
             blurLightningFastReflexes = false;
             blurInfiniteVelocity = false;
             customCameraOverride = false;
-            holyDiverDiversIntuition = false;
         }
 
         public override void ProcessTriggers(TriggersSet triggersSet)
@@ -156,44 +156,53 @@ namespace JoJoFanStands
 
             if (!Main.dedServ && Player.whoAmI == Main.myPlayer)
             {
-                //if (blurLightningFastReflexes)
-                //Filters.Scene.Activate(JoJoFanStandsShaders.CircularGreyscale);
                 JoJoStandsShaders.ChangeShaderActiveState(JoJoFanStandsShaders.CircularGreyscale, blurLightningFastReflexes || blurInfiniteVelocity);
                 if (blurInfiniteVelocity)
                     JoJoStandsShaders.ChangeShaderUseProgress(JoJoFanStandsShaders.CircularGreyscale, 2f);
                 else
                     JoJoStandsShaders.ChangeShaderUseProgress(JoJoFanStandsShaders.CircularGreyscale, 1f);
             }
+
+            if (player.ownedProjectileCounts[ProjectileType<HolyDiverStandT1>()] > 0 ||
+                player.ownedProjectileCounts[ProjectileType<HolyDiverStandT2>()] > 0 ||
+                player.ownedProjectileCounts[ProjectileType<HolyDiverStandT3>()] > 0 ||
+                player.ownedProjectileCounts[ProjectileType<HolyDiverStandFinal>()] > 0)
+            {
+                holyDiverDiversIntuition = true;
+            }
+            else
+                holyDiverDiversIntuition = false;
         }
 
-        public override void PreUpdateMovement()
+        public override void PostUpdateRunSpeeds()
         {
-            if (!holyDiverDiversIntuition) return;
-            Player player = Main.player[Main.myPlayer];
-            if (player.wet)
+            if (Player.wet && holyDiverDiversIntuition)
             {
-                player.maxRunSpeed = System.Math.Max(player.maxRunSpeed, 8f);
-                player.runAcceleration = System.Math.Max(player.runAcceleration, 0.3f);
-                player.accMerman = true;
+                if (Player.maxRunSpeed < 8f)
+                    Player.maxRunSpeed = 8f;
+                if (Player.runAcceleration < 0.3f)
+                    Player.runAcceleration = 0.3f;
+
+                Player.accMerman = true;
+                Player.hideMerman = true;
             }
         }
 
         public override void PostUpdate()
         {
-            if (!holyDiverDiversIntuition) return;
-            Player player = Main.player[Main.myPlayer];
-
-            if (!player.wet) return;
-
-            for (int i = 0; i < Main.maxNPCs; i++)
+            if (Player.whoAmI != Main.myPlayer) return;
+            if (Player.wet && holyDiverDiversIntuition)
             {
-                NPC npc = Main.npc[i];
-                if (!npc.active || npc.friendly) continue;
-                if (npc.wet) continue;
-                if (npc.target == player.whoAmI)
+                for (int i = 0; i < Main.maxNPCs; i++)
                 {
-                    npc.target = 255;
-                    npc.targetRect = new Rectangle(0, 0, 0, 0);
+                    NPC npc = Main.npc[i];
+                    if (!npc.active || npc.friendly) continue;
+                    if (npc.wet) continue;
+                    if (npc.target == Player.whoAmI)
+                    {
+                        npc.target = 255;
+                        npc.targetRect = new Rectangle(0, 0, 0, 0);
+                    }
                 }
             }
         }
@@ -216,14 +225,13 @@ namespace JoJoFanStands
 
         public override void PostUpdateBuffs()
         {
-            if (!holyDiverDiversIntuition) return;
-            Player player = Main.player[Main.myPlayer];
-
-            if (player.wet)
+            if (Player.wet && holyDiverDiversIntuition)
             {
-                player.gills = true;
-                player.nightVision = true;
-                player.dangerSense = false;
+                Player.gills = true;
+                Player.AddBuff(BuffID.NightOwl, 2);
+                Lighting.AddLight(Player.Center, 0.6f, 0.6f, 0.5f);
+                Player.breath = Player.breathMax;
+                Player.dangerSense = false;
             }
         }
 
