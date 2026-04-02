@@ -5,7 +5,7 @@ using Terraria.GameContent;
 
 namespace JoJoFanStands.UI.AbilityWheel.Blur
 {
-    public class BlurAbilityWheel : AbilityWheel
+    public class BlurAbilityWheel : JoJoStands.UI.AbilityWheel
     {
         public static bool Visible;
         public static BlurAbilityWheel blurAbilityWheel;

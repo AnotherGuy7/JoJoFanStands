@@ -6,7 +6,7 @@ using Terraria.Localization;
 
 namespace JoJoFanStands.UI.AbilityWheel.HolyDiver
 {
-    public class HolyDiverAbilityWheel : AbilityWheel
+    public class HolyDiverAbilityWheel : JoJoStands.UI.AbilityWheel
     {
         public static bool Visible;
         public static HolyDiverAbilityWheel holyDiverAbilityWheel;
